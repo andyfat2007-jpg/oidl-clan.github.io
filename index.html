@@ -5,114 +5,67 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ТЕРМИНАЛ УБЕЖИЩА · О.И.Д.Л.</title>
   
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
   </script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
   </script>
   
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background: radial-gradient(circle at 20% 30%, #0a1a0f, #020503);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
       font-family: 'Courier New', 'VT323', 'Lucida Sans Typewriter', monospace;
-      padding: 16px;
-      position: relative;
-      overflow-x: hidden;
+      padding: 16px; position: relative; overflow-x: hidden;
     }
 
     body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: repeating-linear-gradient(0deg,
-          rgba(0, 0, 0, 0.6) 0px,
-          rgba(0, 20, 0, 0.3) 2px,
-          rgba(0, 255, 0, 0.03) 3px,
-          transparent 4px);
-      pointer-events: none;
-      z-index: 100;
-      animation: scanlines 8s linear infinite;
-      opacity: 0.7;
+          rgba(0, 0, 0, 0.6) 0px, rgba(0, 20, 0, 0.3) 2px,
+          rgba(0, 255, 0, 0.03) 3px, transparent 4px);
+      pointer-events: none; z-index: 100; animation: scanlines 8s linear infinite; opacity: 0.7;
     }
 
     body::after {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: radial-gradient(circle at center, transparent 30%, rgba(0, 30, 0, 0.25) 100%);
-      pointer-events: none;
-      z-index: 99;
+      pointer-events: none; z-index: 99;
     }
 
-    @keyframes scanlines {
-      0% { background-position: 0 0; }
-      100% { background-position: 0 15px; }
-    }
+    @keyframes scanlines { 0% { background-position: 0 0; } 100% { background-position: 0 15px; } }
 
-    .glitch-effect {
-      animation: glitch 0.3s ease-in-out;
-    }
+    .glitch-effect { animation: glitch 0.3s ease-in-out; }
 
     @keyframes glitch {
       0% { transform: translate(2px, -1px); opacity: 0.8; }
-      25% { transform: translate(-3px, 2px); opacity: 0.6; }
-      50% { transform: translate(1px, -3px); opacity: 0.9; }
-      75% { transform: translate(-2px, 1px); opacity: 0.7; }
+      50% { transform: translate(-3px, 2px); opacity: 0.6; }
       100% { transform: translate(0, 0); opacity: 1; }
     }
 
     .terminal {
-      max-width: 1000px;
-      width: 100%;
-      background-color: #0b1c0e;
+      max-width: 1000px; width: 100%; background-color: #0b1c0e;
       border: 4px solid #1a3a1e;
       box-shadow: 0 0 0 2px #0d2b10, 0 0 20px #00aa33 inset, 0 0 30px rgba(0, 255, 80, 0.3);
-      border-radius: 12px 12px 20px 20px;
-      padding: 0 0 6px 0;
-      position: relative;
-      z-index: 20;
+      border-radius: 12px 12px 20px 20px; padding: 0 0 6px 0; position: relative; z-index: 20;
     }
 
     .terminal-header {
-      background: #0a170a;
-      border-bottom: 2px solid #1a4c1a;
-      padding: 8px 16px 4px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-radius: 8px 8px 0 0;
+      background: #0a170a; border-bottom: 2px solid #1a4c1a;
+      padding: 8px 16px 4px 16px; display: flex; align-items: center;
+      justify-content: space-between; border-radius: 8px 8px 0 0;
     }
 
     .terminal-header-left { display: flex; gap: 12px; }
 
     .led {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #1d3b1d;
-      box-shadow: 0 0 5px #00aa00;
-      border: 1px solid #2f6b2f;
+      width: 14px; height: 14px; border-radius: 50%; background: #1d3b1d;
+      box-shadow: 0 0 5px #00aa00; border: 1px solid #2f6b2f;
     }
 
     .led.active {
-      background: #33ff33;
-      box-shadow: 0 0 12px #33ff66, 0 0 25px #1aff1a;
+      background: #33ff33; box-shadow: 0 0 12px #33ff66, 0 0 25px #1aff1a;
       animation: pulseLed 2.2s infinite;
     }
 
@@ -122,33 +75,20 @@
     }
 
     .terminal-header-center {
-      font-size: 1.6rem;
-      font-weight: bold;
-      letter-spacing: 8px;
-      text-transform: uppercase;
-      color: #1f8a1f;
-      text-shadow: 0 0 10px #4aff4a;
-      border-left: 2px solid #1f4f1f;
-      border-right: 2px solid #1f4f1f;
-      padding: 0 24px;
-      font-family: 'VT323', 'Courier New', monospace;
+      font-size: 1.6rem; font-weight: bold; letter-spacing: 8px; text-transform: uppercase;
+      color: #1f8a1f; text-shadow: 0 0 10px #4aff4a;
+      border-left: 2px solid #1f4f1f; border-right: 2px solid #1f4f1f;
+      padding: 0 24px; font-family: 'VT323', 'Courier New', monospace;
     }
 
     .terminal-header-right { display: flex; gap: 10px; align-items: center; }
     .terminal-header-right span { color: #3c8f3c; font-size: 1.2rem; font-weight: bold; }
 
     .admin-access-btn {
-      background: #1a0000;
-      border: 2px solid #ff4444;
-      color: #ff4444;
-      font-family: 'Courier New', monospace;
-      font-size: 1rem;
-      padding: 5px 12px;
-      cursor: pointer;
-      text-transform: uppercase;
-      margin-left: 10px;
-      animation: pulseRed 2s infinite;
-      display: none;
+      background: #1a0000; border: 2px solid #ff4444; color: #ff4444;
+      font-family: 'Courier New', monospace; font-size: 1rem; padding: 5px 12px;
+      cursor: pointer; text-transform: uppercase; margin-left: 10px;
+      animation: pulseRed 2s infinite; display: none;
     }
 
     .admin-access-btn.visible { display: inline-block; }
@@ -158,151 +98,76 @@
       50% { box-shadow: 0 0 15px #ff4444; }
     }
 
-    .admin-access-btn:hover {
-      background: #330000;
-      box-shadow: 0 0 20px #ff4444;
-    }
-
-    .sync-indicator {
-      color: #ffaa00;
-      font-size: 0.7rem;
-      margin-left: 8px;
-      display: none;
-    }
-
+    .sync-indicator { color: #ffaa00; font-size: 0.7rem; margin-left: 8px; display: none; }
     .sync-indicator.visible { display: inline; }
 
     .screen {
-      padding: 28px 24px 20px 24px;
-      color: #11dd33;
-      text-shadow: 0 0 8px #19f019, 0 0 2px #116611;
-      background: #0a130a;
-      border-left: 2px solid #153015;
-      border-right: 2px solid #153015;
+      padding: 28px 24px 20px 24px; color: #11dd33;
+      text-shadow: 0 0 8px #19f019, 0 0 2px #116611; background: #0a130a;
+      border-left: 2px solid #153015; border-right: 2px solid #153015;
       border-bottom: 2px solid #1c3b1c;
       box-shadow: inset 0 0 40px #000000, inset 0 0 15px #021002;
-      font-size: 1.2rem;
-      line-height: 1.5;
-      position: relative;
-      min-height: 500px;
+      font-size: 1.2rem; line-height: 1.5; position: relative; min-height: 500px;
     }
 
     .boot-sequence {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #0a130a;
-      z-index: 60;
-      padding: 40px 30px;
-      font-size: 1.1rem;
-      color: #11dd33;
-      overflow: hidden;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: #0a130a; z-index: 60; padding: 40px 30px;
+      font-size: 1.1rem; color: #11dd33; overflow: hidden;
     }
 
-    .boot-line {
-      opacity: 0;
-      margin: 4px 0;
-      animation: fadeInLine 0.1s forwards;
-    }
-
-    @keyframes fadeInLine {
-      to { opacity: 1; }
-    }
+    .boot-line { opacity: 0; margin: 4px 0; animation: fadeInLine 0.1s forwards; }
+    @keyframes fadeInLine { to { opacity: 1; } }
 
     .login-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #0a130a;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-      border-radius: 0 0 8px 8px;
-      padding: 20px;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: #0a130a; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; z-index: 50;
+      border-radius: 0 0 8px 8px; padding: 20px;
     }
 
     .login-container {
-      border: 2px solid #1e6b1e;
-      padding: 30px 40px;
-      background: #051005;
-      box-shadow: inset 0 0 20px #000, 0 0 20px #0f3;
-      width: 100%;
-      max-width: 500px;
+      border: 2px solid #1e6b1e; padding: 30px 40px; background: #051005;
+      box-shadow: inset 0 0 20px #000, 0 0 20px #0f3; width: 100%; max-width: 500px;
     }
 
     .login-header {
-      color: #3aff3a;
-      font-size: 2rem;
-      text-align: center;
-      margin-bottom: 30px;
-      text-transform: uppercase;
-      letter-spacing: 6px;
-      border-bottom: 1px dashed #3f9e3f;
-      padding-bottom: 12px;
+      color: #3aff3a; font-size: 2rem; text-align: center; margin-bottom: 30px;
+      text-transform: uppercase; letter-spacing: 6px; border-bottom: 1px dashed #3f9e3f; padding-bottom: 12px;
     }
 
     .login-field { margin-bottom: 24px; }
     .login-label { color: #6fdf6f; display: block; margin-bottom: 6px; }
 
     .login-input {
-      width: 100%;
-      background: #0b1f0b;
-      border: 2px solid #2c8c2c;
-      color: #b3ffb3;
-      padding: 12px 15px;
-      font-family: 'Courier New', monospace;
-      font-size: 1.5rem;
-      outline: none;
-      box-shadow: inset 0 0 12px #031003;
+      width: 100%; background: #0b1f0b; border: 2px solid #2c8c2c; color: #b3ffb3;
+      padding: 12px 15px; font-family: 'Courier New', monospace; font-size: 1.5rem;
+      outline: none; box-shadow: inset 0 0 12px #031003;
     }
 
     .fake-keystroke-hint { color: #4fa84f; margin-top: 8px; font-size: 0.9rem; }
 
     .login-button {
-      background: #0a1d0a;
-      border: 1px solid #278027;
-      color: #66dd66;
-      padding: 12px 28px;
-      font-family: inherit;
-      font-size: 1.4rem;
-      text-transform: uppercase;
-      cursor: pointer;
-      box-shadow: 0 0 6px #1a4d1a;
-      width: 100%;
-      margin-top: 10px;
+      background: #0a1d0a; border: 1px solid #278027; color: #66dd66;
+      padding: 12px 28px; font-family: inherit; font-size: 1.4rem;
+      text-transform: uppercase; cursor: pointer; box-shadow: 0 0 6px #1a4d1a;
+      width: 100%; margin-top: 10px;
     }
 
     .login-button:hover:not(:disabled) { background: #143e14; color: #bcffbc; border-color: #55c955; box-shadow: 0 0 16px #2aa52a; }
     .login-button:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .robco-banner {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      border-bottom: 1px dashed #2f6e2f;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-      font-size: 1.3rem;
+      display: flex; justify-content: space-between; align-items: baseline;
+      border-bottom: 1px dashed #2f6e2f; padding-bottom: 10px; margin-bottom: 20px; font-size: 1.3rem;
     }
 
     .robco { color: #4fcb4f; text-transform: uppercase; letter-spacing: 3px; }
 
     .clan-status {
-      display: flex;
-      gap: 18px;
-      margin-bottom: 28px;
-      background: #041204;
-      padding: 8px 14px;
-      border: 1px solid #1a551a;
-      font-size: 1.1rem;
-      flex-wrap: wrap;
-      align-items: center;
+      display: flex; gap: 18px; margin-bottom: 28px; background: #041204;
+      padding: 8px 14px; border: 1px solid #1a551a; font-size: 1.1rem;
+      flex-wrap: wrap; align-items: center;
     }
 
     .status-item { display: flex; align-items: center; gap: 8px; }
@@ -311,17 +176,9 @@
 
     .nav-menu { display: flex; border: 1px solid #286828; background: #051005; margin-bottom: 30px; }
     .nav-item {
-      flex: 1;
-      text-align: center;
-      padding: 12px 4px;
-      color: #3db83d;
-      text-transform: uppercase;
-      border-right: 1px solid #1b411b;
-      cursor: pointer;
-      font-weight: bold;
-      letter-spacing: 1.8px;
-      background: #081708;
-      user-select: none;
+      flex: 1; text-align: center; padding: 12px 4px; color: #3db83d;
+      text-transform: uppercase; border-right: 1px solid #1b411b;
+      cursor: pointer; font-weight: bold; letter-spacing: 1.8px; background: #081708; user-select: none;
     }
     .nav-item:last-child { border-right: none; }
     .nav-item:hover { background: #143314; color: #a0ffa0; text-shadow: 0 0 15px #33ff33; }
@@ -341,7 +198,6 @@
       display: flex; align-items: center; justify-content: center; animation: fadeIn 0.2s ease;
     }
     .profile-overlay.hidden { display: none; }
-
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .profile-window {
@@ -353,7 +209,7 @@
     .profile-header { border-bottom: 2px solid #1f5a1f; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
     .profile-name { font-size: 1.8rem; color: #5fff5f; text-transform: uppercase; letter-spacing: 3px; font-family: 'VT323', monospace; }
     .profile-role { color: #8dc98d; font-size: 1rem; text-transform: uppercase; }
-    .profile-close { background: none; border: 2px solid #33aa33; color: #33ff33; font-family: 'Courier New', monospace; font-size: 1.5rem; width: 40px; height: 40px; cursor: pointer; }
+    .profile-close { background: none; border: 2px solid #33aa33; color: #33ff33; font-size: 1.5rem; width: 40px; height: 40px; cursor: pointer; }
     .profile-close:hover { background: #33aa33; color: #000; }
 
     .profile-section { margin-bottom: 14px; border-left: 2px solid #2a5a2a; padding-left: 15px; }
@@ -380,7 +236,7 @@
 
     .admin-header { border-bottom: 2px solid #ff4444; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
     .admin-title { font-size: 1.8rem; color: #ff4444; text-transform: uppercase; letter-spacing: 3px; font-family: 'VT323', monospace; text-shadow: 0 0 10px #ff4444; }
-    .admin-close { background: none; border: 2px solid #ff4444; color: #ff4444; font-family: 'Courier New', monospace; font-size: 1.5rem; width: 40px; height: 40px; cursor: pointer; }
+    .admin-close { background: none; border: 2px solid #ff4444; color: #ff4444; font-size: 1.5rem; width: 40px; height: 40px; cursor: pointer; }
     .admin-close:hover { background: #ff4444; color: #000; }
 
     .admin-input { width: 100%; background: #0b1f0b; border: 2px solid #ff4444; color: #ff8888; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 1rem; outline: none; margin: 6px 0; }
@@ -403,6 +259,16 @@
     .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px dotted #552222; color: #ffaaaa; }
     .admin-list-item button { background: #330000; border: 1px solid #ff4444; color: #ff4444; padding: 4px 10px; cursor: pointer; font-family: inherit; margin-left: 5px; font-size: 0.85rem; }
     .admin-list-item button:hover { background: #ff4444; color: #000; }
+
+    /* Ползунок для ресурсов */
+    .resource-slider {
+      width: 100%; margin: 10px 0; -webkit-appearance: none; height: 10px;
+      background: #1a0000; border: 1px solid #ff4444;
+    }
+    .resource-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 20px; height: 20px;
+      background: #ff4444; border-radius: 50%; cursor: pointer;
+    }
 
     .map-container { border: 2px solid #2a6b2a; padding: 10px; background: #0a1a0a; box-shadow: inset 0 0 20px #000, 0 0 15px rgba(0, 255, 0, 0.2); margin: 20px 0; text-align: center; }
     .map-image { max-width: 100%; height: auto; display: block; border: 1px solid #1f4f1f; filter: sepia(100%) hue-rotate(70deg) saturate(150%) brightness(0.9) contrast(1.1); }
@@ -455,14 +321,8 @@
     <div id="loginOverlay" class="login-overlay" style="display:none;">
       <div class="login-container">
         <div class="login-header">ВХОД В СЕТЬ</div>
-        <div class="login-field">
-          <span class="login-label">> ЛОГИН:</span>
-          <input type="text" id="fakeLogin" class="login-input" placeholder="██████████" readonly>
-        </div>
-        <div class="login-field">
-          <span class="login-label">> ПАРОЛЬ:</span>
-          <input type="password" id="fakePassword" class="login-input" placeholder="••••••••" readonly>
-        </div>
+        <div class="login-field"><span class="login-label">> ЛОГИН:</span><input type="text" id="fakeLogin" class="login-input" placeholder="██████████" readonly></div>
+        <div class="login-field"><span class="login-label">> ПАРОЛЬ:</span><input type="password" id="fakePassword" class="login-input" placeholder="••••••••" readonly></div>
         <div class="fake-keystroke-hint" id="loginHint">[ НАЖМИТЕ ЛЮБУЮ КЛАВИШУ ДЛЯ НАЧАЛА ]</div>
         <button class="login-button" id="loginConfirmBtn" disabled>■ ПОДТВЕРДИТЬ</button>
       </div>
@@ -476,8 +336,8 @@
 
       <div class="clan-status">
         <div class="status-item"><span class="status-label">КЛАН:</span><span class="status-value">О.И.Д.Л.</span></div>
-        <div class="status-item"><span class="status-label">РЕСУРСЫ:</span><span class="status-value">◼◼◼◻◻◻◻◻◻</span></div>
-        <span class="admin-badge" id="adminBadge">◈ РЕЖИМ АДМИНИСТРАТОРА ◈</span>
+        <div class="status-item"><span class="status-label">РЕСУРСЫ:</span><span class="status-value" id="resourcesDisplay">◼◼◼◻◻◻◻◻◻</span></div>
+        <span class="admin-badge" id="adminBadge">◈ АДМИН ◈</span>
       </div>
 
       <div class="nav-menu">
@@ -493,11 +353,11 @@
         <div class="click-hint">[ НАЖМИТЕ НА СТРОКУ ДЛЯ ПОДРОБНОЙ ИНФОРМАЦИИ ]</div>
         <table class="data-table"><thead><tr><th>ИМЯ</th><th>РОЛЬ</th><th>СТАТУС</th></tr></thead><tbody id="clanMembersBody"></tbody></table>
         <div style="margin-top:20px; border-left:3px solid #248f24; padding-left:16px;">
-          <div>> СКЛАД АРСЕНАЛА: 27%</div>
-          <div>> ВОДА / ПАЁК: [ДАННЫЕ ОТСУТСТВУЮТ]</div>
-          <div>> АКТИВНОСТЬ: 23.04.2026</div>
+          <div>> СКЛАД АРСЕНАЛА: <span id="arsenalPercent">27%</span></div>
+          <div>> ВОДА / ПАЁК: <span id="waterSupply">[ДАННЫЕ ОТСУТСТВУЮТ]</span></div>
+          <div>> АКТИВНОСТЬ: <span id="lastActivity">23.04.2026</span></div>
         </div>
-        <div class="log-message">[СИСТЕМА] СБОР ДАННЫХ, ОРУЖИЯ, РЕСУРСОВ.</div>
+        <div class="log-message" id="systemMessage">[СИСТЕМА] СБОР ДАННЫХ, ОРУЖИЯ, РЕСУРСОВ.</div>
       </div>
 
       <div id="tab-tasks" class="content-pane hidden">
@@ -521,7 +381,7 @@
           <div class="freq-display" id="freqDisplay">114.7 МГц</div>
           <input type="range" class="freq-slider" id="freqSlider" min="88" max="150" value="114" step="0.1">
           <div style="text-align:center;color:#4fa84f;">◄ НАСТРОЙКА ЧАСТОТЫ ►</div>
-          <div class="intercept-message" id="interceptMessage">[ НАСТРОЙТЕ ЧАСТОТУ ДЛЯ ПЕРЕХВАТА ]</div>
+          <div class="intercept-message" id="interceptMessage">[ НАСТРОЙТЕ ЧАСТОТУ ]</div>
           <button class="terminal-button" id="scanBtn">■ СКАНИРОВАТЬ ЭФИР</button>
         </div>
       </div>
@@ -564,6 +424,7 @@
       <div class="admin-tabs">
         <button class="admin-tab active" data-admin-tab="members">УЧАСТНИКИ</button>
         <button class="admin-tab" data-admin-tab="tasks">ЗАДАЧИ</button>
+        <button class="admin-tab" data-admin-tab="system">СИСТЕМА</button>
         <button class="admin-tab" data-admin-tab="data">ДАННЫЕ</button>
       </div>
       <div id="adminContent"></div>
@@ -572,7 +433,7 @@
 
   <div class="terminal-footer">
     <span>СИСТЕМА: ОПЕРАТИВНАЯ</span>
-    <span>О.И.Д.Л. v.2.2</span>
+    <span>О.И.Д.Л. v.2.3</span>
     <span>ЯДРО: 99%</span>
   </div>
 </div>
@@ -581,7 +442,7 @@
 (function(){
   "use strict";
 
-  // ==================== FIREBASE ИНИЦИАЛИЗАЦИЯ ====================
+  // ==================== FIREBASE ====================
   const firebaseConfig = {
     apiKey: "AIzaSyCAfEXo57oLviomSjUm4dC23-uHTS11HHU",
     authDomain: "oidl-rule.firebaseapp.com",
@@ -596,104 +457,74 @@
   const db = firebase.database();
   const membersRef = db.ref('members');
   const tasksRef = db.ref('tasks');
+  const systemRef = db.ref('system');
 
   // ==================== АУДИО ====================
   let audioCtx = null;
-
   function initAudio() {
     if (audioCtx) return;
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      startBackgroundHum();
-      startCrackle();
-    } catch(e) {}
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); startBackgroundHum(); startCrackle(); } catch(e) {}
   }
-
   function startBackgroundHum() {
     if (!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    osc.type = 'sine'; osc.frequency.value = 25;
-    const gain = audioCtx.createGain();
-    gain.gain.value = 0.06;
-    osc.connect(gain).connect(audioCtx.destination);
-    osc.start();
+    const osc = audioCtx.createOscillator(); osc.type = 'sine'; osc.frequency.value = 25;
+    const gain = audioCtx.createGain(); gain.gain.value = 0.06;
+    osc.connect(gain).connect(audioCtx.destination); osc.start();
   }
-
   function startCrackle() {
     if (!audioCtx) return;
     setInterval(() => {
       if (Math.random() > 0.7) {
-        const osc = audioCtx.createOscillator();
-        osc.type = 'triangle';
+        const osc = audioCtx.createOscillator(); osc.type = 'triangle';
         osc.frequency.value = 200 + Math.random() * 800;
-        const gain = audioCtx.createGain();
-        gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+        const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
-        osc.connect(gain).connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.03);
+        osc.connect(gain).connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.03);
       }
     }, 500);
   }
-
   function playKeySound() {
     if (!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    osc.type = 'triangle';
+    const osc = audioCtx.createOscillator(); osc.type = 'triangle';
     osc.frequency.value = 440 + Math.random() * 100;
-    const gain = audioCtx.createGain();
-    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-    osc.connect(gain).connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+    osc.connect(gain).connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.05);
   }
-
   function playLoginBeep() {
     if (!audioCtx) return;
     const now = audioCtx.currentTime;
     [880, 660, 440].forEach((freq, i) => {
-      const osc = audioCtx.createOscillator();
-      osc.type = 'square'; osc.frequency.value = freq;
-      const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.15, now + i * 0.1);
+      const osc = audioCtx.createOscillator(); osc.type = 'square'; osc.frequency.value = freq;
+      const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.15, now + i * 0.1);
       gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.12);
-      osc.connect(gain).connect(audioCtx.destination);
-      osc.start(now + i * 0.1); osc.stop(now + i * 0.1 + 0.12);
+      osc.connect(gain).connect(audioCtx.destination); osc.start(now + i * 0.1); osc.stop(now + i * 0.1 + 0.12);
     });
   }
-
   function playRadioStatic(duration = 0.3) {
     if (!audioCtx) return;
     const bufferSize = audioCtx.sampleRate * duration;
     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.1;
-    const source = audioCtx.createBufferSource();
-    source.buffer = buffer;
-    const gain = audioCtx.createGain();
-    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    for (let i = 0; i < bufferSize; i++) buffer.getChannelData(0)[i] = (Math.random() * 2 - 1) * 0.1;
+    const source = audioCtx.createBufferSource(); source.buffer = buffer;
+    const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-    source.connect(gain).connect(audioCtx.destination);
-    source.start();
+    source.connect(gain).connect(audioCtx.destination); source.start();
   }
-
   function playAdminSound() {
     if (!audioCtx) return;
     const now = audioCtx.currentTime;
     [440, 660, 880].forEach((freq, i) => {
-      const osc = audioCtx.createOscillator();
-      osc.type = 'triangle'; osc.frequency.value = freq;
-      const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.1, now + i * 0.08);
+      const osc = audioCtx.createOscillator(); osc.type = 'triangle'; osc.frequency.value = freq;
+      const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.1, now + i * 0.08);
       gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.1);
-      osc.connect(gain).connect(audioCtx.destination);
-      osc.start(now + i * 0.08); osc.stop(now + i * 0.08 + 0.1);
+      osc.connect(gain).connect(audioCtx.destination); osc.start(now + i * 0.08); osc.stop(now + i * 0.08 + 0.1);
     });
   }
 
   // ==================== ЗАГРУЗКА ====================
   const bootLines = [
-    "ROBCO INDUSTRIES (TM) UNIFIED OS v.4.77.12",
-    "COPYRIGHT 2075-2077 ROBCO INDUSTRIES", "",
+    "ROBCO INDUSTRIES (TM) UNIFIED OS v.4.77.12","COPYRIGHT 2075-2077 ROBCO INDUSTRIES", "",
     "ИНИЦИАЛИЗАЦИЯ ЯДРА...", "> ПРОВЕРКА ПАМЯТИ... 64K OK",
     "> ЗАГРУЗКА BIOS... OK", "> ТЕСТ ПРОЦЕССОРА... OK", "",
     "ЗАПУСК СЕТЕВЫХ ПРОТОКОЛОВ...", "> ПОДКЛЮЧЕНИЕ К VAULT-NET...",
@@ -703,145 +534,130 @@
   ];
 
   function runBootSequence() {
-    const bootEl = document.getElementById('bootSequence');
-    if (!bootEl) return;
-    bootEl.style.display = 'block';
-    let delay = 0;
+    const el = document.getElementById('bootSequence'); if (!el) return;
+    el.style.display = 'block'; let d = 0;
     bootLines.forEach(line => {
       setTimeout(() => {
-        const div = document.createElement('div');
-        div.className = 'boot-line';
-        div.textContent = line || '\u00A0';
-        bootEl.appendChild(div);
-        if (line.includes('>')) playKeySound();
-        bootEl.scrollTop = bootEl.scrollHeight;
-      }, delay);
-      delay += line.includes('>') ? 300 : 150;
+        const div = document.createElement('div'); div.className = 'boot-line';
+        div.textContent = line || '\u00A0'; el.appendChild(div);
+        if (line.includes('>')) playKeySound(); el.scrollTop = el.scrollHeight;
+      }, d);
+      d += line.includes('>') ? 300 : 150;
     });
-    setTimeout(() => {
-      bootEl.style.display = 'none';
-      document.getElementById('loginOverlay').style.display = 'flex';
-      initAudio();
-    }, delay + 500);
+    setTimeout(() => { el.style.display = 'none'; document.getElementById('loginOverlay').style.display = 'flex'; initAudio(); }, d + 500);
   }
 
-  // ==================== ЭФФЕКТ ПОМЕХ ====================
   function triggerGlitch() {
-    const content = document.getElementById('mainContent');
-    if (!content || content.style.display === 'none') return;
-    content.classList.add('glitch-effect');
-    playRadioStatic(0.15);
-    setTimeout(() => content.classList.remove('glitch-effect'), 300);
+    const c = document.getElementById('mainContent');
+    if (!c || c.style.display === 'none') return;
+    c.classList.add('glitch-effect'); playRadioStatic(0.15);
+    setTimeout(() => c.classList.remove('glitch-effect'), 300);
   }
   setInterval(() => { if (Math.random() > 0.85) triggerGlitch(); }, 4000);
 
-  // ==================== ДАННЫЕ ПО УМОЛЧАНИЮ ====================
-  const DEFAULT_MEMBERS = [
-    { name: "Фипламя", role: "Глава / Глава Н.О.", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Фипламя Тистлтуэйт\nПол: М\nРаса: Единорог\nДолжность: Глава клана</div></div>` },
-    { name: "Семтил", role: "Учёный", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Семтил (С-H0.1)\nРаса: Робомозг / Земной пони</div></div>` },
-    { name: "Джон", role: "Учёный", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Джон Маргарет Хаус\nРаса: Единорог</div></div>` },
-    { name: "Зефрида", role: "Глава М.О.Г.", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Зефрида</div></div>` },
-    { name: "Лилия", role: "Глава И.О.", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Ли / Лилия\nРаса: Единорог-андроид</div></div>` },
-    { name: "Харви", role: "Инженер", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Харви</div></div>` },
-    { name: "Руби", role: "Инженер", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Руби / Мусорщик\nРаса: Единорог</div></div>` },
-    { name: "Снежок", role: "Питомец", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Снежок\nРоль: Питомец</div></div>` },
-    { name: "Инока", role: "Охранник", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Инока / Инака\nРаса: Пегас</div></div>` },
-    { name: "Найт", role: "Охранник", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Найт</div></div>` },
-    { name: "Шайн", role: "Охранник", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Шайн</div></div>` }
-  ];
+  // ==================== ДАННЫЕ ====================
+  const DEFAULT_SYSTEM = {
+    resources: 3,
+    arsenal: 27,
+    water: "[ДАННЫЕ ОТСУТСТВУЮТ]",
+    activity: "23.04.2026",
+    sysMsg: "[СИСТЕМА] СБОР ДАННЫХ, ОРУЖИЯ, РЕСУРСОВ."
+  };
 
-  const DEFAULT_TASKS = [
-    { id: "OP-21A", description: "ЗАЧИСТКА СЕКТОРА 7G", deadline: "2 ДНЯ" },
-    { id: "OP-22B", description: "СБОР ТЕХ.МУСОРА", deadline: "ВЫПОЛН." },
-    { id: "OP-19E", description: "УКРЕПЛЕНИЕ СТЕНЫ", deadline: "СРОЧНО" }
-  ];
-
-  let membersData = [];
-  let tasksData = [];
+  let membersData = [], tasksData = [], systemData = { ...DEFAULT_SYSTEM };
   let isAdmin = false;
 
-  // ==================== ЗАГРУЗКА ИЗ FIREBASE ====================
+  function renderResources() {
+    const r = systemData.resources;
+    const display = '◼'.repeat(r) + '◻'.repeat(9 - r);
+    const el = document.getElementById('resourcesDisplay');
+    if (el) el.textContent = display;
+  }
+
+  function updateSystemDisplay() {
+    renderResources();
+    const a = document.getElementById('arsenalPercent');
+    const w = document.getElementById('waterSupply');
+    const l = document.getElementById('lastActivity');
+    const s = document.getElementById('systemMessage');
+    if (a) a.textContent = systemData.arsenal + '%';
+    if (w) w.textContent = systemData.water;
+    if (l) l.textContent = systemData.activity;
+    if (s) s.textContent = systemData.sysMsg;
+  }
+
   function loadFromFirebase() {
     document.getElementById('syncIndicator').classList.add('visible');
-    
-    membersRef.once('value').then(snapshot => {
-      if (snapshot.exists()) {
-        membersData = snapshot.val();
-      } else {
-        membersData = JSON.parse(JSON.stringify(DEFAULT_MEMBERS));
-        membersRef.set(membersData);
-      }
+    membersRef.once('value').then(s => {
+      membersData = s.exists() ? s.val() : [];
+      if (!membersData.length) { membersData = getDefaultMembers(); membersRef.set(membersData); }
       renderMembersTable();
     });
-
-    tasksRef.once('value').then(snapshot => {
-      if (snapshot.exists()) {
-        tasksData = snapshot.val();
-      } else {
-        tasksData = JSON.parse(JSON.stringify(DEFAULT_TASKS));
-        tasksRef.set(tasksData);
-      }
+    tasksRef.once('value').then(s => {
+      tasksData = s.exists() ? s.val() : [];
+      if (!tasksData.length) { tasksData = getDefaultTasks(); tasksRef.set(tasksData); }
       renderTasksTable();
     });
-
-    // Слушаем изменения в реальном времени
-    membersRef.on('value', snapshot => {
-      if (snapshot.exists()) {
-        membersData = snapshot.val();
-        renderMembersTable();
-      }
+    systemRef.once('value').then(s => {
+      systemData = s.exists() ? s.val() : { ...DEFAULT_SYSTEM };
+      updateSystemDisplay();
     });
-
-    tasksRef.on('value', snapshot => {
-      if (snapshot.exists()) {
-        tasksData = snapshot.val();
-        renderTasksTable();
-      }
-    });
+    membersRef.on('value', s => { if (s.exists()) { membersData = s.val(); renderMembersTable(); } });
+    tasksRef.on('value', s => { if (s.exists()) { tasksData = s.val(); renderTasksTable(); } });
+    systemRef.on('value', s => { if (s.exists()) { systemData = s.val(); updateSystemDisplay(); } });
   }
 
-  function saveMembersToFirebase() {
-    membersRef.set(membersData);
+  function getDefaultMembers() {
+    return [
+      { name: "Фипламя", role: "Глава / Глава Н.О.", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Фипламя Тистлтуэйт\nРаса: Единорог\nДолжность: Глава клана</div></div>` },
+      { name: "Семтил", role: "Учёный", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Семтил (С-H0.1)\nРаса: Робомозг / Земной пони</div></div>` },
+      { name: "Джон", role: "Учёный", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Джон Маргарет Хаус\nРаса: Единорог</div></div>` },
+      { name: "Зефрида", role: "Глава М.О.Г.", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Зефрида</div></div>` },
+      { name: "Лилия", role: "Глава И.О.", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Ли / Лилия\nРаса: Единорог-андроид</div></div>` },
+      { name: "Харви", role: "Инженер", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Харви</div></div>` },
+      { name: "Руби", role: "Инженер", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Руби / Мусорщик\nРаса: Единорог</div></div>` },
+      { name: "Снежок", role: "Питомец", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Снежок</div></div>` },
+      { name: "Инока", role: "Охранник", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Инока / Инака\nРаса: Пегас</div></div>` },
+      { name: "Найт", role: "Охранник", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Найт</div></div>` },
+      { name: "Шайн", role: "Охранник", status: "Активен", profileHTML: `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: Шайн</div></div>` }
+    ];
   }
 
-  function saveTasksToFirebase() {
-    tasksRef.set(tasksData);
+  function getDefaultTasks() {
+    return [
+      { id: "OP-21A", description: "ЗАЧИСТКА СЕКТОРА 7G", deadline: "2 ДНЯ" },
+      { id: "OP-22B", description: "СБОР ТЕХ.МУСОРА", deadline: "ВЫПОЛН." },
+      { id: "OP-19E", description: "УКРЕПЛЕНИЕ СТЕНЫ", deadline: "СРОЧНО" }
+    ];
   }
 
-  // ==================== РЕНДЕР ТАБЛИЦ ====================
   function renderMembersTable() {
-    const tbody = document.getElementById('clanMembersBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
+    const t = document.getElementById('clanMembersBody'); if (!t) return;
+    t.innerHTML = '';
     membersData.forEach((m, i) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${m.name}</td><td>${m.role}</td><td>${m.status}</td>`;
-      tr.style.cursor = 'pointer';
-      tr.addEventListener('click', () => openProfile(i));
-      tbody.appendChild(tr);
+      tr.style.cursor = 'pointer'; tr.addEventListener('click', () => openProfile(i));
+      t.appendChild(tr);
     });
   }
 
   function renderTasksTable() {
-    const tbody = document.getElementById('tasksTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    tasksData.forEach(t => {
+    const t = document.getElementById('tasksTableBody'); if (!t) return;
+    t.innerHTML = '';
+    tasksData.forEach(td => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${t.id}</td><td>${t.description}</td><td>${t.deadline}</td>`;
-      tbody.appendChild(tr);
+      tr.innerHTML = `<td>${td.id}</td><td>${td.description}</td><td>${td.deadline}</td>`;
+      t.appendChild(tr);
     });
   }
 
-  // ==================== ПРОФИЛЬ ====================
-  function openProfile(index) {
-    const m = membersData[index];
-    if (!m) return;
+  function openProfile(i) {
+    const m = membersData[i]; if (!m) return;
     document.getElementById('profileName').textContent = m.name;
     document.getElementById('profileRole').textContent = m.role;
-    document.getElementById('profileContent').innerHTML = m.profileHTML || '<div class="profile-text">[ ДАННЫЕ ОТСУТСТВУЮТ ]</div>';
-    document.getElementById('profileOverlay').classList.remove('hidden');
-    playKeySound();
+    document.getElementById('profileContent').innerHTML = m.profileHTML || '<div class="profile-text">[ НЕТ ДАННЫХ ]</div>';
+    document.getElementById('profileOverlay').classList.remove('hidden'); playKeySound();
   }
 
   document.getElementById('profileClose').addEventListener('click', () => document.getElementById('profileOverlay').classList.add('hidden'));
@@ -850,48 +666,33 @@
   // ==================== ВХОД ====================
   const loginOverlay = document.getElementById('loginOverlay');
   const mainContent = document.getElementById('mainContent');
-  const fakeLogin = document.getElementById('fakeLogin');
-  const fakePassword = document.getElementById('fakePassword');
-  const loginBtn = document.getElementById('loginConfirmBtn');
-  const loginHint = document.getElementById('loginHint');
+  const fakeLogin = document.getElementById('fakeLogin'), fakePassword = document.getElementById('fakePassword');
+  const loginBtn = document.getElementById('loginConfirmBtn'), loginHint = document.getElementById('loginHint');
   const FULL_LOGIN = 'OPERATIVE.OIDL', FULL_PASSWORD = '********';
   let loginFilled = false, passwordFilled = false, typingActive = false;
-  let currentLoginIdx = 0, currentPasswordIdx = 0, loginInterval = null, passwordInterval = null;
+  let cL = 0, cP = 0, loginInt = null, passInt = null;
 
   function startTypingLogin() {
-    if (typingActive) return;
-    typingActive = true; loginHint.textContent = '[ ВВОД ЛОГИНА... ]';
-    currentLoginIdx = 0; fakeLogin.value = ''; loginFilled = false;
-    if (loginInterval) clearInterval(loginInterval);
-    loginInterval = setInterval(() => {
-      if (currentLoginIdx < FULL_LOGIN.length) {
-        fakeLogin.value += FULL_LOGIN[currentLoginIdx];
-        playKeySound(); currentLoginIdx++;
-      } else {
-        clearInterval(loginInterval); loginInterval = null;
-        loginFilled = true; typingActive = false;
-        loginHint.textContent = '[ ГОТОВО. НАЖИМАЙТЕ КЛАВИШИ ДЛЯ ПАРОЛЯ ]';
-      }
+    if (typingActive) return; typingActive = true; loginHint.textContent = '[ ВВОД ЛОГИНА... ]';
+    cL = 0; fakeLogin.value = ''; loginFilled = false;
+    if (loginInt) clearInterval(loginInt);
+    loginInt = setInterval(() => {
+      if (cL < FULL_LOGIN.length) { fakeLogin.value += FULL_LOGIN[cL]; playKeySound(); cL++; }
+      else { clearInterval(loginInt); loginInt = null; loginFilled = true; typingActive = false; loginHint.textContent = '[ ГОТОВО. НАЖИМАЙТЕ КЛАВИШИ ДЛЯ ПАРОЛЯ ]'; }
     }, 80);
   }
 
   function startTypingPassword() {
-    if (typingActive || !loginFilled) return;
-    typingActive = true; loginHint.textContent = '[ ВВОД ПАРОЛЯ... ]';
-    currentPasswordIdx = 0; fakePassword.value = ''; passwordFilled = false;
-    if (passwordInterval) clearInterval(passwordInterval);
-    passwordInterval = setInterval(() => {
-      if (currentPasswordIdx < FULL_PASSWORD.length) {
-        fakePassword.value += FULL_PASSWORD[currentPasswordIdx];
-        playKeySound(); currentPasswordIdx++;
-      } else {
-        clearInterval(passwordInterval); passwordInterval = null;
-        passwordFilled = true; typingActive = false; checkBothFilled();
-      }
+    if (typingActive || !loginFilled) return; typingActive = true; loginHint.textContent = '[ ВВОД ПАРОЛЯ... ]';
+    cP = 0; fakePassword.value = ''; passwordFilled = false;
+    if (passInt) clearInterval(passInt);
+    passInt = setInterval(() => {
+      if (cP < FULL_PASSWORD.length) { fakePassword.value += FULL_PASSWORD[cP]; playKeySound(); cP++; }
+      else { clearInterval(passInt); passInt = null; passwordFilled = true; typingActive = false; checkBoth(); }
     }, 100);
   }
 
-  function checkBothFilled() {
+  function checkBoth() {
     if (loginFilled && passwordFilled) { loginBtn.disabled = false; loginBtn.textContent = '■ ВОЙТИ'; loginHint.textContent = '[ НАЖМИТЕ "ПОДТВЕРДИТЬ" ]'; }
   }
 
@@ -902,362 +703,289 @@
     if (loginFilled && !passwordFilled && !typingActive) { startTypingPassword(); return; }
   });
 
-  loginBtn.addEventListener('click', function() {
+  loginBtn.addEventListener('click', () => {
     if (!loginFilled || !passwordFilled) return;
-    if (loginInterval) clearInterval(loginInterval);
-    if (passwordInterval) clearInterval(passwordInterval);
-    playLoginBeep();
-    loginOverlay.style.display = 'none';
-    mainContent.style.display = 'block';
-    setActiveTab('dosier');
+    if (loginInt) clearInterval(loginInt); if (passInt) clearInterval(passInt);
+    playLoginBeep(); loginOverlay.style.display = 'none'; mainContent.style.display = 'block'; setActiveTab('dosier');
   });
 
   // ==================== НАВИГАЦИЯ ====================
   const navItems = document.querySelectorAll('.nav-item');
-  const panes = {
-    dosier: document.getElementById('tab-dosier'), tasks: document.getElementById('tab-tasks'),
-    map: document.getElementById('tab-map'), radio: document.getElementById('tab-radio'),
-    vault: document.getElementById('tab-vault')
-  };
-
-  function setActiveTab(tabId) {
+  const panes = { dosier: document.getElementById('tab-dosier'), tasks: document.getElementById('tab-tasks'), map: document.getElementById('tab-map'), radio: document.getElementById('tab-radio'), vault: document.getElementById('tab-vault') };
+  function setActiveTab(id) {
     Object.values(panes).forEach(p => p.classList.add('hidden'));
-    if (panes[tabId]) panes[tabId].classList.remove('hidden');
-    navItems.forEach(item => item.classList.toggle('active', item.dataset.tab === tabId));
+    if (panes[id]) panes[id].classList.remove('hidden');
+    navItems.forEach(n => n.classList.toggle('active', n.dataset.tab === id));
   }
-
-  navItems.forEach(item => item.addEventListener('click', () => setActiveTab(item.dataset.tab)));
+  navItems.forEach(n => n.addEventListener('click', () => setActiveTab(n.dataset.tab)));
   document.getElementById('taskConfirmBtn')?.addEventListener('click', () => {
-    const fb = document.getElementById('taskFeedback');
-    if (fb) { fb.textContent = '✓ ПРИНЯТО.'; setTimeout(() => fb.textContent = '', 3000); }
+    const fb = document.getElementById('taskFeedback'); if (fb) { fb.textContent = '✓ ПРИНЯТО.'; setTimeout(() => fb.textContent = '', 3000); }
   });
 
-  // ==================== АДМИН-ДОСТУП ====================
+  // ==================== АДМИН ====================
   const ADMIN_CODE = 'pipboy42';
-  const adminBtn = document.getElementById('adminAccessBtn');
-  const adminBadge = document.getElementById('adminBadge');
+  const adminBtn = document.getElementById('adminAccessBtn'), adminBadge = document.getElementById('adminBadge');
   const adminPanel = document.getElementById('adminPanel');
 
-  function setAdminMode(active) {
-    isAdmin = active;
-    adminBtn.classList.toggle('visible', active);
-    adminBadge.classList.toggle('visible', active);
-    if (!active) adminPanel.classList.add('hidden');
+  function setAdminMode(a) {
+    isAdmin = a;
+    adminBtn.classList.toggle('visible', a); adminBadge.classList.toggle('visible', a);
+    if (!a) adminPanel.classList.add('hidden');
   }
-
   window.addEventListener('beforeunload', () => setAdminMode(false));
 
-  function openAdminPanel() {
-    if (!isAdmin) return;
-    adminPanel.classList.remove('hidden');
-    renderAdminMembersPanel();
-    switchAdminTab('members');
-    playAdminSound();
-  }
-
+  function openAdminPanel() { if (!isAdmin) return; adminPanel.classList.remove('hidden'); switchAdminTab('members'); playAdminSound(); }
   adminBtn.addEventListener('click', openAdminPanel);
   document.getElementById('adminClose').addEventListener('click', () => adminPanel.classList.add('hidden'));
 
-  // Командная строка
-  const commandInput = document.getElementById('commandInput');
-  commandInput.addEventListener('keydown', function(e) {
+  const cmdInput = document.getElementById('commandInput');
+  cmdInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
-      const cmd = commandInput.value.trim().toLowerCase();
-      let result = '';
+      const cmd = cmdInput.value.trim().toLowerCase(); let result = '';
       switch(cmd) {
-        case 'help': result = 'ДОСТУПНЫЕ КОМАНДЫ:\n> HELP\n> STATUS\n> MEMBERS\n> TIME\n> CLEAR'; break;
+        case 'help': result = '> HELP | STATUS | MEMBERS | TIME | CLEAR'; break;
         case 'status': result = 'СИСТЕМА: ОПЕРАТИВНАЯ\nОБЛАКО: ПОДКЛЮЧЕНО'; break;
         case 'members': result = membersData.map(m => `${m.name} — ${m.role}`).join('\n'); break;
         case 'time': result = new Date().toLocaleString('ru-RU'); break;
-        case 'clear': commandInput.value = ''; return;
-        case ADMIN_CODE:
-          setAdminMode(true);
-          result = '*** ДОСТУП РАЗРЕШЁН ***\nИСПОЛЬЗУЙТЕ КНОПКУ ◈ АДМИН ◈ В ЗАГОЛОВКЕ.';
-          playAdminSound();
-          break;
-        default: result = `НЕИЗВЕСТНАЯ КОМАНДА: "${cmd}"`;
+        case 'clear': cmdInput.value = ''; return;
+        case ADMIN_CODE: setAdminMode(true); result = '*** ДОСТУП РАЗРЕШЁН ***'; playAdminSound(); break;
+        default: result = `НЕИЗВЕСТНО: "${cmd}"`;
       }
-      if (result) {
-        const el = document.createElement('div');
-        el.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#0a1a0a;border:2px solid #33ff33;padding:15px 25px;z-index:400;color:#33ff33;white-space:pre-wrap;font-family:monospace;max-width:80%;';
-        el.textContent = result;
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 4000);
-        playKeySound();
-      }
-      commandInput.value = '';
+      if (result) { showCmdResult(result); } cmdInput.value = '';
     }
   });
 
-  window.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      document.getElementById('profileOverlay').classList.add('hidden');
-      adminPanel.classList.add('hidden');
-    }
-  });
+  function showCmdResult(msg) {
+    const el = document.createElement('div');
+    el.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#0a1a0a;border:2px solid #33ff33;padding:15px 25px;z-index:400;color:#33ff33;white-space:pre-wrap;font-family:monospace;max-width:80%;';
+    el.textContent = msg; document.body.appendChild(el); setTimeout(() => el.remove(), 4000); playKeySound();
+  }
 
-  // ==================== АДМИН-ПАНЕЛЬ: ВКЛАДКИ ====================
+  window.addEventListener('keydown', e => { if (e.key === 'Escape') { document.getElementById('profileOverlay').classList.add('hidden'); adminPanel.classList.add('hidden'); } });
+
+  // ==================== АДМИН-ВКЛАДКИ ====================
   const adminTabs = document.querySelectorAll('.admin-tab');
   const adminContent = document.getElementById('adminContent');
 
   function switchAdminTab(tab) {
     adminTabs.forEach(t => t.classList.toggle('active', t.dataset.adminTab === tab));
-    switch(tab) {
-      case 'members': renderAdminMembersPanel(); break;
-      case 'tasks': renderAdminTasksPanel(); break;
-      case 'data': renderAdminDataPanel(); break;
-    }
+    if (tab === 'members') renderAdminMembers();
+    else if (tab === 'tasks') renderAdminTasks();
+    else if (tab === 'system') renderAdminSystem();
+    else if (tab === 'data') renderAdminData();
   }
+  adminTabs.forEach(t => t.addEventListener('click', () => switchAdminTab(t.dataset.adminTab)));
 
-  adminTabs.forEach(tab => tab.addEventListener('click', () => switchAdminTab(tab.dataset.adminTab)));
-
-  // ==================== АДМИН: УЧАСТНИКИ ====================
-  function renderAdminMembersPanel() {
+  // ==================== СИСТЕМА ====================
+  function renderAdminSystem() {
     adminContent.innerHTML = `
-      <div class="profile-section"><div class="profile-label" style="color:#ff6666;">СПИСОК УЧАСТНИКОВ</div><div class="admin-member-list" id="adminMemberList"></div></div>
+      <div class="profile-section">
+        <div class="profile-label" style="color:#ff6666;">РЕСУРСЫ (закрашенные квадратики: 0-9)</div>
+        <input type="range" class="resource-slider" id="sysResources" min="0" max="9" value="${systemData.resources}">
+        <div style="color:#ffaaaa;text-align:center;font-size:1.2rem;margin:5px 0;" id="sysResPreview">${'◼'.repeat(systemData.resources) + '◻'.repeat(9 - systemData.resources)}</div>
+      </div>
       <hr class="profile-divider" style="border-color:#552222;">
       <div class="profile-section">
-        <div class="profile-label" style="color:#ff6666;" id="memberFormTitle">ДОБАВИТЬ УЧАСТНИКА</div>
-        <input type="text" class="admin-input" id="adminName" placeholder="ИМЯ">
-        <input type="text" class="admin-input" id="adminRole" placeholder="РОЛЬ">
-        <input type="text" class="admin-input" id="adminStatus" placeholder="СТАТУС" value="Активен">
-        <div class="profile-label" style="color:#ff6666;margin-top:10px;">АНКЕТА (HTML)</div>
-        <textarea class="admin-textarea" id="adminProfile" placeholder="HTML-код анкеты..."></textarea>
-        <input type="hidden" id="adminEditIndex" value="-1">
-        <button class="admin-btn save-btn" id="memberSaveBtn">■ СОХРАНИТЬ (ОБЛАКО)</button>
-        <button class="admin-btn" id="memberCancelBtn">■ ОТМЕНА</button>
-      </div>`;
-    renderAdminMembersList();
-    document.getElementById('memberSaveBtn').addEventListener('click', saveMember);
-    document.getElementById('memberCancelBtn').addEventListener('click', clearMemberForm);
-  }
+        <div class="profile-label" style="color:#ff6666;">СКЛАД АРСЕНАЛА (%)</div>
+        <input type="number" class="admin-input" id="sysArsenal" value="${systemData.arsenal}" min="0" max="100">
+      </div>
+      <hr class="profile-divider" style="border-color:#552222;">
+      <div class="profile-section">
+        <div class="profile-label" style="color:#ff6666;">ВОДА / ПАЁК</div>
+        <input type="text" class="admin-input" id="sysWater" value="${systemData.water}">
+      </div>
+      <hr class="profile-divider" style="border-color:#552222;">
+      <div class="profile-section">
+        <div class="profile-label" style="color:#ff6666;">ПОСЛЕДНЯЯ АКТИВНОСТЬ</div>
+        <input type="text" class="admin-input" id="sysActivity" value="${systemData.activity}">
+      </div>
+      <hr class="profile-divider" style="border-color:#552222;">
+      <div class="profile-section">
+        <div class="profile-label" style="color:#ff6666;">СООБЩЕНИЕ [СИСТЕМА]</div>
+        <input type="text" class="admin-input" id="sysMsg" value="${systemData.sysMsg}">
+      </div>
+      <button class="admin-btn save-btn" id="sysSaveBtn">■ СОХРАНИТЬ СИСТЕМУ</button>`;
 
-  function renderAdminMembersList() {
-    const list = document.getElementById('adminMemberList');
-    if (!list) return;
-    list.innerHTML = '';
-    membersData.forEach((m, i) => {
-      const div = document.createElement('div');
-      div.className = 'admin-member-item';
-      div.innerHTML = `<span>${m.name} — ${m.role}</span><span><button onclick="window._editMember(${i})">РЕД.</button><button onclick="window._deleteMember(${i})">УДЛ.</button></span>`;
-      list.appendChild(div);
+    const slider = document.getElementById('sysResources');
+    const preview = document.getElementById('sysResPreview');
+    slider.addEventListener('input', () => {
+      const v = parseInt(slider.value);
+      preview.textContent = '◼'.repeat(v) + '◻'.repeat(9 - v);
+    });
+
+    document.getElementById('sysSaveBtn').addEventListener('click', () => {
+      systemData.resources = parseInt(document.getElementById('sysResources').value);
+      systemData.arsenal = parseInt(document.getElementById('sysArsenal').value) || 0;
+      systemData.water = document.getElementById('sysWater').value.trim();
+      systemData.activity = document.getElementById('sysActivity').value.trim();
+      systemData.sysMsg = document.getElementById('sysMsg').value.trim();
+      systemRef.set(systemData);
+      updateSystemDisplay();
+      playAdminSound();
+      alert('СИСТЕМНЫЕ ДАННЫЕ СОХРАНЕНЫ В ОБЛАКЕ');
     });
   }
 
-  window._editMember = function(i) {
-    const m = membersData[i];
-    document.getElementById('adminName').value = m.name;
-    document.getElementById('adminRole').value = m.role;
-    document.getElementById('adminStatus').value = m.status;
-    document.getElementById('adminProfile').value = m.profileHTML || '';
-    document.getElementById('adminEditIndex').value = i;
-    document.getElementById('memberFormTitle').textContent = 'РЕДАКТИРОВАТЬ УЧАСТНИКА';
-  };
+  // ==================== УЧАСТНИКИ ====================
+  function renderAdminMembers() {
+    adminContent.innerHTML = `
+      <div class="profile-section"><div class="profile-label" style="color:#ff6666;">СПИСОК</div><div class="admin-member-list" id="adminMemberList"></div></div>
+      <hr class="profile-divider" style="border-color:#552222;">
+      <div class="profile-section">
+        <div class="profile-label" style="color:#ff6666;" id="mfTitle">ДОБАВИТЬ</div>
+        <input type="text" class="admin-input" id="aName" placeholder="ИМЯ">
+        <input type="text" class="admin-input" id="aRole" placeholder="РОЛЬ">
+        <input type="text" class="admin-input" id="aStatus" placeholder="СТАТУС" value="Активен">
+        <div class="profile-label" style="color:#ff6666;margin-top:10px;">АНКЕТА (HTML)</div>
+        <textarea class="admin-textarea" id="aProfile" placeholder="HTML..."></textarea>
+        <input type="hidden" id="aEditIdx" value="-1">
+        <button class="admin-btn save-btn" id="mSaveBtn">■ СОХРАНИТЬ</button>
+        <button class="admin-btn" id="mCancelBtn">■ ОТМЕНА</button>
+      </div>`;
+    renderAdminMList();
+    document.getElementById('mSaveBtn').addEventListener('click', saveMember);
+    document.getElementById('mCancelBtn').addEventListener('click', clearMForm);
+  }
 
-  window._deleteMember = function(i) {
-    if (confirm(`Удалить "${membersData[i].name}"?`)) {
-      membersData.splice(i, 1);
-      saveMembersToFirebase();
-      renderMembersTable();
-      renderAdminMembersList();
-    }
+  function renderAdminMList() {
+    const l = document.getElementById('adminMemberList'); if (!l) return; l.innerHTML = '';
+    membersData.forEach((m, i) => {
+      const d = document.createElement('div'); d.className = 'admin-member-item';
+      d.innerHTML = `<span>${m.name} — ${m.role}</span><span><button onclick="window._eM(${i})">РЕД.</button><button onclick="window._dM(${i})">УДЛ.</button></span>`;
+      l.appendChild(d);
+    });
+  }
+
+  window._eM = function(i) {
+    const m = membersData[i];
+    document.getElementById('aName').value = m.name; document.getElementById('aRole').value = m.role;
+    document.getElementById('aStatus').value = m.status; document.getElementById('aProfile').value = m.profileHTML || '';
+    document.getElementById('aEditIdx').value = i; document.getElementById('mfTitle').textContent = 'РЕДАКТИРОВАТЬ';
+  };
+  window._dM = function(i) {
+    if (confirm(`Удалить "${membersData[i].name}"?`)) { membersData.splice(i, 1); membersRef.set(membersData); renderMembersTable(); renderAdminMList(); }
   };
 
   function saveMember() {
-    const name = document.getElementById('adminName').value.trim();
-    const role = document.getElementById('adminRole').value.trim();
-    const status = document.getElementById('adminStatus').value.trim() || 'Активен';
-    const profileHTML = document.getElementById('adminProfile').value;
-    const editIdx = parseInt(document.getElementById('adminEditIndex').value);
-    if (!name || !role) { alert('ИМЯ И РОЛЬ ОБЯЗАТЕЛЬНЫ!'); return; }
-    const data = { name, role, status, profileHTML };
-    if (editIdx >= 0 && editIdx < membersData.length) membersData[editIdx] = data;
-    else membersData.push(data);
-    saveMembersToFirebase();
-    renderMembersTable();
-    renderAdminMembersList();
-    clearMemberForm();
-    playAdminSound();
+    const n = document.getElementById('aName').value.trim(), r = document.getElementById('aRole').value.trim();
+    const s = document.getElementById('aStatus').value.trim() || 'Активен', p = document.getElementById('aProfile').value;
+    if (!n || !r) { alert('ИМЯ И РОЛЬ ОБЯЗАТЕЛЬНЫ!'); return; }
+    const data = { name: n, role: r, status: s, profileHTML: p };
+    const ei = parseInt(document.getElementById('aEditIdx').value);
+    if (ei >= 0 && ei < membersData.length) membersData[ei] = data; else membersData.push(data);
+    membersRef.set(membersData); renderMembersTable(); renderAdminMList(); clearMForm(); playAdminSound();
   }
 
-  function clearMemberForm() {
-    document.getElementById('adminName').value = '';
-    document.getElementById('adminRole').value = '';
-    document.getElementById('adminStatus').value = 'Активен';
-    document.getElementById('adminProfile').value = '';
-    document.getElementById('adminEditIndex').value = '-1';
-    document.getElementById('memberFormTitle').textContent = 'ДОБАВИТЬ УЧАСТНИКА';
+  function clearMForm() {
+    document.getElementById('aName').value = ''; document.getElementById('aRole').value = '';
+    document.getElementById('aStatus').value = 'Активен'; document.getElementById('aProfile').value = '';
+    document.getElementById('aEditIdx').value = '-1'; document.getElementById('mfTitle').textContent = 'ДОБАВИТЬ';
   }
 
-  // ==================== АДМИН: ЗАДАЧИ ====================
-  function renderAdminTasksPanel() {
+  // ==================== ЗАДАЧИ ====================
+  function renderAdminTasks() {
     adminContent.innerHTML = `
-      <div class="profile-section"><div class="profile-label" style="color:#ff6666;">СПИСОК ЗАДАЧ</div><div class="admin-member-list" id="adminTaskList"></div></div>
+      <div class="profile-section"><div class="profile-label" style="color:#ff6666;">СПИСОК</div><div class="admin-member-list" id="adminTaskList"></div></div>
       <hr class="profile-divider" style="border-color:#552222;">
       <div class="profile-section">
-        <div class="profile-label" style="color:#ff6666;" id="taskFormTitle">ДОБАВИТЬ ЗАДАЧУ</div>
-        <input type="text" class="admin-input" id="taskId" placeholder="ID">
-        <input type="text" class="admin-input" id="taskDesc" placeholder="ОПИСАНИЕ">
-        <input type="text" class="admin-input" id="taskDeadline" placeholder="СРОК">
-        <input type="hidden" id="taskEditIndex" value="-1">
-        <button class="admin-btn save-btn" id="taskSaveBtn">■ СОХРАНИТЬ (ОБЛАКО)</button>
-        <button class="admin-btn" id="taskCancelBtn">■ ОТМЕНА</button>
+        <div class="profile-label" style="color:#ff6666;" id="tfTitle">ДОБАВИТЬ</div>
+        <input type="text" class="admin-input" id="tId" placeholder="ID"><input type="text" class="admin-input" id="tDesc" placeholder="ОПИСАНИЕ"><input type="text" class="admin-input" id="tDead" placeholder="СРОК">
+        <input type="hidden" id="tEditIdx" value="-1">
+        <button class="admin-btn save-btn" id="tSaveBtn">■ СОХРАНИТЬ</button><button class="admin-btn" id="tCancelBtn">■ ОТМЕНА</button>
       </div>`;
-    renderAdminTasksList();
-    document.getElementById('taskSaveBtn').addEventListener('click', saveTask);
-    document.getElementById('taskCancelBtn').addEventListener('click', clearTaskForm);
+    renderAdminTList();
+    document.getElementById('tSaveBtn').addEventListener('click', saveTask);
+    document.getElementById('tCancelBtn').addEventListener('click', clearTForm);
   }
 
-  function renderAdminTasksList() {
-    const list = document.getElementById('adminTaskList');
-    if (!list) return;
-    list.innerHTML = '';
+  function renderAdminTList() {
+    const l = document.getElementById('adminTaskList'); if (!l) return; l.innerHTML = '';
     tasksData.forEach((t, i) => {
-      const div = document.createElement('div');
-      div.className = 'admin-list-item';
-      div.innerHTML = `<span>${t.id} — ${t.description} [${t.deadline}]</span><span><button onclick="window._editTask(${i})">РЕД.</button><button onclick="window._deleteTask(${i})">УДЛ.</button></span>`;
-      list.appendChild(div);
+      const d = document.createElement('div'); d.className = 'admin-list-item';
+      d.innerHTML = `<span>${t.id} — ${t.description}</span><span><button onclick="window._eT(${i})">РЕД.</button><button onclick="window._dT(${i})">УДЛ.</button></span>`;
+      l.appendChild(d);
     });
   }
 
-  window._editTask = function(i) {
+  window._eT = function(i) {
     const t = tasksData[i];
-    document.getElementById('taskId').value = t.id;
-    document.getElementById('taskDesc').value = t.description;
-    document.getElementById('taskDeadline').value = t.deadline;
-    document.getElementById('taskEditIndex').value = i;
-    document.getElementById('taskFormTitle').textContent = 'РЕДАКТИРОВАТЬ ЗАДАЧУ';
+    document.getElementById('tId').value = t.id; document.getElementById('tDesc').value = t.description;
+    document.getElementById('tDead').value = t.deadline; document.getElementById('tEditIdx').value = i;
+    document.getElementById('tfTitle').textContent = 'РЕДАКТИРОВАТЬ';
   };
-
-  window._deleteTask = function(i) {
-    if (confirm(`Удалить задачу "${tasksData[i].id}"?`)) {
-      tasksData.splice(i, 1);
-      saveTasksToFirebase();
-      renderTasksTable();
-      renderAdminTasksList();
-    }
+  window._dT = function(i) {
+    if (confirm(`Удалить "${tasksData[i].id}"?`)) { tasksData.splice(i, 1); tasksRef.set(tasksData); renderTasksTable(); renderAdminTList(); }
   };
 
   function saveTask() {
-    const id = document.getElementById('taskId').value.trim();
-    const desc = document.getElementById('taskDesc').value.trim();
-    const deadline = document.getElementById('taskDeadline').value.trim();
-    const editIdx = parseInt(document.getElementById('taskEditIndex').value);
-    if (!id || !desc || !deadline) { alert('ВСЕ ПОЛЯ ОБЯЗАТЕЛЬНЫ!'); return; }
-    const data = { id, description: desc, deadline };
-    if (editIdx >= 0 && editIdx < tasksData.length) tasksData[editIdx] = data;
-    else tasksData.push(data);
-    saveTasksToFirebase();
-    renderTasksTable();
-    renderAdminTasksList();
-    clearTaskForm();
-    playAdminSound();
+    const id = document.getElementById('tId').value.trim(), d = document.getElementById('tDesc').value.trim(), dl = document.getElementById('tDead').value.trim();
+    if (!id || !d || !dl) { alert('ВСЕ ПОЛЯ ОБЯЗАТЕЛЬНЫ!'); return; }
+    const data = { id, description: d, deadline: dl };
+    const ei = parseInt(document.getElementById('tEditIdx').value);
+    if (ei >= 0 && ei < tasksData.length) tasksData[ei] = data; else tasksData.push(data);
+    tasksRef.set(tasksData); renderTasksTable(); renderAdminTList(); clearTForm(); playAdminSound();
   }
 
-  function clearTaskForm() {
-    document.getElementById('taskId').value = '';
-    document.getElementById('taskDesc').value = '';
-    document.getElementById('taskDeadline').value = '';
-    document.getElementById('taskEditIndex').value = '-1';
-    document.getElementById('taskFormTitle').textContent = 'ДОБАВИТЬ ЗАДАЧУ';
+  function clearTForm() {
+    document.getElementById('tId').value = ''; document.getElementById('tDesc').value = '';
+    document.getElementById('tDead').value = ''; document.getElementById('tEditIdx').value = '-1';
+    document.getElementById('tfTitle').textContent = 'ДОБАВИТЬ';
   }
 
-  // ==================== АДМИН: ДАННЫЕ ====================
-  function renderAdminDataPanel() {
+  // ==================== ДАННЫЕ ====================
+  function renderAdminData() {
     adminContent.innerHTML = `
+      <div class="profile-section"><button class="admin-btn" id="syncNowBtn">■ СИНХРОНИЗИРОВАТЬ</button></div>
+      <hr class="profile-divider" style="border-color:#552222;">
       <div class="profile-section">
-        <div class="profile-label" style="color:#ff6666;">СИНХРОНИЗАЦИЯ С ОБЛАКОМ</div>
-        <button class="admin-btn" id="syncNowBtn">■ СИНХРОНИЗИРОВАТЬ СЕЙЧАС</button>
+        <button class="admin-btn" id="expMBtn">■ ЭКСПОРТ УЧАСТНИКОВ</button>
+        <button class="admin-btn" id="expTBtn">■ ЭКСПОРТ ЗАДАЧ</button>
         <hr class="profile-divider" style="border-color:#552222;">
-        <div class="profile-label" style="color:#ff6666;">ЭКСПОРТ</div>
-        <button class="admin-btn" id="exportMembersBtn">■ ЭКСПОРТ УЧАСТНИКОВ</button>
-        <button class="admin-btn" id="exportTasksBtn">■ ЭКСПОРТ ЗАДАЧ</button>
+        <div class="profile-label" style="color:#ff6666;">ИМПОРТ УЧАСТНИКОВ</div>
+        <textarea class="admin-textarea" id="impMData"></textarea><button class="admin-btn" id="impMBtn">■ ИМПОРТ</button>
         <hr class="profile-divider" style="border-color:#552222;">
-        <div class="profile-label" style="color:#ff6666;">ИМПОРТ УЧАСТНИКОВ (JSON)</div>
-        <textarea class="admin-textarea" id="importMembersData" placeholder="Вставьте JSON..."></textarea>
-        <button class="admin-btn" id="importMembersBtn">■ ИМПОРТ</button>
-        <hr class="profile-divider" style="border-color:#552222;">
-        <div class="profile-label" style="color:#ff6666;">ИМПОРТ ЗАДАЧ (JSON)</div>
-        <textarea class="admin-textarea" id="importTasksData" placeholder="Вставьте JSON..."></textarea>
-        <button class="admin-btn" id="importTasksBtn">■ ИМПОРТ</button>
-        <hr class="profile-divider" style="border-color:#552222;">
-        <button class="admin-btn" id="resetAllBtn" style="border-color:#ff8888;color:#ff8888;">■ СБРОС ВСЕХ ДАННЫХ</button>
+        <div class="profile-label" style="color:#ff6666;">ИМПОРТ ЗАДАЧ</div>
+        <textarea class="admin-textarea" id="impTData"></textarea><button class="admin-btn" id="impTBtn">■ ИМПОРТ</button>
       </div>`;
-    document.getElementById('syncNowBtn').addEventListener('click', () => { loadFromFirebase(); alert('СИНХРОНИЗАЦИЯ ВЫПОЛНЕНА'); });
-    document.getElementById('exportMembersBtn').addEventListener('click', () => { copyToClipboard(JSON.stringify(membersData, null, 2)); alert('СКОПИРОВАНО'); });
-    document.getElementById('exportTasksBtn').addEventListener('click', () => { copyToClipboard(JSON.stringify(tasksData, null, 2)); alert('СКОПИРОВАНО'); });
-    document.getElementById('importMembersBtn').addEventListener('click', () => {
-      try {
-        const data = JSON.parse(document.getElementById('importMembersData').value);
-        if (Array.isArray(data)) { membersData = data; saveMembersToFirebase(); renderMembersTable(); alert('ИМПОРТ УСПЕШЕН!'); }
-      } catch(e) { alert('ОШИБКА JSON'); }
+    document.getElementById('syncNowBtn').addEventListener('click', () => { loadFromFirebase(); alert('ГОТОВО'); });
+    document.getElementById('expMBtn').addEventListener('click', () => { copyClip(JSON.stringify(membersData, null, 2)); alert('СКОПИРОВАНО'); });
+    document.getElementById('expTBtn').addEventListener('click', () => { copyClip(JSON.stringify(tasksData, null, 2)); alert('СКОПИРОВАНО'); });
+    document.getElementById('impMBtn').addEventListener('click', () => {
+      try { const d = JSON.parse(document.getElementById('impMData').value); if (Array.isArray(d)) { membersData = d; membersRef.set(membersData); renderMembersTable(); alert('ГОТОВО'); } } catch(e) { alert('ОШИБКА JSON'); }
     });
-    document.getElementById('importTasksBtn').addEventListener('click', () => {
-      try {
-        const data = JSON.parse(document.getElementById('importTasksData').value);
-        if (Array.isArray(data)) { tasksData = data; saveTasksToFirebase(); renderTasksTable(); alert('ИМПОРТ УСПЕШЕН!'); }
-      } catch(e) { alert('ОШИБКА JSON'); }
-    });
-    document.getElementById('resetAllBtn').addEventListener('click', () => {
-      if (confirm('СБРОСИТЬ ВСЕ ДАННЫЕ? ЭТО ЗАТРОНЕТ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ!')) {
-        membersData = JSON.parse(JSON.stringify(DEFAULT_MEMBERS));
-        tasksData = JSON.parse(JSON.stringify(DEFAULT_TASKS));
-        saveMembersToFirebase();
-        saveTasksToFirebase();
-        renderMembersTable();
-        renderTasksTable();
-        alert('ДАННЫЕ СБРОШЕНЫ.');
-      }
+    document.getElementById('impTBtn').addEventListener('click', () => {
+      try { const d = JSON.parse(document.getElementById('impTData').value); if (Array.isArray(d)) { tasksData = d; tasksRef.set(tasksData); renderTasksTable(); alert('ГОТОВО'); } } catch(e) { alert('ОШИБКА JSON'); }
     });
   }
 
-  function copyToClipboard(text) {
+  function copyClip(text) {
     navigator.clipboard.writeText(text).catch(() => {
-      const ta = document.createElement('textarea'); ta.value = text;
-      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+      const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
     });
   }
 
   // ==================== РАДИО ====================
-  const freqSlider = document.getElementById('freqSlider');
-  const freqDisplay = document.getElementById('freqDisplay');
+  const freqSlider = document.getElementById('freqSlider'), freqDisplay = document.getElementById('freqDisplay');
   const interceptMsg = document.getElementById('interceptMessage');
-  const radioMessages = {
-    88.5: "*** СИГНАЛ БЕДСТВИЯ *** ...SOS...",
-    94.2: "АНКЛАВ: КОД КРАСНЫЙ. БУНКЕР 7 ЗАКРЫТ.",
-    101.1: "КАРАВАН: ИДЁМ С ГРУЗОМ ЧЕРЕЗ СЕКТОР G.",
-    107.8: "РЕЙДЕРЫ: ...НАПАДЕНИЕ... МНОГО ДОБЫЧИ...",
-    114.7: "О.И.Д.Л. ШТАБ: ПОДТВЕРЖДАЮ ОПЕРАЦИЮ.",
-    122.3: "БРАТСТВО СТАЛИ: ЗАПРЕЩЁННАЯ ЗОНА.",
-    130.5: "МЕДСЛУЖБА: МЕНЯЕМ МЕДИКАМЕНТЫ.",
-    138.0: "ПИРАТСКОЕ РАДИО: СТАРЫЕ ХИТЫ.",
-    145.8: "ЗАГАДОЧНЫЙ СИГНАЛ: ...УБЕЖИЩЕ 101..."
-  };
-
-  function updateFrequency() {
-    const freq = parseFloat(freqSlider.value).toFixed(1);
-    freqDisplay.textContent = freq + ' МГц';
-    playRadioStatic(0.1);
-    const match = radioMessages[freq];
-    interceptMsg.innerHTML = match ? '<span style="color:#ffff88;">◆ ПЕРЕХВАЧЕНО ◆</span><br>' + match :
-      Object.keys(radioMessages).some(k => Math.abs(parseFloat(k) - freq) < 0.5) ? '...ОБРЫВКИ РЕЧИ...' : '[ ТОЛЬКО БЕЛЫЙ ШУМ ]';
+  const radioMessages = { 88.5: "*** СИГНАЛ БЕДСТВИЯ ***", 94.2: "АНКЛАВ: КОД КРАСНЫЙ.", 101.1: "КАРАВАН: ИДЁМ С ГРУЗОМ.", 107.8: "РЕЙДЕРЫ: НАПАДЕНИЕ...", 114.7: "О.И.Д.Л. ШТАБ: ПОДТВЕРЖДАЮ.", 122.3: "БРАТСТВО СТАЛИ: ЗАПРЕТ.", 130.5: "МЕДСЛУЖБА: МЕНЯЕМ МЕДИКАМЕНТЫ.", 138.0: "ПИРАТСКОЕ РАДИО: ХИТЫ.", 145.8: "ЗАГАДОЧНЫЙ СИГНАЛ..." };
+  function updateFreq() {
+    const f = parseFloat(freqSlider.value).toFixed(1);
+    freqDisplay.textContent = f + ' МГц'; playRadioStatic(0.1);
+    const m = radioMessages[f];
+    interceptMsg.innerHTML = m ? '<span style="color:#ffff88;">◆ ПЕРЕХВАЧЕНО ◆</span><br>' + m : '[ ТОЛЬКО БЕЛЫЙ ШУМ ]';
   }
-
-  freqSlider?.addEventListener('input', updateFrequency);
+  freqSlider?.addEventListener('input', updateFreq);
   document.getElementById('scanBtn')?.addEventListener('click', () => {
-    let f = 88;
-    const iv = setInterval(() => { freqSlider.value = f; updateFrequency(); f += 0.5; if (f > 150) clearInterval(iv); }, 50);
-    playRadioStatic(0.5);
+    let f = 88; const iv = setInterval(() => { freqSlider.value = f; updateFreq(); f += 0.5; if (f > 150) clearInterval(iv); }, 50); playRadioStatic(0.5);
   });
 
   // ==================== УБЕЖИЩЕ ====================
-  document.querySelectorAll('.vault-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.vault-btn').forEach(b => b.classList.remove('active-floor'));
-      btn.classList.add('active-floor');
-      const floor = parseInt(btn.dataset.floor);
+  document.querySelectorAll('.vault-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.vault-btn').forEach(x => x.classList.remove('active-floor'));
+      b.classList.add('active-floor');
       const img = document.getElementById('vaultImage');
-      if (img) { img.src = `vault_floor_${floor + 1}.png`; img.alt = 'ЭТАЖ ' + (floor + 1); }
+      if (img) { img.src = `vault_floor_${parseInt(b.dataset.floor) + 1}.png`; }
     });
   });
 
