@@ -164,9 +164,9 @@
     .status-value { color: #9eff9e; font-weight: bold; }
 
     .nav-menu { display: flex; flex-wrap: wrap; border: 1px solid #286828; background: #051005; margin-bottom: 20px; }
-    .nav-item { text-align: center; color: #3db83d; text-transform: uppercase; border: 1px solid #1b411b; cursor: pointer; font-weight: bold; letter-spacing: 1px; background: #081708; }
-    body.desktop .nav-item { flex: 1; padding: 12px 4px; font-size: 0.8rem; }
-    body.mobile .nav-item { flex: 1 1 28%; padding: 12px 4px; font-size: 0.7rem; }
+    .nav-item { text-align: center; color: #3db83d; text-transform: uppercase; border: 1px solid #1b411b; cursor: pointer; font-weight: bold; letter-spacing: 1px; background: #081708; text-decoration: none; }
+    body.desktop .nav-item { flex: 1; padding: 12px 4px; font-size: 0.75rem; }
+    body.mobile .nav-item { flex: 1 1 25%; padding: 12px 4px; font-size: 0.65rem; }
     .nav-item:hover { background: #143314; color: #a0ffa0; }
     .nav-item.active { background: #1f461f; color: #c6ffc6; border-bottom: 3px solid #33bb33; }
 
@@ -252,8 +252,6 @@
 
     .admin-btn { background: #1a0000; border: 2px solid #ff4444; color: #ff6666; padding: 10px 16px; font-family: inherit; font-size: 0.9rem; text-transform: uppercase; cursor: pointer; margin: 4px; }
     .admin-btn.save-btn { border-color: #44ff44; color: #44ff44; background: #001a00; width: 100%; }
-    .admin-btn.accept-btn { border-color: #44ff44; color: #44ff44; background: #002200; }
-    .admin-btn.reject-btn { border-color: #ff4444; color: #ff4444; background: #220000; }
 
     .admin-member-list { max-height: 200px; overflow-y: auto; border: 1px solid #ff4444; padding: 8px; margin: 8px 0; }
     .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 6px; border-bottom: 1px dotted #552222; color: #ffaaaa; font-size: 0.9rem; flex-wrap: wrap; gap: 4px; }
@@ -338,11 +336,12 @@
         <span class="admin-badge" id="adminBadge">◈ АДМИН ◈</span>
       </div>
 
-      <div class="nav-menu">
+      <div class="nav-menu" id="navMenu">
         <div class="nav-item active" data-tab="dosier">ДОСЬЕ</div>
         <div class="nav-item" data-tab="tasks">ЗАДАЧИ</div>
         <div class="nav-item" data-tab="drones">ДРОНЫ</div>
         <div class="nav-item" data-tab="events">СОБЫТИЯ</div>
+        <a href="medical.html" class="nav-item" style="text-decoration:none;">МЕДПУНКТ</a>
         <div class="nav-item" data-tab="mail">ПОЧТА</div>
         <div class="nav-item" data-tab="recruit">НАБОР</div>
         <div class="nav-item" data-tab="map">КАРТА</div>
@@ -367,19 +366,19 @@
       </div>
 
       <div id="tab-drones" class="content-pane hidden">
-        <div style="color:#bcffbc;">◆ ДРОНЫ ◆</div>
+        <div style="color:#bcffbc;">◆ ДРОНЫ СВЯЗИ ◆</div>
         <div id="dronesContainer"></div>
         <div class="diagnostic-log" id="diagnosticLog">[ ДИАГНОСТИКА ] ОЖИДАНИЕ...</div>
         <button class="terminal-button" id="diagAllBtn">■ ДИАГНОСТИКА ВСЕХ</button>
       </div>
 
       <div id="tab-events" class="content-pane hidden">
-        <div style="color:#88aaff;">◆ КАЛЕНДАРЬ ◆</div>
+        <div style="color:#88aaff;">◆ КАЛЕНДАРЬ СОБЫТИЙ ◆</div>
         <div id="eventsContainer"></div>
       </div>
 
       <div id="tab-mail" class="content-pane hidden">
-        <div style="color:#44aaff;margin-bottom:8px;">◆ ПОЧТА ◆</div>
+        <div style="color:#44aaff;margin-bottom:8px;">◆ ВНУТРЕННЯЯ ПОЧТА ◆</div>
         <div class="mail-tabs">
           <button class="mail-tab active" data-mail-tab="inbox">ВХОДЯЩИЕ</button>
           <button class="mail-tab" data-mail-tab="sent">ОТПРАВЛЕННЫЕ</button>
@@ -388,39 +387,34 @@
         <div id="mailContent"></div>
       </div>
 
- <div id="tab-recruit" class="content-pane hidden">
-  <div style="color:#ffaa00;margin-bottom:12px;text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ НА ВСТУПЛЕНИЕ ◆</div>
-  <div class="application-form" id="applicationForm">
-    <div style="color:#ffaa00;margin-bottom:12px;text-align:center;">ОСНОВНЫЕ ДАННЫЕ</div>
-    <div class="app-field"><span class="app-label">Имя (полное имя/прозвище):</span><input type="text" class="app-input" id="appName" placeholder="Введите имя..."></div>
-    <div class="app-field"><span class="app-label">Пол (М/Ж/Другое):</span><input type="text" class="app-input" id="appGender" placeholder="М/Ж/Другое"></div>
-    <div class="app-field"><span class="app-label">Дата рождения (ДД.ММ + возраст):</span><input type="text" class="app-input" id="appBirth" placeholder="01.01 + 25 лет"></div>
-    <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace" placeholder="Единорог, Земной пони..."></div>
-    <div class="app-field"><span class="app-label">Должность:</span><input type="text" class="app-input" id="appRole" placeholder="Охранник, Учёный..."></div>
-    <div class="app-field"><span class="app-label">Физические параметры:</span><textarea class="app-textarea" id="appPhysical" placeholder="Рост: см\nВес: кг\nОтличительные черты: ..."></textarea></div>
-
-    <div style="color:#ffaa00;margin:16px 0;text-align:center;">ПРОФЕССИОНАЛЬНЫЕ ДАННЫЕ</div>
-    <div class="app-field"><span class="app-label">Отдел/Специализация:</span><input type="text" class="app-input" id="appSpecialization" placeholder="Боевой/Медицинский/Разведывательный..."></div>
-    <div class="app-field"><span class="app-label">Навыки (3 ключевых + уровень):</span><textarea class="app-textarea" id="appSkills" placeholder="1) ...\n2) ...\n3) ..."></textarea></div>
-    <div class="app-field"><span class="app-label">Наставник:</span><input type="text" class="app-input" id="appMentor" placeholder="Имя наставника или нет">
-
-    <div style="color:#ffaa00;margin:16px 0;text-align:center;">ЛИЧНОСТЬ И БИОГРАФИЯ</div>
-    <div class="app-field"><span class="app-label">Краткая история:</span><textarea class="app-textarea" id="appHistory" placeholder="Происхождение, важные события, причина вступления в клан..."></textarea></div>
-    <div class="app-field"><span class="app-label">Характер:</span><textarea class="app-textarea" id="appCharacter" placeholder="Основные качества, принципы..."></textarea></div>
-    <div class="app-field"><span class="app-label">Фобии/Слабости:</span><textarea class="app-textarea" id="appPhobias" placeholder="Что влияет на решения..."></textarea></div>
-
-    <div style="color:#ffaa00;margin:16px 0;text-align:center;">ОСОБЫЕ ОТМЕТКИ</div>
-    <div class="app-field"><span class="app-label">Вредные привычки:</span><input type="text" class="app-input" id="appHabits" placeholder="Курение, агрессия..."></div>
-    <div class="app-field"><span class="app-label">Хронические болезни:</span><input type="text" class="app-input" id="appIllnesses" placeholder="Если имеются..."></div>
-    <div class="app-field"><span class="app-label">Аллергии/Непереносимости:</span><input type="text" class="app-input" id="appAllergies" placeholder="Пищевые, медицинские..."></div>
-
-    <div style="color:#ffaa00;margin:16px 0;text-align:center;">ДОПОЛНИТЕЛЬНО</div>
-    <div class="app-field"><span class="app-label">Хобби:</span><input type="text" class="app-input" id="appHobbies" placeholder="Увлечения..."></div>
-    <div class="app-field"><span class="app-label">Личные цели:</span><textarea class="app-textarea" id="appGoals" placeholder="Чего хочет достичь..."></textarea></div>
-
-    <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ ЗАЯВКУ</button>
-  </div>
-</div>
+      <div id="tab-recruit" class="content-pane hidden">
+        <div style="color:#ffaa00;margin-bottom:12px;text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ НА ВСТУПЛЕНИЕ ◆</div>
+        <div class="application-form" id="applicationForm">
+          <div style="color:#ffaa00;margin-bottom:12px;text-align:center;">ОСНОВНЫЕ ДАННЫЕ</div>
+          <div class="app-field"><span class="app-label">Имя (полное имя/прозвище):</span><input type="text" class="app-input" id="appName" placeholder="Введите имя..."></div>
+          <div class="app-field"><span class="app-label">Пол (М/Ж/Другое):</span><input type="text" class="app-input" id="appGender" placeholder="М/Ж/Другое"></div>
+          <div class="app-field"><span class="app-label">Дата рождения (ДД.ММ + возраст):</span><input type="text" class="app-input" id="appBirth" placeholder="01.01 + 25 лет"></div>
+          <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace" placeholder="Единорог, Земной пони..."></div>
+          <div class="app-field"><span class="app-label">Должность:</span><input type="text" class="app-input" id="appRole" placeholder="Охранник, Учёный..."></div>
+          <div class="app-field"><span class="app-label">Физические параметры:</span><textarea class="app-textarea" id="appPhysical" placeholder="Рост: см&#10;Вес: кг&#10;Отличительные черты: ..."></textarea></div>
+          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ПРОФЕССИОНАЛЬНЫЕ ДАННЫЕ</div>
+          <div class="app-field"><span class="app-label">Отдел/Специализация:</span><input type="text" class="app-input" id="appSpecialization" placeholder="Боевой/Медицинский..."></div>
+          <div class="app-field"><span class="app-label">Навыки (3 ключевых + уровень):</span><textarea class="app-textarea" id="appSkills" placeholder="1) ...&#10;2) ...&#10;3) ..."></textarea></div>
+          <div class="app-field"><span class="app-label">Наставник:</span><input type="text" class="app-input" id="appMentor" placeholder="Имя или нет"></div>
+          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ЛИЧНОСТЬ И БИОГРАФИЯ</div>
+          <div class="app-field"><span class="app-label">Краткая история:</span><textarea class="app-textarea" id="appHistory" placeholder="Происхождение, важные события..."></textarea></div>
+          <div class="app-field"><span class="app-label">Характер:</span><textarea class="app-textarea" id="appCharacter" placeholder="Основные качества, принципы..."></textarea></div>
+          <div class="app-field"><span class="app-label">Фобии/Слабости:</span><textarea class="app-textarea" id="appPhobias" placeholder="Что влияет на решения..."></textarea></div>
+          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ОСОБЫЕ ОТМЕТКИ</div>
+          <div class="app-field"><span class="app-label">Вредные привычки:</span><input type="text" class="app-input" id="appHabits" placeholder="Курение, агрессия..."></div>
+          <div class="app-field"><span class="app-label">Хронические болезни:</span><input type="text" class="app-input" id="appIllnesses" placeholder="Если имеются..."></div>
+          <div class="app-field"><span class="app-label">Аллергии/Непереносимости:</span><input type="text" class="app-input" id="appAllergies" placeholder="Пищевые, медицинские..."></div>
+          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ДОПОЛНИТЕЛЬНО</div>
+          <div class="app-field"><span class="app-label">Хобби:</span><input type="text" class="app-input" id="appHobbies" placeholder="Увлечения..."></div>
+          <div class="app-field"><span class="app-label">Личные цели:</span><textarea class="app-textarea" id="appGoals" placeholder="Чего хочет достичь..."></textarea></div>
+          <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ ЗАЯВКУ</button>
+        </div>
+      </div>
 
       <div id="tab-map" class="content-pane hidden">
         <div style="color:#bcffbc;">◆ КАРТА ◆</div>
@@ -440,10 +434,10 @@
       <div id="tab-vault" class="content-pane hidden">
         <div style="color:#bcffbc;">◆ УБЕЖИЩЕ 42 ◆</div>
         <div class="vault-controls">
-          <button class="vault-btn active-floor" data-floor="0">1</button>
-          <button class="vault-btn" data-floor="1">2</button>
-          <button class="vault-btn" data-floor="2">3</button>
-          <button class="vault-btn" data-floor="3">4</button>
+          <button class="vault-btn active-floor" data-floor="0">ЭТАЖ 1</button>
+          <button class="vault-btn" data-floor="1">ЭТАЖ 2</button>
+          <button class="vault-btn" data-floor="2">ЭТАЖ 3</button>
+          <button class="vault-btn" data-floor="3">ЭТАЖ 4</button>
         </div>
         <div class="map-container"><img src="vault_floor_1.png" alt="ЭТАЖ" class="vault-image" id="vaultImage"></div>
       </div>
@@ -490,7 +484,7 @@
     </div>
   </div>
 
-  <div class="terminal-footer"><span>О.И.Д.Л. v.3.4</span><span>ЯДРО: 99%</span></div>
+  <div class="terminal-footer"><span>О.И.Д.Л. v.3.5</span><span>ЯДРО: 99%</span></div>
 </div>
 
 <script>
@@ -532,133 +526,6 @@
 
   let members=[], tasks=[], sys={...DEFSYS}, drones=[...DEFDRONES], applications=[], events=[], radioMessages={...DEFRADIO}, mails=[], marqueeText="", accessCodes={}, isAdmin=false, currentUser=null;
 
-  // ==================== СИСТЕМА АККАУНТОВ ====================
-  function updateLoginForm() {
-    const select = document.getElementById('loginUserSelect');
-    const status = document.getElementById('loginStatus');
-    const btn = document.getElementById('loginConfirmBtn');
-    const passInput = document.getElementById('loginPassInput');
-    
-    select.innerHTML = '<option value="">— ВЫБЕРИТЕ —</option>';
-    members.forEach(m => {
-      const option = document.createElement('option');
-      option.value = m.name;
-      option.textContent = m.name;
-      select.appendChild(option);
-    });
-    
-    select.onchange = function() {
-      if (this.value) {
-        status.textContent = '[ ВВЕДИТЕ КОД ДОСТУПА ]';
-        passInput.disabled = false;
-        passInput.focus();
-        checkLoginReady();
-      } else {
-        status.textContent = '[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]';
-        passInput.disabled = true;
-        btn.disabled = true;
-        btn.classList.remove('ready');
-      }
-    };
-    
-    passInput.oninput = checkLoginReady;
-  }
-
-  function checkLoginReady() {
-    const name = document.getElementById('loginUserSelect').value;
-    const pass = document.getElementById('loginPassInput').value;
-    const btn = document.getElementById('loginConfirmBtn');
-    const status = document.getElementById('loginStatus');
-    
-    if (name && pass.length >= 3) {
-      btn.disabled = false;
-      btn.classList.add('ready');
-      status.textContent = '[ НАЖМИТЕ "ВОЙТИ" ]';
-    } else if (name && pass.length > 0) {
-      btn.disabled = true;
-      btn.classList.remove('ready');
-      status.textContent = '[ МИНИМУМ 3 СИМВОЛА ]';
-    }
-  }
-
-  function doLogin() {
-    const name = document.getElementById('loginUserSelect').value;
-    const pass = document.getElementById('loginPassInput').value;
-    const status = document.getElementById('loginStatus');
-    
-    if (!name || pass.length < 3) return;
-
-    // Проверяем, есть ли уже пароль у этого пользователя
-    if (!accessCodes[name] || accessCodes[name] === '0000') {
-      // Первый вход — устанавливаем пароль
-      accessCodes[name] = pass;
-      db.ref('accessCodes').set(accessCodes);
-      status.textContent = '[ ПАРОЛЬ УСТАНОВЛЕН! ВХОД... ]';
-      setTimeout(() => completeLogin(name), 800);
-    } else if (accessCodes[name] === pass) {
-      // Пароль верный
-      status.textContent = '[ ВХОД РАЗРЕШЁН... ]';
-      setTimeout(() => completeLogin(name), 500);
-    } else {
-      // Неверный пароль
-      status.textContent = '[ НЕВЕРНЫЙ КОД ДОСТУПА ]';
-      document.getElementById('loginPassInput').value = '';
-      document.getElementById('loginConfirmBtn').disabled = true;
-      document.getElementById('loginConfirmBtn').classList.remove('ready');
-      playKey();
-    }
-  }
-
-  function completeLogin(name) {
-    currentUser = name;
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'block';
-    updateUserUI();
-    document.querySelector('.nav-item').click();
-    playBeep();
-  }
-
-  function logout() {
-    currentUser = null;
-    isAdmin = false;
-    document.getElementById('mainContent').style.display = 'none';
-    document.getElementById('loginOverlay').style.display = 'flex';
-    document.getElementById('loginUserSelect').value = '';
-    document.getElementById('loginPassInput').value = '';
-    document.getElementById('loginConfirmBtn').disabled = true;
-    document.getElementById('loginConfirmBtn').classList.remove('ready');
-    document.getElementById('loginStatus').textContent = '[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]';
-    updateUserUI();
-    updateLoginForm();
-  }
-
-  function updateUserUI() {
-    const indicator = document.getElementById('userIndicator');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const adminBtn = document.getElementById('adminAccessBtn');
-    const adminBadge = document.getElementById('adminBadge');
-    
-    if (currentUser) {
-      indicator.textContent = '👤 ' + currentUser.toUpperCase();
-      indicator.classList.add('show');
-      logoutBtn.classList.add('show');
-    } else {
-      indicator.classList.remove('show');
-      logoutBtn.classList.remove('show');
-      adminBtn.classList.remove('visible');
-      adminBadge.classList.remove('visible');
-      isAdmin = false;
-    }
-  }
-
-  document.getElementById('loginConfirmBtn').addEventListener('click', doLogin);
-  document.getElementById('loginPassInput').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') doLogin();
-  });
-  document.getElementById('logoutBtn').addEventListener('click', logout);
-
-  // ==================== ОСТАЛЬНЫЕ ФУНКЦИИ ====================
-
   function renderSys() {
     const r=sys.resources, el=document.getElementById('resourcesDisplay'); if(el)el.textContent='◼'.repeat(r)+'◻'.repeat(9-r);
     const a=document.getElementById('arsenalPercent'), w=document.getElementById('waterSupply'), l=document.getElementById('lastActivity'), s=document.getElementById('systemMessage');
@@ -698,44 +565,29 @@
 
   // ПОЧТА
   function renderMailInbox() {
-    const container = document.getElementById('mailContent');
-    const inbox = mails.filter(m => m.to === currentUser || m.to === '' || m.to === 'all');
-    let html = '';
-    if (!inbox.length) { html = '<div style="color:#667799;text-align:center;padding:20px;">НЕТ ВХОДЯЩИХ</div>'; }
-    else {
-      [...inbox].reverse().forEach(m => {
-        html += `<div class="mail-card${m.read?'':' unread'}" onclick="openMail('${m.id}')">
-          <div class="mail-from">ОТ: ${m.from}</div><div class="mail-subject">${m.subject}</div><div class="mail-date">${m.date}</div></div>`;
-      });
-    }
-    container.innerHTML = html;
+    const container=document.getElementById('mailContent');
+    const inbox=mails.filter(m=>m.to===currentUser||m.to===''||m.to==='all');
+    let html='';
+    if(!inbox.length){ html='<div style="color:#667799;text-align:center;padding:20px;">НЕТ ВХОДЯЩИХ</div>'; }
+    else { [...inbox].reverse().forEach(m=>{ html+=`<div class="mail-card${m.read?'':' unread'}" onclick="openMail('${m.id}')"><div class="mail-from">ОТ: ${m.from}</div><div class="mail-subject">${m.subject}</div><div class="mail-date">${m.date}</div></div>`; }); }
+    container.innerHTML=html;
   }
 
   function renderMailSent() {
-    const container = document.getElementById('mailContent');
-    const sent = mails.filter(m => m.from === currentUser);
-    let html = '';
-    if (!sent.length) { html = '<div style="color:#667799;text-align:center;padding:20px;">НЕТ ОТПРАВЛЕННЫХ</div>'; }
-    else {
-      [...sent].reverse().forEach(m => {
-        html += `<div class="mail-card" onclick="openMail('${m.id}')">
-          <div class="mail-from">КОМУ: ${m.to||'ВСЕМ'}</div><div class="mail-subject">${m.subject}</div><div class="mail-date">${m.date}</div></div>`;
-      });
-    }
-    container.innerHTML = html;
+    const container=document.getElementById('mailContent');
+    const sent=mails.filter(m=>m.from===currentUser);
+    let html='';
+    if(!sent.length){ html='<div style="color:#667799;text-align:center;padding:20px;">НЕТ ОТПРАВЛЕННЫХ</div>'; }
+    else { [...sent].reverse().forEach(m=>{ html+=`<div class="mail-card" onclick="openMail('${m.id}')"><div class="mail-from">КОМУ: ${m.to||'ВСЕМ'}</div><div class="mail-subject">${m.subject}</div><div class="mail-date">${m.date}</div></div>`; }); }
+    container.innerHTML=html;
   }
 
   function renderMailWrite() {
-    const container = document.getElementById('mailContent');
-    let opts = '<option value="">ВСЕМ</option>';
-    members.forEach(m => { opts += `<option value="${m.name}">${m.name}</option>`; });
-    container.innerHTML = `
-      <div class="application-form" style="border-color:#44aaff;">
-        <div class="app-field"><span class="app-label" style="color:#88aaff;">КОМУ:</span><select class="app-input" id="mailTo" style="color:#88ccff;">${opts}</select></div>
-        <div class="app-field"><span class="app-label" style="color:#88aaff;">ТЕМА:</span><input type="text" class="app-input" id="mailSubject" style="border-color:#44aaff;color:#88ccff;"></div>
-        <div class="app-field"><span class="app-label" style="color:#88aaff;">СООБЩЕНИЕ:</span><textarea class="app-textarea" id="mailBody" style="border-color:#44aaff;color:#88ccff;"></textarea></div>
-        <button class="app-submit" id="mailSendBtn" style="border-color:#44aaff;color:#44aaff;">■ ОТПРАВИТЬ</button></div>`;
-    document.getElementById('mailSendBtn').addEventListener('click', ()=>{
+    const container=document.getElementById('mailContent');
+    let opts='<option value="">ВСЕМ</option>';
+    members.forEach(m=>{ opts+=`<option value="${m.name}">${m.name}</option>`; });
+    container.innerHTML=`<div class="application-form" style="border-color:#44aaff;"><div class="app-field"><span class="app-label" style="color:#88aaff;">КОМУ:</span><select class="app-input" id="mailTo" style="color:#88ccff;">${opts}</select></div><div class="app-field"><span class="app-label" style="color:#88aaff;">ТЕМА:</span><input type="text" class="app-input" id="mailSubject" style="border-color:#44aaff;color:#88ccff;"></div><div class="app-field"><span class="app-label" style="color:#88aaff;">СООБЩЕНИЕ:</span><textarea class="app-textarea" id="mailBody" style="border-color:#44aaff;color:#88ccff;"></textarea></div><button class="app-submit" id="mailSendBtn" style="border-color:#44aaff;color:#44aaff;">■ ОТПРАВИТЬ</button></div>`;
+    document.getElementById('mailSendBtn').addEventListener('click',()=>{
       const to=document.getElementById('mailTo').value, subject=document.getElementById('mailSubject').value.trim()||'БЕЗ ТЕМЫ', body=document.getElementById('mailBody').value.trim();
       if(!body){ alert('ТЕКСТ!'); return; }
       mails.push({ id:Date.now().toString(), from:currentUser, to, subject, body, date:new Date().toLocaleString('ru-RU'), read:false });
@@ -745,7 +597,7 @@
     });
   }
 
-  window.openMail = function(id) {
+  window.openMail=function(id){
     const m=mails.find(x=>x.id===id); if(!m)return;
     if(!m.read){ m.read=true; db.ref('mails').set(mails); }
     document.getElementById('mailViewName').textContent=m.subject;
@@ -756,8 +608,8 @@
 
   document.getElementById('mailViewClose')?.addEventListener('click',()=>document.getElementById('mailViewOverlay').classList.add('hidden'));
 
-  document.querySelectorAll('.mail-tab').forEach(tab => {
-    tab.addEventListener('click', ()=>{
+  document.querySelectorAll('.mail-tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
       document.querySelectorAll('.mail-tab').forEach(t=>t.classList.remove('active'));
       tab.classList.add('active');
       const t=tab.dataset.mailTab;
@@ -767,17 +619,10 @@
     });
   });
 
-  function updateAppBadge() {
-    const badge=document.getElementById('appBadge');
-    if(badge){ badge.textContent=applications.length; badge.classList.toggle('show',applications.length>0); }
-  }
+  function updateAppBadge(){ const badge=document.getElementById('appBadge'); if(badge){ badge.textContent=applications.length; badge.classList.toggle('show',applications.length>0); } }
+  function updateMarquee(){ const bar=document.getElementById('marqueeBar'), text=document.getElementById('marqueeText'); if(bar&&text){ if(marqueeText){ bar.classList.add('show'); text.textContent='⚠ '+marqueeText+' ⚠'; } else { bar.classList.remove('show'); text.textContent=''; } } }
 
-  function updateMarquee() {
-    const bar=document.getElementById('marqueeBar'), text=document.getElementById('marqueeText');
-    if(bar&&text){ if(marqueeText){ bar.classList.add('show'); text.textContent='⚠ '+marqueeText+' ⚠'; } else { bar.classList.remove('show'); text.textContent=''; } }
-  }
-
-  function loadData() {
+  function loadData(){
     document.getElementById('syncIndicator').classList.add('visible');
     db.ref('members').on('value',sn=>{ if(sn.exists()){ members=sn.val(); renderM(); updateLoginForm(); } });
     db.ref('tasks').on('value',sn=>{ if(sn.exists()){ tasks=sn.val(); renderT(); } });
@@ -791,69 +636,124 @@
     db.ref('accessCodes').on('value',sn=>{ accessCodes=sn.exists()?sn.val():{}; });
   }
 
-  function renderM() { const t=document.getElementById('clanMembersBody'); if(!t)return; t.innerHTML=''; members.forEach((m,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=isMobile?`<td>${m.name}</td><td>${m.role}</td>`:`<td>${m.name}</td><td>${m.role}</td><td>${m.status||'Активен'}</td>`; tr.style.cursor='pointer'; tr.addEventListener('click',()=>openProfile(i)); t.appendChild(tr); }); }
-  function renderT() { const t=document.getElementById('tasksTableBody'); if(!t)return; t.innerHTML=''; if(!tasks.length){ t.innerHTML=isMobile?'<tr><td colspan="2">НЕТ ЗАДАЧ</td></tr>':'<tr><td colspan="3">НЕТ ЗАДАЧ</td></tr>'; return; } tasks.forEach(td=>{ const tr=document.createElement('tr'); tr.innerHTML=isMobile?`<td>${td.id}</td><td>${td.description}</td>`:`<td>${td.id}</td><td>${td.description}</td><td>${td.deadline}</td>`; t.appendChild(tr); }); }
-  function openProfile(i) { const m=members[i]; if(!m)return; document.getElementById('profileName').textContent=m.name; document.getElementById('profileRole').textContent=m.role; document.getElementById('profileContent').innerHTML=m.profileHTML||'<div class="profile-text">[ НЕТ ДАННЫХ ]</div>'; document.getElementById('profileOverlay').classList.remove('hidden'); }
-  function updateFreqDisplay() { const freq=parseFloat(document.getElementById('freqSlider')?.value||114).toFixed(1); document.getElementById('freqDisplay').textContent=freq+' МГц'; document.getElementById('interceptMessage').textContent=radioMessages[freq]||'[ ШУМ ]'; }
+  function renderM(){ const t=document.getElementById('clanMembersBody'); if(!t)return; t.innerHTML=''; members.forEach((m,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=isMobile?`<td>${m.name}</td><td>${m.role}</td>`:`<td>${m.name}</td><td>${m.role}</td><td>${m.status||'Активен'}</td>`; tr.style.cursor='pointer'; tr.addEventListener('click',()=>openProfile(i)); t.appendChild(tr); }); }
+  function renderT(){ const t=document.getElementById('tasksTableBody'); if(!t)return; t.innerHTML=''; if(!tasks.length){ t.innerHTML=isMobile?'<tr><td colspan="2">НЕТ ЗАДАЧ</td></tr>':'<tr><td colspan="3">НЕТ ЗАДАЧ</td></tr>'; return; } tasks.forEach(td=>{ const tr=document.createElement('tr'); tr.innerHTML=isMobile?`<td>${td.id}</td><td>${td.description}</td>`:`<td>${td.id}</td><td>${td.description}</td><td>${td.deadline}</td>`; t.appendChild(tr); }); }
+  function openProfile(i){ const m=members[i]; if(!m)return; document.getElementById('profileName').textContent=m.name; document.getElementById('profileRole').textContent=m.role; document.getElementById('profileContent').innerHTML=m.profileHTML||'<div class="profile-text">[ НЕТ ДАННЫХ ]</div>'; document.getElementById('profileOverlay').classList.remove('hidden'); }
+  function updateFreqDisplay(){ const freq=parseFloat(document.getElementById('freqSlider')?.value||114).toFixed(1); document.getElementById('freqDisplay').textContent=freq+' МГц'; document.getElementById('interceptMessage').textContent=radioMessages[freq]||'[ ШУМ ]'; }
 
   document.getElementById('profileClose').addEventListener('click',()=>document.getElementById('profileOverlay').classList.add('hidden'));
   document.getElementById('profileOverlay').addEventListener('click',function(e){ if(e.target===this)this.classList.add('hidden'); });
 
-  document.querySelectorAll('.nav-item').forEach(n=>{ n.addEventListener('click',()=>{ document.querySelectorAll('.content-pane').forEach(p=>p.classList.add('hidden')); const tab=document.getElementById('tab-'+n.dataset.tab); if(tab){ tab.classList.remove('hidden'); if(n.dataset.tab==='mail') renderMailInbox(); } document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active')); n.classList.add('active'); }); });
+  // АККАУНТЫ
+  function updateLoginForm(){
+    const select=document.getElementById('loginUserSelect');
+    select.innerHTML='<option value="">— ВЫБЕРИТЕ —</option>';
+    members.forEach(m=>{ const o=document.createElement('option'); o.value=m.name; o.textContent=m.name; select.appendChild(o); });
+    select.onchange=function(){ if(this.value){ document.getElementById('loginStatus').textContent='[ ВВЕДИТЕ КОД ]'; document.getElementById('loginPassInput').disabled=false; document.getElementById('loginPassInput').focus(); checkLoginReady(); } else { document.getElementById('loginStatus').textContent='[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]'; document.getElementById('loginPassInput').disabled=true; document.getElementById('loginConfirmBtn').disabled=true; document.getElementById('loginConfirmBtn').classList.remove('ready'); } };
+    document.getElementById('loginPassInput').oninput=checkLoginReady;
+  }
 
-  document.getElementById('appSubmitBtn')?.addEventListener('click',()=>{ const app={name:document.getElementById('appName').value.trim(),role:document.getElementById('appRole').value.trim(),date:new Date().toLocaleString('ru-RU')}; if(!app.name)return; applications.push(app); db.ref('applications').set(applications); alert('ЗАЯВКА ОТПРАВЛЕНА!'); playBeep(); });
+  function checkLoginReady(){
+    const name=document.getElementById('loginUserSelect').value;
+    const pass=document.getElementById('loginPassInput').value;
+    const btn=document.getElementById('loginConfirmBtn'), st=document.getElementById('loginStatus');
+    if(name&&pass.length>=3){ btn.disabled=false; btn.classList.add('ready'); st.textContent='[ НАЖМИТЕ "ВОЙТИ" ]'; }
+    else if(name&&pass.length>0){ btn.disabled=true; btn.classList.remove('ready'); st.textContent='[ МИНИМУМ 3 СИМВОЛА ]'; }
+  }
+
+  function doLogin(){
+    const name=document.getElementById('loginUserSelect').value;
+    const pass=document.getElementById('loginPassInput').value;
+    const st=document.getElementById('loginStatus');
+    if(!name||pass.length<3)return;
+    if(!accessCodes[name]||accessCodes[name]==='0000'){ accessCodes[name]=pass; db.ref('accessCodes').set(accessCodes); st.textContent='[ ПАРОЛЬ УСТАНОВЛЕН! ]'; setTimeout(()=>completeLogin(name),800); }
+    else if(accessCodes[name]===pass){ st.textContent='[ ВХОД... ]'; setTimeout(()=>completeLogin(name),500); }
+    else { st.textContent='[ НЕВЕРНЫЙ КОД ]'; document.getElementById('loginPassInput').value=''; document.getElementById('loginConfirmBtn').disabled=true; document.getElementById('loginConfirmBtn').classList.remove('ready'); playKey(); }
+  }
+
+  function completeLogin(name){
+    currentUser=name;
+    document.getElementById('loginOverlay').style.display='none';
+    document.getElementById('mainContent').style.display='block';
+    updateUserUI();
+    document.querySelector('.nav-item').click();
+    playBeep();
+  }
+
+  function logout(){
+    currentUser=null; isAdmin=false;
+    document.getElementById('mainContent').style.display='none';
+    document.getElementById('loginOverlay').style.display='flex';
+    document.getElementById('loginUserSelect').value='';
+    document.getElementById('loginPassInput').value='';
+    document.getElementById('loginConfirmBtn').disabled=true;
+    document.getElementById('loginConfirmBtn').classList.remove('ready');
+    document.getElementById('loginStatus').textContent='[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]';
+    updateUserUI(); updateLoginForm();
+  }
+
+  function updateUserUI(){
+    const ind=document.getElementById('userIndicator'), lb=document.getElementById('logoutBtn');
+    if(currentUser){ ind.textContent='👤 '+currentUser.toUpperCase(); ind.classList.add('show'); lb.classList.add('show'); }
+    else { ind.classList.remove('show'); lb.classList.remove('show'); document.getElementById('adminAccessBtn').classList.remove('visible'); document.getElementById('adminBadge').classList.remove('visible'); }
+  }
+
+  document.getElementById('loginConfirmBtn').addEventListener('click',doLogin);
+  document.getElementById('loginPassInput').addEventListener('keydown',function(e){ if(e.key==='Enter')doLogin(); });
+  document.getElementById('logoutBtn').addEventListener('click',logout);
+
+  document.querySelectorAll('.nav-item[data-tab]').forEach(n=>{ n.addEventListener('click',()=>{ document.querySelectorAll('.content-pane').forEach(p=>p.classList.add('hidden')); const tab=document.getElementById('tab-'+n.dataset.tab); if(tab){ tab.classList.remove('hidden'); if(n.dataset.tab==='mail')renderMailInbox(); } document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.remove('active')); n.classList.add('active'); }); });
+
+  // ЗАЯВКА
+  document.getElementById('appSubmitBtn')?.addEventListener('click',()=>{
+    const app={
+      name:document.getElementById('appName').value.trim(), gender:document.getElementById('appGender').value.trim(),
+      birth:document.getElementById('appBirth').value.trim(), race:document.getElementById('appRace').value.trim(),
+      role:document.getElementById('appRole').value.trim(), physical:document.getElementById('appPhysical').value.trim(),
+      specialization:document.getElementById('appSpecialization').value.trim(), skills:document.getElementById('appSkills').value.trim(),
+      mentor:document.getElementById('appMentor').value.trim(), history:document.getElementById('appHistory').value.trim(),
+      character:document.getElementById('appCharacter').value.trim(), phobias:document.getElementById('appPhobias').value.trim(),
+      habits:document.getElementById('appHabits').value.trim(), illnesses:document.getElementById('appIllnesses').value.trim(),
+      allergies:document.getElementById('appAllergies').value.trim(), hobbies:document.getElementById('appHobbies').value.trim(),
+      goals:document.getElementById('appGoals').value.trim(), date:new Date().toLocaleString('ru-RU')
+    };
+    if(!app.name){ alert('ИМЯ ОБЯЗАТЕЛЬНО!'); return; }
+    applications.push(app); db.ref('applications').set(applications);
+    alert('ЗАЯВКА ОТПРАВЛЕНА!');
+    ['appName','appGender','appBirth','appRace','appRole','appPhysical','appSpecialization','appSkills','appMentor','appHistory','appCharacter','appPhobias','appHabits','appIllnesses','appAllergies','appHobbies','appGoals'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
+    playBeep();
+  });
 
   // АДМИН
   const ADMIN='pipboy42';
   const adminBtn=document.getElementById('adminAccessBtn'), adminBadge=document.getElementById('adminBadge'), adminPanel=document.getElementById('adminPanel');
   function setAdmin(a){ isAdmin=a; adminBtn.classList.toggle('visible',a); adminBadge.classList.toggle('visible',a); if(!a)adminPanel.classList.add('hidden'); }
+  adminBtn.addEventListener('click',()=>{ if(!isAdmin)return; adminPanel.classList.remove('hidden'); switchATab('members'); playBeep(); });
+  document.getElementById('adminClose').addEventListener('click',()=>adminPanel.classList.add('hidden'));
   
   const cmdInput=document.getElementById('commandInput');
   cmdInput.addEventListener('keydown',function(e){ if(e.key==='Enter'){ const cmd=cmdInput.value.trim().toLowerCase(); if(cmd===ADMIN){ setAdmin(true); alert('*** ДОСТУП РАЗРЕШЁН ***'); playBeep(); } else if(cmd==='logout'){ logout(); } cmdInput.value=''; } });
   
-  adminBtn.addEventListener('click',()=>{ if(!isAdmin)return; adminPanel.classList.remove('hidden'); switchATab('members'); playBeep(); });
-  document.getElementById('adminClose').addEventListener('click',()=>adminPanel.classList.add('hidden'));
   window.addEventListener('keydown',e=>{ if(e.key==='Escape'){ document.getElementById('profileOverlay').classList.add('hidden'); document.getElementById('mailViewOverlay').classList.add('hidden'); adminPanel.classList.add('hidden'); } });
 
   const adminTabs=document.querySelectorAll('.admin-tab'), adminContent=document.getElementById('adminContent');
   function switchATab(t){ adminTabs.forEach(tb=>tb.classList.toggle('active',tb.dataset.adminTab===t)); if(t==='members')renderAM(); else if(t==='access')renderAAccess(); else if(t==='tasks')renderAT(); else if(t==='drones')renderADr(); else if(t==='events')renderAEv(); else if(t==='mail')renderAMail(); else if(t==='marquee')renderAMarquee(); else if(t==='apps')renderAApps(); else if(t==='radio')renderARadio(); else if(t==='system')renderAS(); else if(t==='data')renderAD(); }
   adminTabs.forEach(t=>t.addEventListener('click',()=>switchATab(t.dataset.adminTab)));
 
-  // АДМИН: ДОСТУП
-  function renderAAccess() {
-    adminContent.innerHTML = `<div class="profile-label" style="color:#ffaa00;">УПРАВЛЕНИЕ ДОСТУПОМ</div><div class="admin-member-list" id="adminAccessList"></div>`;
-    renderAAccessList();
-  }
+  // ADMIN: ACCESS
+  function renderAAccess(){ adminContent.innerHTML=`<div class="profile-label" style="color:#ffaa00;">УПРАВЛЕНИЕ ДОСТУПОМ</div><div class="admin-member-list" id="adminAccessList"></div>`; renderAAccessList(); }
+  function renderAAccessList(){ const l=document.getElementById('adminAccessList'); if(!l)return; l.innerHTML=''; members.forEach(m=>{ const pass=accessCodes[m.name]||'0000'; const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${m.name}</span><span style="color:#ffaa00;">🔑 ${pass}</span><span><button onclick="window._resetPass('${m.name}')">СБРОС</button></span>`; l.appendChild(d); }); }
+  window._resetPass=function(name){ if(confirm(`Сбросить пароль для "${name}" на 0000?`)){ accessCodes[name]='0000'; db.ref('accessCodes').set(accessCodes); renderAAccessList(); alert(`Пароль сброшен.`); playBeep(); } };
 
-  function renderAAccessList() {
-    const l=document.getElementById('adminAccessList'); if(!l)return; l.innerHTML='';
-    members.forEach(m=>{
-      const pass = accessCodes[m.name] || '0000';
-      const d=document.createElement('div'); d.className='admin-list-item';
-      d.innerHTML=`<span>${m.name}</span><span style="color:#ffaa00;">🔑 ${pass}</span><span><button onclick="window._resetPass('${m.name}')">СБРОС</button></span>`;
-      l.appendChild(d);
-    });
-  }
-
-  window._resetPass = function(name) {
-    if(confirm(`Сбросить пароль для "${name}" на 0000?`)){
-      accessCodes[name] = '0000';
-      db.ref('accessCodes').set(accessCodes);
-      renderAAccessList();
-      alert(`Пароль для "${name}" сброшен. При следующем входе пользователь установит новый.`);
-      playBeep();
-    }
-  };
-
-  // АДМИН: MAIL
-  function renderAMail() { adminContent.innerHTML=`<div class="profile-label" style="color:#44aaff;">ВСЕ СООБЩЕНИЯ (${mails.length})</div><div class="admin-member-list" id="adminMailList"></div>`; renderAMailList(); }
+  // ADMIN: MAIL
+  function renderAMail(){ adminContent.innerHTML=`<div class="profile-label" style="color:#44aaff;">ВСЕ СООБЩЕНИЯ (${mails.length})</div><div class="admin-member-list" id="adminMailList"></div>`; renderAMailList(); }
   function renderAMailList(){ const l=document.getElementById('adminMailList'); if(!l)return; l.innerHTML=''; if(!mails.length){ l.innerHTML='<div style="color:#667799;padding:10px;">НЕТ СООБЩЕНИЙ</div>'; return; } [...mails].reverse().forEach(m=>{ const idx=mails.indexOf(m); const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${m.from} → ${m.to||'ВСЕМ'}</span><span>${m.subject}</span><span><button onclick="window._delMail(${idx})">УДЛ</button></span>`; l.appendChild(d); }); }
   window._delMail=function(i){ if(confirm('Удалить?')){ mails.splice(i,1); db.ref('mails').set(mails); renderAMailList(); } };
 
-  // АДМИН: MARQUEE
+  // ADMIN: MARQUEE
   function renderAMarquee(){ adminContent.innerHTML=`<input type="text" class="admin-input" id="marqueeInput" value="${marqueeText}"><button class="admin-btn save-btn" id="marqueeSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="marqueeClear">■ ОЧИСТИТЬ</button>`; document.getElementById('marqueeSave').addEventListener('click',()=>{ marqueeText=document.getElementById('marqueeInput').value.trim(); db.ref('marquee').set(marqueeText); updateMarquee(); }); document.getElementById('marqueeClear').addEventListener('click',()=>{ marqueeText=''; db.ref('marquee').set(''); updateMarquee(); }); }
 
-  // АДМИН: EVENTS
+  // ADMIN: EVENTS
   function renderAEv(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminEventList"></div><input type="date" class="admin-input" id="evDate"><input type="time" class="admin-input" id="evTime"><input type="text" class="admin-input" id="evTitle"><textarea class="admin-textarea" id="evDesc"></textarea><input type="hidden" id="evEditIdx" value="-1"><button class="admin-btn save-btn" id="evSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="evCancel">■ ОТМЕНА</button>`; renderAEvList(); document.getElementById('evSave').addEventListener('click',saveEvent); document.getElementById('evCancel').addEventListener('click',clearEvForm); }
   function renderAEvList(){ const l=document.getElementById('adminEventList'); if(!l)return; l.innerHTML=''; events.forEach((e,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${e.date}</span><span>${e.title}</span><span><button onclick="window._eEv(${i})">Р</button><button onclick="window._dEv(${i})">У</button></span>`; l.appendChild(d); }); }
   window._eEv=function(i){ const e=events[i]; document.getElementById('evDate').value=e.date; document.getElementById('evTime').value=e.time; document.getElementById('evTitle').value=e.title; document.getElementById('evDesc').value=e.description; document.getElementById('evEditIdx').value=i; };
@@ -861,27 +761,30 @@
   function saveEvent(){ const date=document.getElementById('evDate').value, time=document.getElementById('evTime').value, title=document.getElementById('evTitle').value.trim(), desc=document.getElementById('evDesc').value.trim(); if(!date||!title)return; const data={date,time:time||'00:00',title,description:desc}; const ei=parseInt(document.getElementById('evEditIdx').value); if(ei>=0) events[ei]=data; else events.push(data); db.ref('events').set(events); renderEvents(); renderAEvList(); clearEvForm(); }
   function clearEvForm(){ document.getElementById('evDate').value=''; document.getElementById('evTime').value=''; document.getElementById('evTitle').value=''; document.getElementById('evDesc').value=''; document.getElementById('evEditIdx').value='-1'; }
 
-  // АДМИН: APPS
+  // ADMIN: APPS
   function renderAApps(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminAppList"></div>`; renderAAppList(); }
   function renderAAppList(){ const l=document.getElementById('adminAppList'); if(!l)return; l.innerHTML=''; if(!applications.length){ l.innerHTML='<div style="color:#ffaa00;padding:10px;">НЕТ ЗАЯВОК</div>'; return; } applications.forEach((a,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${a.name}</span><span><button onclick="window._acceptApp(${i})">✓</button><button onclick="window._rejectApp(${i})">✕</button></span>`; l.appendChild(d); }); }
   window._acceptApp=function(i){ const a=applications[i]; if(confirm('Принять?')){ members.push({name:a.name,role:a.role||'Рекрут',status:'Активен',profileHTML:`<div>${a.name}</div>`}); db.ref('members').set(members); applications.splice(i,1); db.ref('applications').set(applications); renderM(); renderAAppList(); } };
   window._rejectApp=function(i){ if(confirm('Отклонить?')){ applications.splice(i,1); db.ref('applications').set(applications); renderAAppList(); } };
 
-  // АДМИН: DRONES, RADIO, SYSTEM, MEMBERS, TASKS, DATA
+  // ADMIN: DRONES
   function renderADr(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminDroneList"></div><input type="text" class="admin-input" id="drName"><input type="text" class="admin-input" id="drStatus"><input type="range" class="resource-slider" id="drHealth" min="0" max="100" value="85"><div id="drHealthVal">85%</div><input type="hidden" id="drEditIdx" value="-1"><button class="admin-btn save-btn" id="drSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="drCancel">■ ОТМЕНА</button>`; renderADrList(); document.getElementById('drHealth').addEventListener('input',function(){ document.getElementById('drHealthVal').textContent=this.value+'%'; }); document.getElementById('drSave').addEventListener('click',saveDrone); document.getElementById('drCancel').addEventListener('click',clearDrForm); }
   function renderADrList(){ const l=document.getElementById('adminDroneList'); if(!l)return; l.innerHTML=''; drones.forEach((d,i)=>{ const div=document.createElement('div'); div.className='admin-list-item'; div.innerHTML=`<span>${d.name}</span><span><button onclick="window._eDr(${i})">РЕД</button></span>`; l.appendChild(div); }); }
   window._eDr=function(i){ const d=drones[i]; document.getElementById('drName').value=d.name; document.getElementById('drStatus').value=d.status; document.getElementById('drHealth').value=d.health; document.getElementById('drHealthVal').textContent=d.health+'%'; document.getElementById('drEditIdx').value=i; };
   function saveDrone(){ const n=document.getElementById('drName').value.trim(), s=document.getElementById('drStatus').value.trim(), h=parseInt(document.getElementById('drHealth').value); if(!n)return; const ei=parseInt(document.getElementById('drEditIdx').value); if(ei>=0) drones[ei]={name:n,status:s,health:h}; db.ref('drones').set(drones); renderDrones(); renderADrList(); clearDrForm(); }
   function clearDrForm(){ document.getElementById('drName').value=''; document.getElementById('drStatus').value=''; document.getElementById('drHealth').value=85; document.getElementById('drHealthVal').textContent='85%'; document.getElementById('drEditIdx').value='-1'; }
 
+  // ADMIN: RADIO
   function renderARadio(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminRadioList"></div><input type="number" class="admin-input" id="rFreq" step="0.1"><textarea class="admin-textarea" id="rMsg"></textarea><input type="hidden" id="rEditFreq"><button class="admin-btn save-btn" id="rSave">■ СОХРАНИТЬ</button>`; renderARadioList(); document.getElementById('rSave').addEventListener('click',saveRadio); }
   function renderARadioList(){ const l=document.getElementById('adminRadioList'); if(!l)return; l.innerHTML=''; Object.keys(radioMessages).forEach(f=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${f}</span><span><button onclick="window._eR('${f}')">Р</button><button onclick="window._dR('${f}')">У</button></span>`; l.appendChild(d); }); }
   window._eR=function(f){ document.getElementById('rFreq').value=f; document.getElementById('rMsg').value=radioMessages[f]; document.getElementById('rEditFreq').value=f; };
   window._dR=function(f){ if(confirm('Удалить?')){ delete radioMessages[f]; db.ref('radioMessages').set(radioMessages); updateFreqDisplay(); renderARadioList(); } };
   function saveRadio(){ const freq=parseFloat(document.getElementById('rFreq').value).toFixed(1), msg=document.getElementById('rMsg').value.trim(); if(!freq||!msg)return; radioMessages[freq]=msg; db.ref('radioMessages').set(radioMessages); updateFreqDisplay(); renderARadioList(); }
 
+  // ADMIN: SYSTEM
   function renderAS(){ adminContent.innerHTML=`<input type="range" class="resource-slider" id="sr" min="0" max="9" value="${sys.resources}"><div id="sp">${'◼'.repeat(sys.resources)+'◻'.repeat(9-sys.resources)}</div><input type="number" class="admin-input" id="sa" value="${sys.arsenal}"><input type="text" class="admin-input" id="sw" value="${sys.water}"><input type="text" class="admin-input" id="sl" value="${sys.activity}"><input type="text" class="admin-input" id="ss" value="${sys.sysMsg}"><button class="admin-btn save-btn" id="ssBtn">■ СОХРАНИТЬ</button>`; document.getElementById('sr').addEventListener('input',function(){ document.getElementById('sp').textContent='◼'.repeat(parseInt(this.value))+'◻'.repeat(9-parseInt(this.value)); }); document.getElementById('ssBtn').addEventListener('click',()=>{ sys.resources=parseInt(document.getElementById('sr').value); sys.arsenal=parseInt(document.getElementById('sa').value)||0; sys.water=document.getElementById('sw').value.trim(); sys.activity=document.getElementById('sl').value.trim(); sys.sysMsg=document.getElementById('ss').value.trim(); db.ref('system').set(sys); renderSys(); }); }
 
+  // ADMIN: MEMBERS
   function renderAM(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminMemberList"></div><input type="text" class="admin-input" id="aName"><input type="text" class="admin-input" id="aRole"><input type="text" class="admin-input" id="aStatus" value="Активен"><textarea class="admin-textarea" id="aProfile"></textarea><input type="hidden" id="aEditIdx" value="-1"><button class="admin-btn save-btn" id="mSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="mCancel">■ ОТМЕНА</button>`; renderAML(); document.getElementById('mSave').addEventListener('click',saveM); document.getElementById('mCancel').addEventListener('click',clearMF); }
   function renderAML(){ const l=document.getElementById('adminMemberList'); if(!l)return; l.innerHTML=''; members.forEach((m,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${m.name}</span><span><button onclick="window._eM(${i})">Р</button><button onclick="window._dM(${i})">У</button></span>`; l.appendChild(d); }); }
   window._eM=function(i){ const m=members[i]; document.getElementById('aName').value=m.name; document.getElementById('aRole').value=m.role; document.getElementById('aStatus').value=m.status||'Активен'; document.getElementById('aProfile').value=m.profileHTML||''; document.getElementById('aEditIdx').value=i; };
@@ -889,12 +792,14 @@
   function saveM(){ const n=document.getElementById('aName').value.trim(), r=document.getElementById('aRole').value.trim(); if(!n||!r)return; const d={name:n,role:r,status:document.getElementById('aStatus').value.trim()||'Активен',profileHTML:document.getElementById('aProfile').value}; const ei=parseInt(document.getElementById('aEditIdx').value); if(ei>=0) members[ei]=d; else members.push(d); db.ref('members').set(members); renderM(); renderAML(); clearMF(); }
   function clearMF(){ document.getElementById('aName').value=''; document.getElementById('aRole').value=''; document.getElementById('aStatus').value='Активен'; document.getElementById('aProfile').value=''; document.getElementById('aEditIdx').value='-1'; }
 
+  // ADMIN: TASKS
   function renderAT(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminTaskList"></div><input type="text" class="admin-input" id="tId"><input type="text" class="admin-input" id="tDesc"><input type="text" class="admin-input" id="tDead"><input type="hidden" id="tEditIdx" value="-1"><button class="admin-btn save-btn" id="tSave">■ СОХРАНИТЬ</button>`; renderATL(); document.getElementById('tSave').addEventListener('click',saveT); }
   function renderATL(){ const l=document.getElementById('adminTaskList'); if(!l)return; l.innerHTML=''; tasks.forEach((t,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${t.id}</span><span><button onclick="window._eT(${i})">Р</button><button onclick="window._dT(${i})">У</button></span>`; l.appendChild(d); }); }
   window._eT=function(i){ const t=tasks[i]; document.getElementById('tId').value=t.id; document.getElementById('tDesc').value=t.description; document.getElementById('tDead').value=t.deadline; document.getElementById('tEditIdx').value=i; };
   window._dT=function(i){ if(confirm('Удалить?')){ tasks.splice(i,1); db.ref('tasks').set(tasks); renderT(); renderATL(); } };
   function saveT(){ const id=document.getElementById('tId').value.trim(), d=document.getElementById('tDesc').value.trim(), dl=document.getElementById('tDead').value.trim(); if(!id||!d||!dl)return; const ei=parseInt(document.getElementById('tEditIdx').value); if(ei>=0) tasks[ei]={id,description:d,deadline:dl}; else tasks.push({id,description:d,deadline:dl}); db.ref('tasks').set(tasks); renderT(); renderATL(); }
 
+  // ADMIN: DATA
   function renderAD(){ adminContent.innerHTML=`<button class="admin-btn" id="expM">■ ЭКСПОРТ</button><textarea class="admin-textarea" id="impM"></textarea><button class="admin-btn" id="impMBtn">■ ИМПОРТ</button>`; document.getElementById('expM').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(members,null,2)); }); document.getElementById('impMBtn').addEventListener('click',()=>{ try{ const d=JSON.parse(document.getElementById('impM').value); if(Array.isArray(d)){ members=d; db.ref('members').set(members); renderM(); } }catch(e){} }); }
 
   // RADIO
@@ -904,7 +809,6 @@
   // VAULT
   document.querySelectorAll('.vault-btn').forEach(b=>{ b.addEventListener('click',()=>{ document.querySelectorAll('.vault-btn').forEach(x=>x.classList.remove('active-floor')); b.classList.add('active-floor'); const img=document.getElementById('vaultImage'); if(img)img.src=`vault_floor_${parseInt(b.dataset.floor)+1}.png`; }); });
 
-  // START
   loadData();
   runBoot();
   setAdmin(false);
