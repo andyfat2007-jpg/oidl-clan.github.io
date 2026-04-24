@@ -35,7 +35,6 @@
     @keyframes scanlines { 0% { background-position: 0 0; } 100% { background-position: 0 15px; } }
 
     .glitch-effect { animation: glitch 0.3s ease-in-out; }
-
     @keyframes glitch {
       0% { transform: translate(2px, -1px); opacity: 0.8; }
       50% { transform: translate(-3px, 2px); opacity: 0.6; }
@@ -140,7 +139,7 @@
       flex: 1; text-align: center; padding: 12px 4px; color: #3db83d;
       text-transform: uppercase; border-right: 1px solid #1b411b;
       cursor: pointer; font-weight: bold; letter-spacing: 1.5px; background: #081708; user-select: none;
-      min-width: 80px; font-size: 0.95rem;
+      min-width: 80px; font-size: 0.9rem;
     }
     .nav-item:last-child { border-right: none; }
     .nav-item:hover { background: #143314; color: #a0ffa0; text-shadow: 0 0 15px #33ff33; }
@@ -164,31 +163,27 @@
     .drone-name { color: #5fff5f; font-size: 1.2rem; font-family: 'VT323', monospace; letter-spacing: 2px; }
     .drone-status { color: #8dc98d; font-size: 0.9rem; margin-top: 4px; }
     .drone-health { margin-top: 6px; }
-    .drone-health-bar {
-      height: 10px; background: #1a3a1a; border: 1px solid #2a5a2a;
-      width: 200px; margin-top: 3px;
-    }
-    .drone-health-fill {
-      height: 100%; background: #33ff33;
-      transition: width 0.5s;
-    }
+    .drone-health-bar { height: 10px; background: #1a3a1a; border: 1px solid #2a5a2a; width: 200px; margin-top: 3px; }
+    .drone-health-fill { height: 100%; background: #33ff33; transition: width 0.5s; }
     .drone-health-fill.warning { background: #ffaa00; }
     .drone-health-fill.danger { background: #ff4444; }
     .drone-actions { display: flex; gap: 8px; }
-    .drone-btn {
-      background: #0a1d0a; border: 1px solid #278027; color: #66dd66;
-      padding: 8px 14px; font-family: inherit; font-size: 0.9rem;
-      text-transform: uppercase; cursor: pointer;
-    }
+    .drone-btn { background: #0a1d0a; border: 1px solid #278027; color: #66dd66; padding: 8px 14px; font-family: inherit; font-size: 0.9rem; text-transform: uppercase; cursor: pointer; }
     .drone-btn:hover { background: #143e14; }
     .drone-btn.diag-btn { border-color: #44aaff; color: #44aaff; }
     .drone-btn.diag-btn:hover { background: #0a1a2a; }
 
-    .diagnostic-log {
-      border: 1px solid #33bb33; background: #051005;
-      padding: 12px; margin-top: 20px; min-height: 100px;
-      color: #b6fbb6; font-size: 0.9rem; white-space: pre-wrap;
-    }
+    .diagnostic-log { border: 1px solid #33bb33; background: #051005; padding: 12px; margin-top: 20px; min-height: 100px; color: #b6fbb6; font-size: 0.9rem; white-space: pre-wrap; }
+
+    /* Анкета */
+    .application-form { border: 2px solid #ffaa00; padding: 20px; background: #0a1a0a; margin: 15px 0; }
+    .application-form h3 { color: #ffaa00; text-align: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 3px; font-family: 'VT323', monospace; }
+    .app-field { margin-bottom: 12px; }
+    .app-label { color: #ffcc66; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 3px; display: block; }
+    .app-input { width: 100%; background: #0b1f0b; border: 2px solid #ffaa00; color: #ffcc88; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 0.95rem; outline: none; }
+    .app-textarea { width: 100%; background: #0b1f0b; border: 2px solid #ffaa00; color: #ffcc88; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 0.95rem; outline: none; resize: vertical; min-height: 70px; }
+    .app-submit { background: #1a0a00; border: 2px solid #ffaa00; color: #ffaa00; padding: 12px 28px; font-family: inherit; font-size: 1.1rem; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 10px; }
+    .app-submit:hover { background: #331a00; box-shadow: 0 0 15px #ffaa00; }
 
     .profile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 200; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
     .profile-overlay.hidden { display: none; }
@@ -226,6 +221,8 @@
     .admin-btn:hover { background: #330000; box-shadow: 0 0 15px #ff4444; }
     .admin-btn.save-btn { border-color: #44ff44; color: #44ff44; background: #001a00; }
     .admin-btn.save-btn:hover { background: #003300; box-shadow: 0 0 15px #44ff44; }
+    .admin-btn.accept-btn { border-color: #44ff44; color: #44ff44; background: #002200; }
+    .admin-btn.reject-btn { border-color: #ff4444; color: #ff4444; background: #220000; }
 
     .admin-member-list { max-height: 250px; overflow-y: auto; border: 1px solid #ff4444; padding: 10px; margin: 10px 0; }
     .admin-member-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px dotted #552222; color: #ffaaaa; }
@@ -233,7 +230,7 @@
     .admin-member-item button:hover { background: #ff4444; color: #000; }
 
     .admin-tabs { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
-    .admin-tab { background: #1a0000; border: 1px solid #ff4444; color: #ff8888; padding: 8px 12px; cursor: pointer; font-family: inherit; text-transform: uppercase; font-size: 0.85rem; }
+    .admin-tab { background: #1a0000; border: 1px solid #ff4444; color: #ff8888; padding: 8px 10px; cursor: pointer; font-family: inherit; text-transform: uppercase; font-size: 0.8rem; }
     .admin-tab.active { background: #330000; color: #ff4444; border-bottom: 3px solid #ff4444; }
 
     .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px dotted #552222; color: #ffaaaa; }
@@ -266,6 +263,9 @@
     .admin-badge { color: #ff4444; font-size: 0.9rem; margin-left: 10px; text-shadow: 0 0 8px #ff4444; display: none; }
     .admin-badge.visible { display: inline; }
     .click-hint { font-size: 0.8rem; color: #3d8f3d; margin-top: 8px; font-style: italic; }
+
+    /* Просмотр заявки */
+    .app-view { border: 2px solid #ffaa00; padding: 16px; background: #0a0a0a; margin: 10px 0; color: #ffcc88; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.5; max-height: 300px; overflow-y: auto; }
 
     @media (max-width: 600px) { .terminal-header-center { font-size: 1.2rem; letter-spacing: 4px; } }
   </style>
@@ -310,11 +310,13 @@
         <div class="nav-item active" data-tab="dosier">► ДОСЬЕ</div>
         <div class="nav-item" data-tab="tasks">► ЗАДАЧИ</div>
         <div class="nav-item" data-tab="drones">► ДРОНЫ</div>
+        <div class="nav-item" data-tab="recruit">► НАБОР</div>
         <div class="nav-item" data-tab="map">► КАРТА</div>
         <div class="nav-item" data-tab="radio">► РАДИО</div>
         <div class="nav-item" data-tab="vault">► УБЕЖИЩЕ</div>
       </div>
 
+      <!-- ДОСЬЕ -->
       <div id="tab-dosier" class="content-pane">
         <div style="margin-bottom:8px; color:#8bef8b;">ЗАГРУЗКА ЛИЧНОГО СОСТАВА</div>
         <div class="click-hint">[ НАЖМИТЕ НА СТРОКУ ]</div>
@@ -327,6 +329,7 @@
         <div class="log-message" id="systemMessage">[СИСТЕМА] СБОР ДАННЫХ, ОРУЖИЯ, РЕСУРСОВ.</div>
       </div>
 
+      <!-- ЗАДАЧИ -->
       <div id="tab-tasks" class="content-pane hidden">
         <div style="color:#bcffbc;">== АКТИВНЫЕ ЗАДАЧИ ==</div>
         <table class="data-table"><thead><tr><th>ID</th><th>ОПИСАНИЕ</th><th>СРОК</th></tr></thead><tbody id="tasksTableBody"></tbody></table>
@@ -334,21 +337,56 @@
         <div id="taskFeedback" style="margin-top:6px;"></div>
       </div>
 
-      <!-- ВКЛАДКА ДРОНЫ -->
+      <!-- ДРОНЫ -->
       <div id="tab-drones" class="content-pane hidden">
         <div style="color:#bcffbc;margin-bottom:16px;">◆ ДРОНЫ СВЯЗИ ◆</div>
         <div id="dronesContainer"></div>
-        <div class="diagnostic-log" id="diagnosticLog">
-          [ ДИАГНОСТИКА ] ОЖИДАНИЕ ЗАПУСКА...
-        </div>
+        <div class="diagnostic-log" id="diagnosticLog">[ ДИАГНОСТИКА ] ОЖИДАНИЕ ЗАПУСКА...</div>
         <button class="terminal-button" id="diagAllBtn">■ ДИАГНОСТИКА ВСЕХ ДРОНОВ</button>
       </div>
 
+      <!-- НАБОР -->
+      <div id="tab-recruit" class="content-pane hidden">
+        <div style="color:#ffaa00;margin-bottom:16px;text-align:center;font-size:1.3rem;letter-spacing:3px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ НА ВСТУПЛЕНИЕ ◆</div>
+        <div class="application-form" id="applicationForm">
+          <div style="color:#ffaa00;margin-bottom:16px;text-align:center;">ОСНОВНЫЕ ДАННЫЕ</div>
+          <div class="app-field"><span class="app-label">Имя (полное имя/прозвище):</span><input type="text" class="app-input" id="appName" placeholder="Введите имя..."></div>
+          <div class="app-field"><span class="app-label">Пол (М/Ж/Другое):</span><input type="text" class="app-input" id="appGender" placeholder="М/Ж/Другое"></div>
+          <div class="app-field"><span class="app-label">Дата рождения (ДД.ММ + возраст):</span><input type="text" class="app-input" id="appBirth" placeholder="01.01 + 25 лет"></div>
+          <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace" placeholder="Единорог, Земной пони..."></div>
+          <div class="app-field"><span class="app-label">Желаемая должность:</span><input type="text" class="app-input" id="appRole" placeholder="Охранник, Учёный..."></div>
+          <div class="app-field"><span class="app-label">Физические параметры (Рост/Вес/Особые черты):</span><textarea class="app-textarea" id="appPhysical" placeholder="Рост: см&#10;Вес: кг&#10;Отличительные черты: ..."></textarea></div>
+
+          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ПРОФЕССИОНАЛЬНЫЕ ДАННЫЕ</div>
+          <div class="app-field"><span class="app-label">Отдел/Специализация:</span><input type="text" class="app-input" id="appSpecialization" placeholder="Боевой/Медицинский/Разведывательный..."></div>
+          <div class="app-field"><span class="app-label">Навыки (3 ключевых + уровень):</span><textarea class="app-textarea" id="appSkills" placeholder="1) ...&#10;2) ...&#10;3) ..."></textarea></div>
+          <div class="app-field"><span class="app-label">Наставник (если есть):</span><input type="text" class="app-input" id="appMentor" placeholder="Имя наставника или нет"></div>
+
+          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ЛИЧНОСТЬ И БИОГРАФИЯ</div>
+          <div class="app-field"><span class="app-label">Краткая история:</span><textarea class="app-textarea" id="appHistory" placeholder="Происхождение, важные события, причина вступления в клан..."></textarea></div>
+          <div class="app-field"><span class="app-label">Характер:</span><textarea class="app-textarea" id="appCharacter" placeholder="Основные качества, принципы..."></textarea></div>
+          <div class="app-field"><span class="app-label">Фобии/Слабости:</span><textarea class="app-textarea" id="appPhobias" placeholder="Что влияет на решения..."></textarea></div>
+
+          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ОСОБЫЕ ОТМЕТКИ</div>
+          <div class="app-field"><span class="app-label">Вредные привычки:</span><input type="text" class="app-input" id="appHabits" placeholder="Курение, агрессия..."></div>
+          <div class="app-field"><span class="app-label">Хронические болезни:</span><input type="text" class="app-input" id="appIllnesses" placeholder="Если имеются..."></div>
+          <div class="app-field"><span class="app-label">Аллергии/Непереносимости:</span><input type="text" class="app-input" id="appAllergies" placeholder="Пищевые, медицинские..."></div>
+
+          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ДОПОЛНИТЕЛЬНО</div>
+          <div class="app-field"><span class="app-label">Хобби:</span><input type="text" class="app-input" id="appHobbies" placeholder="Увлечения..."></div>
+          <div class="app-field"><span class="app-label">Личные цели:</span><textarea class="app-textarea" id="appGoals" placeholder="Чего хочет достичь..."></textarea></div>
+
+          <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ ЗАЯВКУ</button>
+        </div>
+      </div>
+
+      <!-- КАРТА -->
       <div id="tab-map" class="content-pane hidden">
         <div style="color:#bcffbc;">◆ КАРТА ПУСТОШИ ◆</div>
         <div class="map-container"><img src="map.png" alt="КАРТА" class="map-image" id="mapImage"></div>
       </div>
 
+      <!-- РАДИО -->
       <div id="tab-radio" class="content-pane hidden">
         <div style="color:#bcffbc;">◆ РАДИО ◆</div>
         <div class="radio-tuner">
@@ -359,6 +397,7 @@
         </div>
       </div>
 
+      <!-- УБЕЖИЩЕ -->
       <div id="tab-vault" class="content-pane hidden">
         <div style="color:#bcffbc;">◆ СХЕМА УБЕЖИЩА 42 ◆</div>
         <div class="vault-controls">
@@ -392,6 +431,7 @@
         <button class="admin-tab active" data-admin-tab="members">УЧАСТНИКИ</button>
         <button class="admin-tab" data-admin-tab="tasks">ЗАДАЧИ</button>
         <button class="admin-tab" data-admin-tab="drones">ДРОНЫ</button>
+        <button class="admin-tab" data-admin-tab="apps">ЗАЯВКИ</button>
         <button class="admin-tab" data-admin-tab="system">СИСТЕМА</button>
         <button class="admin-tab" data-admin-tab="data">ДАННЫЕ</button>
       </div>
@@ -399,7 +439,7 @@
     </div>
   </div>
 
-  <div class="terminal-footer"><span>СИСТЕМА: ОПЕРАТИВНАЯ</span><span>О.И.Д.Л. v.2.7</span><span>ЯДРО: 99%</span></div>
+  <div class="terminal-footer"><span>СИСТЕМА: ОПЕРАТИВНАЯ</span><span>О.И.Д.Л. v.2.8</span><span>ЯДРО: 99%</span></div>
 </div>
 
 <script>
@@ -442,7 +482,7 @@
     { name: "СТРИЖ-4", status: "РЕМОНТ", health: 18 }
   ];
 
-  let members=[], tasks=[], sys={...DEFSYS}, drones=[...DEFDRONES], isAdmin=false;
+  let members=[], tasks=[], sys={...DEFSYS}, drones=[...DEFDRONES], applications=[], isAdmin=false;
 
   function renderSys() {
     const r=sys.resources, el=document.getElementById('resourcesDisplay'); if(el)el.textContent='◼'.repeat(r)+'◻'.repeat(9-r);
@@ -451,62 +491,26 @@
   }
 
   function renderDrones() {
-    const container = document.getElementById('dronesContainer');
-    if (!container) return;
-    container.innerHTML = '';
+    const container = document.getElementById('dronesContainer'); if (!container) return; container.innerHTML = '';
     drones.forEach((drone, i) => {
-      const healthClass = drone.health < 30 ? 'danger' : (drone.health < 60 ? 'warning' : '');
-      const card = document.createElement('div');
-      card.className = 'drone-card';
-      card.innerHTML = `
-        <div class="drone-info">
-          <div class="drone-name">◆ ${drone.name}</div>
-          <div class="drone-status">СТАТУС: ${drone.status}</div>
-          <div class="drone-health">
-            РАБОТОСПОСОБНОСТЬ: ${drone.health}%
-            <div class="drone-health-bar"><div class="drone-health-fill ${healthClass}" style="width:${drone.health}%"></div></div>
-          </div>
-        </div>
-        <div class="drone-actions">
-          <button class="drone-btn diag-btn" onclick="window._diagDrone(${i})">▶ ДИАГНОСТИКА</button>
-        </div>`;
+      const hc = drone.health < 30 ? 'danger' : (drone.health < 60 ? 'warning' : '');
+      const card = document.createElement('div'); card.className = 'drone-card';
+      card.innerHTML = `<div class="drone-info"><div class="drone-name">◆ ${drone.name}</div><div class="drone-status">СТАТУС: ${drone.status}</div><div class="drone-health">РАБОТОСПОСОБНОСТЬ: ${drone.health}%<div class="drone-health-bar"><div class="drone-health-fill ${hc}" style="width:${drone.health}%"></div></div></div></div><div class="drone-actions"><button class="drone-btn diag-btn" onclick="window._diagDrone(${i})">▶ ДИАГНОСТИКА</button></div>`;
       container.appendChild(card);
     });
   }
 
   window._diagDrone = function(i) {
-    const drone = drones[i];
-    const log = document.getElementById('diagnosticLog');
-    const messages = [
-      `[${drone.name}] ЗАПУСК ДИАГНОСТИКИ...`,
-      `[${drone.name}] ПРОВЕРКА СВЯЗИ... OK`,
-      `[${drone.name}] СОСТОЯНИЕ БАТАРЕИ: ${drone.health}%`,
-      `[${drone.name}] КАНАЛ ПЕРЕДАЧИ: СТАБИЛЕН`,
-      `[${drone.name}] ДИАГНОСТИКА ЗАВЕРШЕНА.`
-    ];
-    log.textContent = '';
-    let idx = 0;
-    const iv = setInterval(() => {
-      if (idx < messages.length) {
-        log.textContent += messages[idx] + '\n';
-        log.scrollTop = log.scrollHeight;
-        idx++;
-      } else {
-        clearInterval(iv);
-      }
-    }, 400);
+    const drone = drones[i]; const log = document.getElementById('diagnosticLog');
+    const msgs = [`[${drone.name}] ЗАПУСК ДИАГНОСТИКИ...`,`[${drone.name}] СВЯЗЬ: OK`,`[${drone.name}] БАТАРЕЯ: ${drone.health}%`,`[${drone.name}] КАНАЛ: СТАБИЛЕН`,`[${drone.name}] ДИАГНОСТИКА ЗАВЕРШЕНА.`];
+    log.textContent = ''; let idx = 0;
+    const iv = setInterval(() => { if (idx < msgs.length) { log.textContent += msgs[idx] + '\n'; log.scrollTop = log.scrollHeight; idx++; } else clearInterval(iv); }, 400);
     playKey();
   };
 
   document.getElementById('diagAllBtn')?.addEventListener('click', () => {
-    const log = document.getElementById('diagnosticLog');
-    log.textContent = '[ДИАГНОСТИКА ВСЕХ ДРОНОВ]\n';
-    drones.forEach((d, i) => {
-      setTimeout(() => {
-        log.textContent += `[${d.name}] РАБОТОСПОСОБНОСТЬ: ${d.health}% | СТАТУС: ${d.status}\n`;
-        log.scrollTop = log.scrollHeight;
-      }, (i + 1) * 500);
-    });
+    const log = document.getElementById('diagnosticLog'); log.textContent = '[ДИАГНОСТИКА ВСЕХ ДРОНОВ]\n';
+    drones.forEach((d, i) => { setTimeout(() => { log.textContent += `[${d.name}] РАБОТОСПОСОБНОСТЬ: ${d.health}% | СТАТУС: ${d.status}\n`; log.scrollTop = log.scrollHeight; }, (i+1)*500); });
     playBeep();
   });
 
@@ -516,25 +520,13 @@
     db.ref('tasks').on('value',sn=>{ if(sn.exists()){ tasks=sn.val(); renderT(); } });
     db.ref('system').on('value',sn=>{ if(sn.exists()){ sys=sn.val(); renderSys(); } });
     db.ref('drones').on('value',sn=>{ if(sn.exists()){ drones=sn.val(); } else { db.ref('drones').set(DEFDRONES); } renderDrones(); });
+    db.ref('applications').on('value',sn=>{ if(sn.exists()){ applications=sn.val(); } else { applications=[]; } });
   }
 
-  function renderM() {
-    const t=document.getElementById('clanMembersBody'); if(!t)return; t.innerHTML='';
-    members.forEach((m,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${m.name}</td><td>${m.role}</td><td>${m.status||'Активен'}</td>`; tr.style.cursor='pointer'; tr.addEventListener('click',()=>openProfile(i)); t.appendChild(tr); });
-  }
+  function renderM() { const t=document.getElementById('clanMembersBody'); if(!t)return; t.innerHTML=''; members.forEach((m,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${m.name}</td><td>${m.role}</td><td>${m.status||'Активен'}</td>`; tr.style.cursor='pointer'; tr.addEventListener('click',()=>openProfile(i)); t.appendChild(tr); }); }
+  function renderT() { const t=document.getElementById('tasksTableBody'); if(!t)return; t.innerHTML=''; tasks.forEach(td=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${td.id}</td><td>${td.description}</td><td>${td.deadline}</td>`; t.appendChild(tr); }); }
 
-  function renderT() {
-    const t=document.getElementById('tasksTableBody'); if(!t)return; t.innerHTML='';
-    tasks.forEach(td=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${td.id}</td><td>${td.description}</td><td>${td.deadline}</td>`; t.appendChild(tr); });
-  }
-
-  function openProfile(i) {
-    const m=members[i]; if(!m)return;
-    document.getElementById('profileName').textContent=m.name;
-    document.getElementById('profileRole').textContent=m.role;
-    document.getElementById('profileContent').innerHTML=m.profileHTML||'<div class="profile-text">[ НЕТ ДАННЫХ ]</div>';
-    document.getElementById('profileOverlay').classList.remove('hidden');
-  }
+  function openProfile(i) { const m=members[i]; if(!m)return; document.getElementById('profileName').textContent=m.name; document.getElementById('profileRole').textContent=m.role; document.getElementById('profileContent').innerHTML=m.profileHTML||'<div class="profile-text">[ НЕТ ДАННЫХ ]</div>'; document.getElementById('profileOverlay').classList.remove('hidden'); }
 
   document.getElementById('profileClose').addEventListener('click',()=>document.getElementById('profileOverlay').classList.add('hidden'));
   document.getElementById('profileOverlay').addEventListener('click',function(e){ if(e.target===this)this.classList.add('hidden'); });
@@ -551,13 +543,44 @@
   function checkBoth() { if(lf&&pf){ loginBtn.disabled=false; loginBtn.textContent='■ ВОЙТИ'; loginHint.textContent='[ ГОТОВО ]'; } }
 
   window.addEventListener('keydown',function(e){ if(!loginO||loginO.style.display==='none')return; if(!audioCtx)initAudio(); if(!lf&&!ta)startL(); else if(lf&&!pf&&!ta)startP(); });
-
   loginBtn.addEventListener('click',()=>{ if(!lf||!pf)return; if(li)clearInterval(li); if(pi)clearInterval(pi); playBeep(); loginO.style.display='none'; mainC.style.display='block'; document.querySelector('.nav-item').click(); });
 
   // NAVIGATION
   document.querySelectorAll('.nav-item').forEach(n=>{ n.addEventListener('click',()=>{ document.querySelectorAll('.content-pane').forEach(p=>p.classList.add('hidden')); const tab=document.getElementById('tab-'+n.dataset.tab); if(tab)tab.classList.remove('hidden'); document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active')); n.classList.add('active'); }); });
-
   document.getElementById('taskConfirmBtn')?.addEventListener('click',()=>{ const fb=document.getElementById('taskFeedback'); if(fb){ fb.textContent='✓ ПРИНЯТО.'; setTimeout(()=>fb.textContent='',3000); } });
+
+  // APPLICATION SUBMIT
+  document.getElementById('appSubmitBtn')?.addEventListener('click', () => {
+    const app = {
+      name: document.getElementById('appName').value.trim(),
+      gender: document.getElementById('appGender').value.trim(),
+      birth: document.getElementById('appBirth').value.trim(),
+      race: document.getElementById('appRace').value.trim(),
+      role: document.getElementById('appRole').value.trim(),
+      physical: document.getElementById('appPhysical').value.trim(),
+      specialization: document.getElementById('appSpecialization').value.trim(),
+      skills: document.getElementById('appSkills').value.trim(),
+      mentor: document.getElementById('appMentor').value.trim(),
+      history: document.getElementById('appHistory').value.trim(),
+      character: document.getElementById('appCharacter').value.trim(),
+      phobias: document.getElementById('appPhobias').value.trim(),
+      habits: document.getElementById('appHabits').value.trim(),
+      illnesses: document.getElementById('appIllnesses').value.trim(),
+      allergies: document.getElementById('appAllergies').value.trim(),
+      hobbies: document.getElementById('appHobbies').value.trim(),
+      goals: document.getElementById('appGoals').value.trim(),
+      date: new Date().toLocaleString('ru-RU')
+    };
+    if (!app.name) { alert('ИМЯ ОБЯЗАТЕЛЬНО!'); return; }
+    applications.push(app);
+    db.ref('applications').set(applications);
+    alert('ЗАЯВКА ОТПРАВЛЕНА НА РАССМОТРЕНИЕ!');
+    // Очистить форму
+    ['appName','appGender','appBirth','appRace','appRole','appPhysical','appSpecialization','appSkills','appMentor','appHistory','appCharacter','appPhobias','appHabits','appIllnesses','appAllergies','appHobbies','appGoals'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    playBeep();
+  });
 
   // ADMIN
   const ADMIN='pipboy42';
@@ -576,161 +599,133 @@
 
   // ADMIN TABS
   const adminTabs=document.querySelectorAll('.admin-tab'), adminContent=document.getElementById('adminContent');
-  function switchATab(t){ adminTabs.forEach(tb=>tb.classList.toggle('active',tb.dataset.adminTab===t)); if(t==='members')renderAM(); else if(t==='tasks')renderAT(); else if(t==='drones')renderADr(); else if(t==='system')renderAS(); else if(t==='data')renderAD(); }
+  function switchATab(t){ adminTabs.forEach(tb=>tb.classList.toggle('active',tb.dataset.adminTab===t)); if(t==='members')renderAM(); else if(t==='tasks')renderAT(); else if(t==='drones')renderADr(); else if(t==='apps')renderAApps(); else if(t==='system')renderAS(); else if(t==='data')renderAD(); }
   adminTabs.forEach(t=>t.addEventListener('click',()=>switchATab(t.dataset.adminTab)));
+
+  // ADMIN: APPLICATIONS
+  function renderAApps() {
+    adminContent.innerHTML = `<div class="profile-label" style="color:#ffaa00;">ЗАЯВКИ НА ВСТУПЛЕНИЕ (${applications.length})</div><div class="admin-member-list" id="adminAppList"></div><div id="appViewContainer"></div>`;
+    renderAAppList();
+  }
+
+  function renderAAppList() {
+    const l = document.getElementById('adminAppList'); if (!l) return; l.innerHTML = '';
+    if (!applications.length) { l.innerHTML = '<div style="color:#ffaa00;text-align:center;padding:20px;">НЕТ ЗАЯВОК</div>'; return; }
+    applications.forEach((a, i) => {
+      const div = document.createElement('div'); div.className = 'admin-list-item';
+      div.innerHTML = `<span style="color:#ffaa00;">${a.name}</span><span>${a.role||'БЕЗ ДОЛЖНОСТИ'}</span><span>
+        <button onclick="window._viewApp(${i})">СМ</button>
+        <button class="accept-btn" onclick="window._acceptApp(${i})">ПРИНЯТЬ</button>
+        <button class="reject-btn" onclick="window._rejectApp(${i})">ОТКЛ</button></span>`;
+      l.appendChild(div);
+    });
+  }
+
+  window._viewApp = function(i) {
+    const a = applications[i];
+    const container = document.getElementById('appViewContainer');
+    container.innerHTML = `
+      <div class="app-view">
+        <strong>ОСНОВНЫЕ ДАННЫЕ</strong>
+        Имя: ${a.name}
+        Пол: ${a.gender}
+        Дата рождения: ${a.birth}
+        Раса: ${a.race}
+        Должность: ${a.role}
+        Физические параметры: ${a.physical}
+
+        <strong>ПРОФЕССИОНАЛЬНЫЕ ДАННЫЕ</strong>
+        Специализация: ${a.specialization}
+        Навыки: ${a.skills}
+        Наставник: ${a.mentor}
+
+        <strong>ЛИЧНОСТЬ И БИОГРАФИЯ</strong>
+        История: ${a.history}
+        Характер: ${a.character}
+        Фобии: ${a.phobias}
+
+        <strong>ОСОБЫЕ ОТМЕТКИ</strong>
+        Вредные привычки: ${a.habits}
+        Болезни: ${a.illnesses}
+        Аллергии: ${a.allergies}
+
+        <strong>ДОПОЛНИТЕЛЬНО</strong>
+        Хобби: ${a.hobbies}
+        Цели: ${a.goals}
+
+        Подана: ${a.date}
+      </div>`;
+  };
+
+  window._acceptApp = function(i) {
+    const a = applications[i];
+    if (confirm(`Принять "${a.name}" в клан?`)) {
+      const profileHTML = `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: ${a.name}\nПол: ${a.gender}\nРаса: ${a.race}\nДолжность: ${a.role||'Не указана'}</div></div><hr class="profile-divider"><div class="profile-section"><div class="profile-label">БИОГРАФИЯ</div><div class="profile-text">${a.history||'Не указана'}</div></div>`;
+      members.push({ name: a.name, role: a.role || 'Рекрут', status: 'Активен', profileHTML });
+      db.ref('members').set(members);
+      applications.splice(i, 1);
+      db.ref('applications').set(applications);
+      renderM();
+      renderAAppList();
+      document.getElementById('appViewContainer').innerHTML = '';
+      alert(`${a.name} ПРИНЯТ В КЛАН!`);
+      playBeep();
+    }
+  };
+
+  window._rejectApp = function(i) {
+    if (confirm(`Отклонить заявку "${applications[i].name}"?`)) {
+      applications.splice(i, 1);
+      db.ref('applications').set(applications);
+      renderAAppList();
+      document.getElementById('appViewContainer').innerHTML = '';
+      alert('ЗАЯВКА ОТКЛОНЕНА.');
+    }
+  };
 
   // ADMIN: DRONES
   function renderADr() {
     adminContent.innerHTML = `
-      <div class="profile-label" style="color:#ff6666;">РЕДАКТИРОВАНИЕ ДРОНОВ</div>
-      <div class="admin-member-list" id="adminDroneList"></div>
-      <hr class="profile-divider" style="border-color:#552222;">
-      <input type="text" class="admin-input" id="drName" placeholder="НАЗВАНИЕ">
-      <input type="text" class="admin-input" id="drStatus" placeholder="СТАТУС">
+      <div class="profile-label" style="color:#ff6666;">РЕДАКТИРОВАНИЕ ДРОНОВ</div><div class="admin-member-list" id="adminDroneList"></div>
+      <input type="text" class="admin-input" id="drName" placeholder="НАЗВАНИЕ"><input type="text" class="admin-input" id="drStatus" placeholder="СТАТУС">
       <div class="profile-label" style="color:#ff6666;">РАБОТОСПОСОБНОСТЬ (%)</div>
-      <input type="range" class="resource-slider" id="drHealth" min="0" max="100" value="85">
-      <div style="color:#ffaaaa;text-align:center;font-size:1.2rem;" id="drHealthVal">85%</div>
+      <input type="range" class="resource-slider" id="drHealth" min="0" max="100" value="85"><div style="color:#ffaaaa;text-align:center;font-size:1.2rem;" id="drHealthVal">85%</div>
       <input type="hidden" id="drEditIdx" value="-1">
-      <button class="admin-btn save-btn" id="drSave">■ СОХРАНИТЬ ДРОН</button>
-      <button class="admin-btn" id="drCancel">■ ОТМЕНА</button>`;
+      <button class="admin-btn save-btn" id="drSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="drCancel">■ ОТМЕНА</button>`;
     renderADrList();
     document.getElementById('drHealth').addEventListener('input', function() { document.getElementById('drHealthVal').textContent = this.value + '%'; });
     document.getElementById('drSave').addEventListener('click', saveDrone);
     document.getElementById('drCancel').addEventListener('click', clearDrForm);
   }
 
-  function renderADrList() {
-    const l = document.getElementById('adminDroneList'); if (!l) return; l.innerHTML = '';
-    drones.forEach((d, i) => {
-      const div = document.createElement('div'); div.className = 'admin-list-item';
-      div.innerHTML = `<span>${d.name} — ${d.health}% [${d.status}]</span><span><button onclick="window._eDr(${i})">РЕД</button></span>`;
-      l.appendChild(div);
-    });
-  }
-
-  window._eDr = function(i) {
-    const d = drones[i];
-    document.getElementById('drName').value = d.name;
-    document.getElementById('drStatus').value = d.status;
-    document.getElementById('drHealth').value = d.health;
-    document.getElementById('drHealthVal').textContent = d.health + '%';
-    document.getElementById('drEditIdx').value = i;
-  };
-
-  function saveDrone() {
-    const name = document.getElementById('drName').value.trim();
-    const status = document.getElementById('drStatus').value.trim();
-    const health = parseInt(document.getElementById('drHealth').value);
-    if (!name) { alert('ВВЕДИТЕ НАЗВАНИЕ!'); return; }
-    const data = { name, status: status || 'АКТИВЕН', health };
-    const ei = parseInt(document.getElementById('drEditIdx').value);
-    if (ei >= 0 && ei < drones.length) drones[ei] = data;
-    db.ref('drones').set(drones);
-    renderDrones();
-    renderADrList();
-    clearDrForm();
-    playBeep();
-  }
-
-  function clearDrForm() {
-    document.getElementById('drName').value = '';
-    document.getElementById('drStatus').value = '';
-    document.getElementById('drHealth').value = 85;
-    document.getElementById('drHealthVal').textContent = '85%';
-    document.getElementById('drEditIdx').value = '-1';
-  }
+  function renderADrList() { const l=document.getElementById('adminDroneList'); if(!l)return; l.innerHTML=''; drones.forEach((d,i)=>{ const div=document.createElement('div'); div.className='admin-list-item'; div.innerHTML=`<span>${d.name} — ${d.health}% [${d.status}]</span><span><button onclick="window._eDr(${i})">РЕД</button></span>`; l.appendChild(div); }); }
+  window._eDr=function(i){ const d=drones[i]; document.getElementById('drName').value=d.name; document.getElementById('drStatus').value=d.status; document.getElementById('drHealth').value=d.health; document.getElementById('drHealthVal').textContent=d.health+'%'; document.getElementById('drEditIdx').value=i; };
+  function saveDrone() { const name=document.getElementById('drName').value.trim(), status=document.getElementById('drStatus').value.trim(), health=parseInt(document.getElementById('drHealth').value); if(!name){ alert('ВВЕДИТЕ НАЗВАНИЕ!'); return; } const data={ name, status:status||'АКТИВЕН', health }; const ei=parseInt(document.getElementById('drEditIdx').value); if(ei>=0&&ei<drones.length) drones[ei]=data; db.ref('drones').set(drones); renderDrones(); renderADrList(); clearDrForm(); playBeep(); }
+  function clearDrForm() { document.getElementById('drName').value=''; document.getElementById('drStatus').value=''; document.getElementById('drHealth').value=85; document.getElementById('drHealthVal').textContent='85%'; document.getElementById('drEditIdx').value='-1'; }
 
   // ADMIN: SYSTEM
   function renderAS() {
-    adminContent.innerHTML=`
-      <div class="profile-section"><div class="profile-label" style="color:#ff6666;">РЕСУРСЫ (0-9)</div><input type="range" class="resource-slider" id="sr" min="0" max="9" value="${sys.resources}"><div style="color:#ffaaaa;text-align:center;font-size:1.3rem;" id="sp">${'◼'.repeat(sys.resources)+'◻'.repeat(9-sys.resources)}</div></div>
-      <hr class="profile-divider" style="border-color:#552222;">
-      <div class="profile-section"><div class="profile-label" style="color:#ff6666;">АРСЕНАЛ (%)</div><input type="number" class="admin-input" id="sa" value="${sys.arsenal}"></div>
-      <div class="profile-section"><div class="profile-label" style="color:#ff6666;">ВОДА / ПАЁК</div><input type="text" class="admin-input" id="sw" value="${sys.water}"></div>
-      <div class="profile-section"><div class="profile-label" style="color:#ff6666;">АКТИВНОСТЬ</div><input type="text" class="admin-input" id="sl" value="${sys.activity}"></div>
-      <div class="profile-section"><div class="profile-label" style="color:#ff6666;">[СИСТЕМА]</div><input type="text" class="admin-input" id="ss" value="${sys.sysMsg}"></div>
-      <button class="admin-btn save-btn" id="ssBtn">■ СОХРАНИТЬ</button>`;
+    adminContent.innerHTML=`<div class="profile-section"><div class="profile-label" style="color:#ff6666;">РЕСУРСЫ (0-9)</div><input type="range" class="resource-slider" id="sr" min="0" max="9" value="${sys.resources}"><div style="color:#ffaaaa;text-align:center;font-size:1.3rem;" id="sp">${'◼'.repeat(sys.resources)+'◻'.repeat(9-sys.resources)}</div></div><hr class="profile-divider" style="border-color:#552222;"><div class="profile-section"><div class="profile-label" style="color:#ff6666;">АРСЕНАЛ (%)</div><input type="number" class="admin-input" id="sa" value="${sys.arsenal}"></div><div class="profile-section"><div class="profile-label" style="color:#ff6666;">ВОДА / ПАЁК</div><input type="text" class="admin-input" id="sw" value="${sys.water}"></div><div class="profile-section"><div class="profile-label" style="color:#ff6666;">АКТИВНОСТЬ</div><input type="text" class="admin-input" id="sl" value="${sys.activity}"></div><div class="profile-section"><div class="profile-label" style="color:#ff6666;">[СИСТЕМА]</div><input type="text" class="admin-input" id="ss" value="${sys.sysMsg}"></div><button class="admin-btn save-btn" id="ssBtn">■ СОХРАНИТЬ</button>`;
     document.getElementById('sr').addEventListener('input',function(){ document.getElementById('sp').textContent='◼'.repeat(parseInt(this.value))+'◻'.repeat(9-parseInt(this.value)); });
-    document.getElementById('ssBtn').addEventListener('click',()=>{
-      sys.resources=parseInt(document.getElementById('sr').value);
-      sys.arsenal=parseInt(document.getElementById('sa').value)||0;
-      sys.water=document.getElementById('sw').value.trim();
-      sys.activity=document.getElementById('sl').value.trim();
-      sys.sysMsg=document.getElementById('ss').value.trim();
-      db.ref('system').set(sys); renderSys(); alert('СОХРАНЕНО В ОБЛАКЕ');
-    });
+    document.getElementById('ssBtn').addEventListener('click',()=>{ sys.resources=parseInt(document.getElementById('sr').value); sys.arsenal=parseInt(document.getElementById('sa').value)||0; sys.water=document.getElementById('sw').value.trim(); sys.activity=document.getElementById('sl').value.trim(); sys.sysMsg=document.getElementById('ss').value.trim(); db.ref('system').set(sys); renderSys(); alert('СОХРАНЕНО В ОБЛАКЕ'); });
   }
 
-  // ADMIN: MEMBERS
-  function renderAM() {
-    adminContent.innerHTML=`
-      <div class="admin-member-list" id="adminMemberList"></div>
-      <input type="text" class="admin-input" id="aName" placeholder="ИМЯ"><input type="text" class="admin-input" id="aRole" placeholder="РОЛЬ"><input type="text" class="admin-input" id="aStatus" placeholder="СТАТУС" value="Активен">
-      <textarea class="admin-textarea" id="aProfile" placeholder="HTML анкеты..."></textarea><input type="hidden" id="aEditIdx" value="-1">
-      <button class="admin-btn save-btn" id="mSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="mCancel">■ ОТМЕНА</button>`;
-    renderAML();
-    document.getElementById('mSave').addEventListener('click',saveM);
-    document.getElementById('mCancel').addEventListener('click',clearMF);
-  }
-
+  // ADMIN: MEMBERS, TASKS, DATA (кратко)
+  function renderAM() { adminContent.innerHTML=`<div class="admin-member-list" id="adminMemberList"></div><input type="text" class="admin-input" id="aName" placeholder="ИМЯ"><input type="text" class="admin-input" id="aRole" placeholder="РОЛЬ"><input type="text" class="admin-input" id="aStatus" placeholder="СТАТУС" value="Активен"><textarea class="admin-textarea" id="aProfile" placeholder="HTML анкеты..."></textarea><input type="hidden" id="aEditIdx" value="-1"><button class="admin-btn save-btn" id="mSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="mCancel">■ ОТМЕНА</button>`; renderAML(); document.getElementById('mSave').addEventListener('click',saveM); document.getElementById('mCancel').addEventListener('click',clearMF); }
   function renderAML() { const l=document.getElementById('adminMemberList'); if(!l)return; l.innerHTML=''; members.forEach((m,i)=>{ const d=document.createElement('div'); d.className='admin-member-item'; d.innerHTML=`<span>${m.name} - ${m.role}</span><span><button onclick="window._eM(${i})">РЕД</button><button onclick="window._dM(${i})">УДЛ</button></span>`; l.appendChild(d); }); }
   window._eM=function(i){ const m=members[i]; document.getElementById('aName').value=m.name; document.getElementById('aRole').value=m.role; document.getElementById('aStatus').value=m.status||'Активен'; document.getElementById('aProfile').value=m.profileHTML||''; document.getElementById('aEditIdx').value=i; };
   window._dM=function(i){ if(confirm('Удалить?')){ members.splice(i,1); db.ref('members').set(members); renderM(); renderAML(); } };
-
-  function saveM() {
-    const n=document.getElementById('aName').value.trim(), r=document.getElementById('aRole').value.trim();
-    if(!n||!r){ alert('ИМЯ И РОЛЬ!'); return; }
-    const data={ name:n, role:r, status:document.getElementById('aStatus').value.trim()||'Активен', profileHTML:document.getElementById('aProfile').value };
-    const ei=parseInt(document.getElementById('aEditIdx').value);
-    if(ei>=0&&ei<members.length) members[ei]=data; else members.push(data);
-    db.ref('members').set(members); renderM(); renderAML(); clearMF();
-  }
+  function saveM() { const n=document.getElementById('aName').value.trim(), r=document.getElementById('aRole').value.trim(); if(!n||!r){ alert('ИМЯ И РОЛЬ!'); return; } const data={ name:n, role:r, status:document.getElementById('aStatus').value.trim()||'Активен', profileHTML:document.getElementById('aProfile').value }; const ei=parseInt(document.getElementById('aEditIdx').value); if(ei>=0&&ei<members.length) members[ei]=data; else members.push(data); db.ref('members').set(members); renderM(); renderAML(); clearMF(); }
   function clearMF(){ document.getElementById('aName').value=''; document.getElementById('aRole').value=''; document.getElementById('aStatus').value='Активен'; document.getElementById('aProfile').value=''; document.getElementById('aEditIdx').value='-1'; }
 
-  // ADMIN: TASKS
-  function renderAT() {
-    adminContent.innerHTML=`
-      <div class="admin-member-list" id="adminTaskList"></div>
-      <input type="text" class="admin-input" id="tId" placeholder="ID"><input type="text" class="admin-input" id="tDesc" placeholder="ОПИСАНИЕ"><input type="text" class="admin-input" id="tDead" placeholder="СРОК"><input type="hidden" id="tEditIdx" value="-1">
-      <button class="admin-btn save-btn" id="tSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="tCancel">■ ОТМЕНА</button>`;
-    renderATL();
-    document.getElementById('tSave').addEventListener('click',saveT);
-    document.getElementById('tCancel').addEventListener('click',clearTF);
-  }
-
+  function renderAT() { adminContent.innerHTML=`<div class="admin-member-list" id="adminTaskList"></div><input type="text" class="admin-input" id="tId" placeholder="ID"><input type="text" class="admin-input" id="tDesc" placeholder="ОПИСАНИЕ"><input type="text" class="admin-input" id="tDead" placeholder="СРОК"><input type="hidden" id="tEditIdx" value="-1"><button class="admin-btn save-btn" id="tSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="tCancel">■ ОТМЕНА</button>`; renderATL(); document.getElementById('tSave').addEventListener('click',saveT); document.getElementById('tCancel').addEventListener('click',clearTF); }
   function renderATL() { const l=document.getElementById('adminTaskList'); if(!l)return; l.innerHTML=''; tasks.forEach((t,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${t.id} - ${t.description}</span><span><button onclick="window._eT(${i})">РЕД</button><button onclick="window._dT(${i})">УДЛ</button></span>`; l.appendChild(d); }); }
   window._eT=function(i){ const t=tasks[i]; document.getElementById('tId').value=t.id; document.getElementById('tDesc').value=t.description; document.getElementById('tDead').value=t.deadline; document.getElementById('tEditIdx').value=i; };
   window._dT=function(i){ if(confirm('Удалить?')){ tasks.splice(i,1); db.ref('tasks').set(tasks); renderT(); renderATL(); } };
-
-  function saveT() {
-    const id=document.getElementById('tId').value.trim(), d=document.getElementById('tDesc').value.trim(), dl=document.getElementById('tDead').value.trim();
-    if(!id||!d||!dl){ alert('ВСЕ ПОЛЯ!'); return; }
-    const data={ id, description:d, deadline:dl };
-    const ei=parseInt(document.getElementById('tEditIdx').value);
-    if(ei>=0&&ei<tasks.length) tasks[ei]=data; else tasks.push(data);
-    db.ref('tasks').set(tasks); renderT(); renderATL(); clearTF();
-  }
+  function saveT() { const id=document.getElementById('tId').value.trim(), d=document.getElementById('tDesc').value.trim(), dl=document.getElementById('tDead').value.trim(); if(!id||!d||!dl){ alert('ВСЕ ПОЛЯ!'); return; } const data={ id, description:d, deadline:dl }; const ei=parseInt(document.getElementById('tEditIdx').value); if(ei>=0&&ei<tasks.length) tasks[ei]=data; else tasks.push(data); db.ref('tasks').set(tasks); renderT(); renderATL(); clearTF(); }
   function clearTF(){ document.getElementById('tId').value=''; document.getElementById('tDesc').value=''; document.getElementById('tDead').value=''; document.getElementById('tEditIdx').value='-1'; }
 
-  // ADMIN: DATA
-  function renderAD() {
-    adminContent.innerHTML=`
-      <button class="admin-btn" id="syncBtn">■ СИНХРОНИЗИРОВАТЬ</button>
-      <hr class="profile-divider" style="border-color:#552222;">
-      <button class="admin-btn" id="expM">■ ЭКСПОРТ УЧАСТНИКОВ</button>
-      <button class="admin-btn" id="expT">■ ЭКСПОРТ ЗАДАЧ</button>
-      <button class="admin-btn" id="expDr">■ ЭКСПОРТ ДРОНОВ</button>
-      <textarea class="admin-textarea" id="impM" placeholder="JSON участников..."></textarea><button class="admin-btn" id="impMBtn">■ ИМПОРТ УЧАСТНИКОВ</button>
-      <textarea class="admin-textarea" id="impT" placeholder="JSON задач..."></textarea><button class="admin-btn" id="impTBtn">■ ИМПОРТ ЗАДАЧ</button>
-      <textarea class="admin-textarea" id="impDr" placeholder="JSON дронов..."></textarea><button class="admin-btn" id="impDrBtn">■ ИМПОРТ ДРОНОВ</button>`;
-    document.getElementById('syncBtn').addEventListener('click',()=>{ loadData(); alert('ГОТОВО'); });
-    document.getElementById('expM').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(members,null,2)); alert('СКОПИРОВАНО'); });
-    document.getElementById('expT').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(tasks,null,2)); alert('СКОПИРОВАНО'); });
-    document.getElementById('expDr').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(drones,null,2)); alert('СКОПИРОВАНО'); });
-    document.getElementById('impMBtn').addEventListener('click',()=>{ try{ const d=JSON.parse(document.getElementById('impM').value); if(Array.isArray(d)){ members=d; db.ref('members').set(members); renderM(); alert('ГОТОВО'); } }catch(e){ alert('ОШИБКА JSON'); } });
-    document.getElementById('impTBtn').addEventListener('click',()=>{ try{ const d=JSON.parse(document.getElementById('impT').value); if(Array.isArray(d)){ tasks=d; db.ref('tasks').set(tasks); renderT(); alert('ГОТОВО'); } }catch(e){ alert('ОШИБКА JSON'); } });
-    document.getElementById('impDrBtn').addEventListener('click',()=>{ try{ const d=JSON.parse(document.getElementById('impDr').value); if(Array.isArray(d)){ drones=d; db.ref('drones').set(drones); renderDrones(); alert('ГОТОВО'); } }catch(e){ alert('ОШИБКА JSON'); } });
-  }
+  function renderAD() { adminContent.innerHTML=`<button class="admin-btn" id="syncBtn">■ СИНХРОНИЗИРОВАТЬ</button><hr class="profile-divider" style="border-color:#552222;"><button class="admin-btn" id="expM">■ ЭКСПОРТ УЧАСТНИКОВ</button><button class="admin-btn" id="expT">■ ЭКСПОРТ ЗАДАЧ</button><button class="admin-btn" id="expDr">■ ЭКСПОРТ ДРОНОВ</button><button class="admin-btn" id="expApp">■ ЭКСПОРТ ЗАЯВОК</button><textarea class="admin-textarea" id="impM" placeholder="JSON участников..."></textarea><button class="admin-btn" id="impMBtn">■ ИМПОРТ УЧАСТНИКОВ</button><textarea class="admin-textarea" id="impT" placeholder="JSON задач..."></textarea><button class="admin-btn" id="impTBtn">■ ИМПОРТ ЗАДАЧ</button>`; document.getElementById('syncBtn').addEventListener('click',()=>{ loadData(); alert('ГОТОВО'); }); document.getElementById('expM').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(members,null,2)); alert('СКОПИРОВАНО'); }); document.getElementById('expT').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(tasks,null,2)); alert('СКОПИРОВАНО'); }); document.getElementById('expDr').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(drones,null,2)); alert('СКОПИРОВАНО'); }); document.getElementById('expApp').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(applications,null,2)); alert('СКОПИРОВАНО'); }); document.getElementById('impMBtn').addEventListener('click',()=>{ try{ const d=JSON.parse(document.getElementById('impM').value); if(Array.isArray(d)){ members=d; db.ref('members').set(members); renderM(); alert('ГОТОВО'); } }catch(e){ alert('ОШИБКА JSON'); } }); document.getElementById('impTBtn').addEventListener('click',()=>{ try{ const d=JSON.parse(document.getElementById('impT').value); if(Array.isArray(d)){ tasks=d; db.ref('tasks').set(tasks); renderT(); alert('ГОТОВО'); } }catch(e){ alert('ОШИБКА JSON'); } }); }
 
   // RADIO
   const radioMessages={ 88.5:"*** SOS ***", 94.2:"АНКЛАВ: КОД КРАСНЫЙ.", 101.1:"КАРАВАН В ПУТИ.", 107.8:"РЕЙДЕРЫ...", 114.7:"О.И.Д.Л. ШТАБ.", 122.3:"БРАТСТВО: ЗАПРЕТ.", 130.5:"МЕДИКАМЕНТЫ.", 138.0:"РАДИО.", 145.8:"УБЕЖИЩЕ 101..." };
@@ -744,7 +739,6 @@
   loadData();
   runBoot();
   setAdmin(false);
-
 })();
 </script>
 </body>
