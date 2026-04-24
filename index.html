@@ -2,272 +2,419 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ТЕРМИНАЛ УБЕЖИЩА · О.И.Д.Л.</title>
   
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
-      background: radial-gradient(circle at 20% 30%, #0a1a0f, #020503);
-      min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      font-family: 'Courier New', 'VT323', 'Lucida Sans Typewriter', monospace;
-      padding: 16px; position: relative; overflow-x: hidden;
+      background: #020503; min-height: 100vh; min-height: 100dvh;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Courier New', 'VT323', monospace;
+      position: relative; overflow-x: hidden;
+      user-select: none; -webkit-user-select: none;
     }
 
     body::before {
       content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: repeating-linear-gradient(0deg,
-          rgba(0, 0, 0, 0.6) 0px, rgba(0, 20, 0, 0.3) 2px,
-          rgba(0, 255, 0, 0.03) 3px, transparent 4px);
-      pointer-events: none; z-index: 100; animation: scanlines 8s linear infinite; opacity: 0.7;
+          rgba(0,0,0,0.5) 0px, rgba(0,20,0,0.2) 3px,
+          rgba(0,255,0,0.02) 4px, transparent 5px);
+      pointer-events: none; z-index: 100; animation: scan 10s linear infinite; opacity: 0.7;
     }
 
-    body::after {
+    body.desktop { padding: 16px; }
+    body.desktop::after {
       content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle at center, transparent 30%, rgba(0, 30, 0, 0.25) 100%);
+      background: radial-gradient(circle at center, transparent 30%, rgba(0,30,0,0.25) 100%);
       pointer-events: none; z-index: 99;
     }
+    body.mobile { padding: 0; }
 
-    @keyframes scanlines { 0% { background-position: 0 0; } 100% { background-position: 0 15px; } }
+    @keyframes scan { 0% { background-position: 0 0; } 100% { background-position: 0 20px; } }
 
     .glitch-effect { animation: glitch 0.3s ease-in-out; }
-    @keyframes glitch {
-      0% { transform: translate(2px, -1px); opacity: 0.8; }
-      50% { transform: translate(-3px, 2px); opacity: 0.6; }
-      100% { transform: translate(0, 0); opacity: 1; }
-    }
+    @keyframes glitch { 0%{transform:translate(2px,-1px);opacity:0.8;} 50%{transform:translate(-3px,2px);opacity:0.6;} 100%{transform:translate(0,0);opacity:1;} }
 
     .terminal {
-      max-width: 1100px; width: 100%; background-color: #0b1c0e;
-      border: 4px solid #1a3a1e;
-      box-shadow: 0 0 0 2px #0d2b10, 0 0 20px #00aa33 inset, 0 0 30px rgba(0, 255, 80, 0.3);
-      border-radius: 12px 12px 20px 20px; padding: 0 0 6px 0; position: relative; z-index: 20;
+      background-color: #0b1c0e; display: flex; flex-direction: column;
+      position: relative; z-index: 20;
+    }
+    body.desktop .terminal {
+      max-width: 1100px; width: 100%; border: 4px solid #1a3a1e;
+      box-shadow: 0 0 0 2px #0d2b10, 0 0 20px #00aa33 inset, 0 0 30px rgba(0,255,80,0.3);
+      border-radius: 12px 12px 20px 20px; padding: 0 0 6px 0;
+    }
+    body.mobile .terminal {
+      width: 100%; min-height: 100vh; min-height: 100dvh; border: none;
     }
 
     .terminal-header {
       background: #0a170a; border-bottom: 2px solid #1a4c1a;
-      padding: 8px 16px 4px 16px; display: flex; align-items: center;
-      justify-content: space-between; border-radius: 8px 8px 0 0;
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
     }
+    body.desktop .terminal-header { padding: 8px 16px 4px 16px; border-radius: 8px 8px 0 0; }
+    body.mobile .terminal-header { padding: 14px 16px; }
 
-    .terminal-header-left { display: flex; gap: 12px; }
-    .led { width: 14px; height: 14px; border-radius: 50%; background: #1d3b1d; box-shadow: 0 0 5px #00aa00; border: 1px solid #2f6b2f; }
-    .led.active { background: #33ff33; box-shadow: 0 0 12px #33ff66, 0 0 25px #1aff1a; animation: pulseLed 2.2s infinite; }
+    .terminal-header-left { display: flex; gap: 8px; }
+    body.desktop .terminal-header-left { gap: 12px; }
 
-    @keyframes pulseLed { 0%, 100% { opacity: 1; background: #33ff33; } 50% { opacity: 0.5; background: #22cc22; } }
+    .led { border-radius: 50%; background: #1d3b1d; box-shadow: 0 0 5px #00aa00; border: 1px solid #2f6b2f; }
+    body.desktop .led { width: 14px; height: 14px; }
+    body.mobile .led { width: 10px; height: 10px; }
+    .led.active { background: #33ff33; box-shadow: 0 0 12px #33ff66; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
 
     .terminal-header-center {
-      font-size: 1.6rem; font-weight: bold; letter-spacing: 8px; text-transform: uppercase;
-      color: #1f8a1f; text-shadow: 0 0 10px #4aff4a;
-      border-left: 2px solid #1f4f1f; border-right: 2px solid #1f4f1f;
-      padding: 0 24px; font-family: 'VT323', 'Courier New', monospace;
+      font-weight: bold; letter-spacing: 5px; color: #1f8a1f;
+      text-shadow: 0 0 8px #4aff4a; font-family: 'VT323', monospace;
     }
+    body.desktop .terminal-header-center { font-size: 1.6rem; letter-spacing: 8px; padding: 0 24px; border-left: 2px solid #1f4f1f; border-right: 2px solid #1f4f1f; }
+    body.mobile .terminal-header-center { font-size: 1.2rem; }
 
-    .terminal-header-right { display: flex; gap: 10px; align-items: center; }
-    .terminal-header-right span { color: #3c8f3c; font-size: 1.2rem; font-weight: bold; }
+    .terminal-header-right { display: flex; align-items: center; }
+    body.desktop .terminal-header-right { gap: 10px; }
+    body.mobile .terminal-header-right { gap: 8px; }
+    body.desktop .terminal-header-right span { color: #3c8f3c; font-size: 1.2rem; font-weight: bold; }
 
     .admin-access-btn {
       background: #1a0000; border: 2px solid #ff4444; color: #ff4444;
-      font-family: 'Courier New', monospace; font-size: 1rem; padding: 5px 12px;
-      cursor: pointer; text-transform: uppercase; margin-left: 10px;
-      animation: pulseRed 2s infinite; display: none;
+      font-family: 'Courier New', monospace; cursor: pointer;
+      animation: pulseRed 2s infinite; display: none; text-transform: uppercase;
     }
     .admin-access-btn.visible { display: inline-block; }
+    body.desktop .admin-access-btn { font-size: 1rem; padding: 5px 12px; margin-left: 10px; }
+    body.mobile .admin-access-btn { font-size: 0.8rem; padding: 8px 12px; }
+    @keyframes pulseRed { 0%,100%{box-shadow:0 0 4px #ff4444;} 50%{box-shadow:0 0 12px #ff4444;} }
 
-    @keyframes pulseRed { 0%, 100% { box-shadow: 0 0 5px #ff4444; } 50% { box-shadow: 0 0 15px #ff4444; } }
-
-    .sync-indicator { color: #ffaa00; font-size: 0.7rem; margin-left: 8px; display: none; }
+    .sync-indicator { color: #ffaa00; display: none; }
+    body.desktop .sync-indicator { font-size: 0.7rem; margin-left: 8px; }
+    body.mobile .sync-indicator { font-size: 0.65rem; }
     .sync-indicator.visible { display: inline; }
 
     .screen {
-      padding: 28px 24px 20px 24px; color: #11dd33;
-      text-shadow: 0 0 8px #19f019, 0 0 2px #116611; background: #0a130a;
+      color: #11dd33; text-shadow: 0 0 6px #19f019; background: #0a130a;
+      font-size: 1rem; line-height: 1.4; position: relative; flex: 1;
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
+    }
+    body.desktop .screen {
+      padding: 28px 24px 20px 24px; font-size: 1.2rem; min-height: 500px;
       border-left: 2px solid #153015; border-right: 2px solid #153015;
       border-bottom: 2px solid #1c3b1c;
-      box-shadow: inset 0 0 40px #000000, inset 0 0 15px #021002;
-      font-size: 1.2rem; line-height: 1.5; position: relative; min-height: 500px;
+      box-shadow: inset 0 0 40px #000, inset 0 0 15px #021002;
+    }
+    body.mobile .screen {
+      padding: 20px 14px; box-shadow: inset 0 0 30px #000;
     }
 
     .boot-sequence {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: #0a130a; z-index: 60; padding: 40px 30px;
-      font-size: 1.1rem; color: #11dd33; overflow: hidden;
+      background: #0a130a; z-index: 60; color: #11dd33;
     }
-    .boot-line { opacity: 0; margin: 4px 0; animation: fadeInLine 0.1s forwards; }
-    @keyframes fadeInLine { to { opacity: 1; } }
+    body.desktop .boot-sequence { padding: 40px 30px; font-size: 1.1rem; }
+    body.mobile .boot-sequence {
+      padding: 40px 20px; font-size: 0.9rem;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .boot-line { opacity: 0; margin: 3px 0; animation: fadeIn 0.1s forwards; }
+    body.mobile .boot-line { text-align: center; }
+    @keyframes fadeIn { to { opacity: 1; } }
 
     .login-overlay {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: #0a130a; display: flex; flex-direction: column;
       align-items: center; justify-content: center; z-index: 50;
-      border-radius: 0 0 8px 8px; padding: 20px;
     }
+    body.desktop .login-overlay { border-radius: 0 0 8px 8px; padding: 20px; }
+    body.mobile .login-overlay { padding: 20px; }
 
     .login-container {
-      border: 2px solid #1e6b1e; padding: 30px 40px; background: #051005;
-      box-shadow: inset 0 0 20px #000, 0 0 20px #0f3; width: 100%; max-width: 500px;
+      border: 2px solid #1e6b1e; background: #051005;
+      box-shadow: inset 0 0 20px #000; width: 100%;
     }
+    body.desktop .login-container { padding: 30px 40px; max-width: 500px; box-shadow: 0 0 20px #0f3; }
+    body.mobile .login-container { padding: 30px 20px; }
 
     .login-header {
-      color: #3aff3a; font-size: 2rem; text-align: center; margin-bottom: 30px;
-      text-transform: uppercase; letter-spacing: 6px; border-bottom: 1px dashed #3f9e3f; padding-bottom: 12px;
+      color: #3aff3a; text-align: center; margin-bottom: 25px;
+      text-transform: uppercase; letter-spacing: 4px;
+      border-bottom: 1px dashed #3f9e3f; padding-bottom: 10px; font-family: 'VT323', monospace;
     }
+    body.desktop .login-header { font-size: 2rem; letter-spacing: 6px; margin-bottom: 30px; }
+    body.mobile .login-header { font-size: 1.6rem; }
 
-    .login-field { margin-bottom: 24px; }
-    .login-label { color: #6fdf6f; display: block; margin-bottom: 6px; }
-    .login-input { width: 100%; background: #0b1f0b; border: 2px solid #2c8c2c; color: #b3ffb3; padding: 12px 15px; font-family: 'Courier New', monospace; font-size: 1.5rem; outline: none; box-shadow: inset 0 0 12px #031003; }
-    .fake-keystroke-hint { color: #4fa84f; margin-top: 8px; font-size: 0.9rem; }
+    .login-field { margin-bottom: 20px; }
+    .login-label { color: #6fdf6f; display: block; margin-bottom: 4px; }
+    body.desktop .login-label { font-size: 1rem; }
+    body.mobile .login-label { font-size: 1rem; }
 
-    .login-button { background: #0a1d0a; border: 1px solid #278027; color: #66dd66; padding: 12px 28px; font-family: inherit; font-size: 1.4rem; text-transform: uppercase; cursor: pointer; box-shadow: 0 0 6px #1a4d1a; width: 100%; margin-top: 10px; }
-    .login-button:hover:not(:disabled) { background: #143e14; color: #bcffbc; border-color: #55c955; box-shadow: 0 0 16px #2aa52a; }
-    .login-button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .login-input {
+      width: 100%; background: #0b1f0b; border: 2px solid #2c8c2c; color: #b3ffb3;
+      padding: 14px 12px; font-family: 'Courier New', monospace; outline: none;
+      box-shadow: inset 0 0 10px #031003;
+    }
+    body.desktop .login-input { font-size: 1.5rem; }
+    body.mobile .login-input { font-size: 1.4rem; text-align: center; }
 
-    .robco-banner { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed #2f6e2f; padding-bottom: 10px; margin-bottom: 20px; font-size: 1.3rem; }
-    .robco { color: #4fcb4f; text-transform: uppercase; letter-spacing: 3px; }
+    .login-status { color: #4fa84f; text-align: center; font-size: 0.9rem; margin-top: 8px; }
 
-    .clan-status { display: flex; gap: 18px; margin-bottom: 28px; background: #041204; padding: 8px 14px; border: 1px solid #1a551a; font-size: 1.1rem; flex-wrap: wrap; align-items: center; }
-    .status-item { display: flex; align-items: center; gap: 8px; }
-    .status-label { color: #70db70; opacity: 0.9; }
-    .status-value { color: #9eff9e; font-weight: bold; text-transform: uppercase; }
+    .login-button {
+      background: #0a1d0a; border: 2px solid #278027; color: #66dd66;
+      font-family: inherit; text-transform: uppercase; cursor: pointer;
+      width: 100%; margin-top: 12px; letter-spacing: 2px;
+    }
+    body.desktop .login-button { padding: 12px 28px; font-size: 1.4rem; }
+    body.mobile .login-button { padding: 18px; font-size: 1.4rem; }
+    .login-button:disabled { opacity: 0.4; }
+    .login-button.ready {
+      border-color: #33ff33; color: #33ff33;
+      box-shadow: 0 0 20px #33ff33; animation: pulseReady 1s infinite;
+    }
+    @keyframes pulseReady { 0%,100%{box-shadow:0 0 10px #33ff33;} 50%{box-shadow:0 0 25px #33ff33;} }
 
-    .nav-menu { display: flex; border: 1px solid #286828; background: #051005; margin-bottom: 30px; flex-wrap: wrap; }
+    .robco-banner {
+      display: flex; justify-content: space-between; align-items: baseline;
+      border-bottom: 1px dashed #2f6e2f; padding-bottom: 8px; margin-bottom: 16px;
+      flex-wrap: wrap; gap: 4px;
+    }
+    body.desktop .robco-banner { font-size: 0.85rem; }
+    body.mobile .robco-banner { font-size: 0.85rem; }
+
+    .clan-status {
+      display: flex; gap: 10px; margin-bottom: 20px; background: #041204;
+      padding: 10px; border: 1px solid #1a551a; flex-wrap: wrap; align-items: center;
+    }
+    body.desktop .clan-status { font-size: 1.1rem; gap: 18px; padding: 8px 14px; margin-bottom: 28px; }
+    body.mobile .clan-status { font-size: 0.95rem; padding: 12px; }
+
+    .status-item { display: flex; align-items: center; gap: 6px; }
+    .status-label { color: #70db70; }
+    .status-value { color: #9eff9e; font-weight: bold; }
+
+    .nav-menu { display: flex; flex-wrap: wrap; border: 1px solid #286828; background: #051005; margin-bottom: 20px; }
     .nav-item {
-      flex: 1; text-align: center; padding: 12px 4px; color: #3db83d;
-      text-transform: uppercase; border-right: 1px solid #1b411b;
-      cursor: pointer; font-weight: bold; letter-spacing: 1.5px; background: #081708; user-select: none;
-      min-width: 80px; font-size: 0.9rem;
+      text-align: center; color: #3db83d; text-transform: uppercase;
+      border: 1px solid #1b411b; cursor: pointer; font-weight: bold;
+      letter-spacing: 1px; background: #081708;
     }
-    .nav-item:last-child { border-right: none; }
+    body.desktop .nav-item { flex: 1; padding: 12px 4px; font-size: 0.9rem; letter-spacing: 1.5px; border-right: 1px solid #1b411b; }
+    body.desktop .nav-item:last-child { border-right: none; }
+    body.mobile .nav-item { flex: 1 1 30%; padding: 12px 4px; font-size: 0.8rem; }
     .nav-item:hover { background: #143314; color: #a0ffa0; text-shadow: 0 0 15px #33ff33; }
     .nav-item.active { background: #1f461f; color: #c6ffc6; border-bottom: 3px solid #33bb33; text-shadow: 0 0 12px #7fff7f; }
 
     .content-pane.hidden { display: none; }
 
-    .data-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 1.0rem; }
-    .data-table th { text-align: left; padding: 6px 2px; color: #56d656; border-bottom: 1px solid #216321; text-transform: uppercase; }
-    .data-table td { padding: 6px 2px; border-bottom: 1px dotted #1c541c; color: #b2f5b2; }
+    .data-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    body.desktop .data-table { font-size: 0.85rem; }
+    body.mobile .data-table { font-size: 0.9rem; }
+    .data-table th { text-align: left; padding: 8px 4px; color: #56d656; border-bottom: 1px solid #216321; font-size: 0.75rem; }
+    .data-table td { padding: 8px 4px; border-bottom: 1px dotted #1c541c; color: #b2f5b2; }
+    body.mobile .data-table td { padding: 12px 6px; }
     .data-table tbody tr { cursor: pointer; transition: background 0.15s; }
-    .data-table tbody tr:hover { background: #1a3a1a; color: #d4ffd4; text-shadow: 0 0 10px #66ff66; }
+    .data-table tbody tr:hover, .data-table tbody tr:active { background: #1a3a1a; color: #d4ffd4; text-shadow: 0 0 10px #66ff66; }
 
     /* Дроны */
     .drone-card {
-      border: 2px solid #2a6b2a; background: #0a1a0a; padding: 16px; margin: 12px 0;
+      border: 2px solid #2a6b2a; background: #0a1a0a; padding: 14px; margin: 10px 0;
       display: flex; justify-content: space-between; align-items: center;
-      box-shadow: inset 0 0 15px #000;
+      box-shadow: inset 0 0 15px #000; flex-wrap: wrap; gap: 10px;
     }
+    body.mobile .drone-card { flex-direction: column; align-items: flex-start; }
     .drone-info { flex: 1; }
-    .drone-name { color: #5fff5f; font-size: 1.2rem; font-family: 'VT323', monospace; letter-spacing: 2px; }
-    .drone-status { color: #8dc98d; font-size: 0.9rem; margin-top: 4px; }
-    .drone-health { margin-top: 6px; }
-    .drone-health-bar { height: 10px; background: #1a3a1a; border: 1px solid #2a5a2a; width: 200px; margin-top: 3px; }
+    .drone-name { color: #5fff5f; font-family: 'VT323', monospace; letter-spacing: 2px; }
+    body.desktop .drone-name { font-size: 1.2rem; }
+    body.mobile .drone-name { font-size: 1.1rem; }
+    .drone-status { color: #8dc98d; font-size: 0.85rem; margin-top: 3px; }
+    .drone-health { margin-top: 5px; }
+    .drone-health-bar { height: 8px; background: #1a3a1a; border: 1px solid #2a5a2a; margin-top: 3px; }
+    body.desktop .drone-health-bar { width: 200px; }
+    body.mobile .drone-health-bar { width: 100%; }
     .drone-health-fill { height: 100%; background: #33ff33; transition: width 0.5s; }
     .drone-health-fill.warning { background: #ffaa00; }
     .drone-health-fill.danger { background: #ff4444; }
-    .drone-actions { display: flex; gap: 8px; }
-    .drone-btn { background: #0a1d0a; border: 1px solid #278027; color: #66dd66; padding: 8px 14px; font-family: inherit; font-size: 0.9rem; text-transform: uppercase; cursor: pointer; }
-    .drone-btn:hover { background: #143e14; }
+    .drone-actions { display: flex; gap: 6px; }
+    .drone-btn {
+      background: #0a1d0a; border: 1px solid #278027; color: #66dd66;
+      padding: 8px 12px; font-family: inherit; font-size: 0.85rem; text-transform: uppercase; cursor: pointer;
+    }
     .drone-btn.diag-btn { border-color: #44aaff; color: #44aaff; }
-    .drone-btn.diag-btn:hover { background: #0a1a2a; }
 
-    .diagnostic-log { border: 1px solid #33bb33; background: #051005; padding: 12px; margin-top: 20px; min-height: 100px; color: #b6fbb6; font-size: 0.9rem; white-space: pre-wrap; }
+    .diagnostic-log {
+      border: 1px solid #33bb33; background: #051005;
+      padding: 12px; margin-top: 16px; min-height: 80px; color: #b6fbb6; font-size: 0.85rem; white-space: pre-wrap;
+    }
 
     /* Анкета */
-    .application-form { border: 2px solid #ffaa00; padding: 20px; background: #0a1a0a; margin: 15px 0; }
-    .application-form h3 { color: #ffaa00; text-align: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 3px; font-family: 'VT323', monospace; }
-    .app-field { margin-bottom: 12px; }
-    .app-label { color: #ffcc66; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 3px; display: block; }
-    .app-input { width: 100%; background: #0b1f0b; border: 2px solid #ffaa00; color: #ffcc88; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 0.95rem; outline: none; }
-    .app-textarea { width: 100%; background: #0b1f0b; border: 2px solid #ffaa00; color: #ffcc88; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 0.95rem; outline: none; resize: vertical; min-height: 70px; }
-    .app-submit { background: #1a0a00; border: 2px solid #ffaa00; color: #ffaa00; padding: 12px 28px; font-family: inherit; font-size: 1.1rem; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 10px; }
-    .app-submit:hover { background: #331a00; box-shadow: 0 0 15px #ffaa00; }
+    .application-form { border: 2px solid #ffaa00; padding: 16px; background: #0a1a0a; margin: 12px 0; }
+    .application-form h3 { color: #ffaa00; text-align: center; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 3px; font-family: 'VT323', monospace; }
+    .app-field { margin-bottom: 10px; }
+    .app-label { color: #ffcc66; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 2px; display: block; }
+    .app-input, .app-textarea {
+      width: 100%; background: #0b1f0b; border: 2px solid #ffaa00; color: #ffcc88;
+      padding: 8px 10px; font-family: 'Courier New', monospace; font-size: 0.9rem; outline: none;
+    }
+    .app-textarea { resize: vertical; min-height: 60px; }
+    .app-submit {
+      background: #1a0a00; border: 2px solid #ffaa00; color: #ffaa00;
+      padding: 12px 24px; font-family: inherit; font-size: 1rem; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 8px;
+    }
 
-    .profile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 200; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
+    .profile-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9); z-index: 200;
+      display: flex; align-items: center; justify-content: center; animation: fadeIn 0.2s;
+    }
     .profile-overlay.hidden { display: none; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
 
-    .profile-window { background: #0b1c0e; border: 3px solid #2a6b2a; box-shadow: 0 0 30px #00aa33, inset 0 0 20px #000; padding: 25px 30px; max-width: 600px; width: 90%; max-height: 85vh; overflow-y: auto; }
-    .profile-header { border-bottom: 2px solid #1f5a1f; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-    .profile-name { font-size: 1.8rem; color: #5fff5f; text-transform: uppercase; letter-spacing: 3px; font-family: 'VT323', monospace; }
-    .profile-role { color: #8dc98d; font-size: 1rem; text-transform: uppercase; }
-    .profile-close { background: none; border: 2px solid #33aa33; color: #33ff33; font-size: 1.5rem; width: 40px; height: 40px; cursor: pointer; }
-    .profile-close:hover { background: #33aa33; color: #000; }
+    .profile-window {
+      background: #0b1c0e; border: 3px solid #2a6b2a; padding: 20px 16px;
+      width: 95%; max-height: 85vh; overflow-y: auto;
+    }
+    body.desktop .profile-window { max-width: 600px; padding: 25px 30px; }
+    .profile-header { border-bottom: 2px solid #1f5a1f; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .profile-name { font-size: 1.5rem; color: #5fff5f; text-transform: uppercase; letter-spacing: 2px; font-family: 'VT323', monospace; }
+    body.desktop .profile-name { font-size: 1.8rem; letter-spacing: 3px; }
+    .profile-role { color: #8dc98d; font-size: 1rem; }
+    .profile-close {
+      background: none; border: 2px solid #33aa33; color: #33ff33;
+      font-size: 1.5rem; width: 44px; height: 44px; cursor: pointer; text-align: center; line-height: 40px;
+    }
+    body.desktop .profile-close { width: 40px; height: 40px; line-height: 36px; }
 
-    .profile-section { margin-bottom: 14px; border-left: 2px solid #2a5a2a; padding-left: 15px; }
-    .profile-label { color: #4fcb4f; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
-    .profile-text { color: #b6fbb6; line-height: 1.5; font-size: 0.95rem; white-space: pre-wrap; }
-    .profile-divider { border: none; border-top: 1px dashed #1f4f1f; margin: 12px 0; }
+    .profile-section { margin-bottom: 12px; border-left: 2px solid #2a5a2a; padding-left: 12px; }
+    .profile-label { color: #4fcb4f; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+    .profile-text { color: #b6fbb6; line-height: 1.5; font-size: 0.9rem; white-space: pre-wrap; }
+    .profile-divider { border: none; border-top: 1px dashed #1f4f1f; margin: 10px 0; }
 
-    .command-line { display: flex; align-items: center; gap: 8px; margin-top: 20px; border-top: 1px solid #1d531d; padding-top: 14px; }
-    .command-prompt { color: #2fa32f; white-space: nowrap; }
-    .command-input { background: transparent; border: none; color: #33ff33; font-family: 'Courier New', monospace; font-size: 1.1rem; outline: none; flex: 1; }
+    .command-line {
+      display: flex; align-items: center; gap: 6px; margin-top: 16px;
+      border-top: 1px solid #1d531d; padding-top: 12px;
+    }
+    .command-input {
+      background: transparent; border: none; color: #33ff33;
+      font-family: 'Courier New', monospace; outline: none; flex: 1;
+    }
+    body.desktop .command-input { font-size: 1.1rem; }
+    body.mobile .command-input { font-size: 1rem; }
 
-    .admin-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 300; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
+    .cursor-blink {
+      display: inline-block; background: #22dd22; animation: blink 1s step-end infinite;
+    }
+    body.desktop .cursor-blink { width: 10px; height: 18px; margin-left: 5px; }
+    body.mobile .cursor-blink { width: 8px; height: 14px; margin-left: 4px; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+    .admin-panel {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95); z-index: 300;
+      display: flex; align-items: center; justify-content: center;
+    }
     .admin-panel.hidden { display: none; }
 
-    .admin-window { background: #0b1c0e; border: 3px solid #ff4444; box-shadow: 0 0 30px #ff4444, inset 0 0 20px #000; padding: 25px 30px; max-width: 750px; width: 95%; max-height: 90vh; overflow-y: auto; }
-    .admin-header { border-bottom: 2px solid #ff4444; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-    .admin-title { font-size: 1.8rem; color: #ff4444; text-transform: uppercase; letter-spacing: 3px; font-family: 'VT323', monospace; text-shadow: 0 0 10px #ff4444; }
-    .admin-close { background: none; border: 2px solid #ff4444; color: #ff4444; font-size: 1.5rem; width: 40px; height: 40px; cursor: pointer; }
-    .admin-close:hover { background: #ff4444; color: #000; }
+    .admin-window {
+      background: #0b1c0e; border: 2px solid #ff4444;
+      overflow-y: auto;
+    }
+    body.desktop .admin-window { max-width: 750px; width: 95%; max-height: 90vh; padding: 25px 30px; border-width: 3px; }
+    body.mobile .admin-window { width: 100%; height: 100%; padding: 20px 14px; }
 
-    .admin-input { width: 100%; background: #0b1f0b; border: 2px solid #ff4444; color: #ff8888; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 1rem; outline: none; margin: 6px 0; }
-    .admin-textarea { width: 100%; background: #0b1f0b; border: 2px solid #ff4444; color: #ff8888; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 0.9rem; outline: none; margin: 6px 0; resize: vertical; min-height: 100px; }
+    .admin-header { border-bottom: 2px solid #ff4444; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .admin-title { font-size: 1.4rem; color: #ff4444; text-transform: uppercase; letter-spacing: 3px; font-family: 'VT323', monospace; }
+    body.desktop .admin-title { font-size: 1.8rem; }
+    .admin-close { background: none; border: 2px solid #ff4444; color: #ff4444; font-size: 1.5rem; width: 44px; height: 44px; cursor: pointer; text-align: center; line-height: 40px; }
+    body.desktop .admin-close { width: 40px; height: 40px; line-height: 36px; }
 
-    .admin-btn { background: #1a0000; border: 2px solid #ff4444; color: #ff6666; padding: 10px 20px; font-family: inherit; font-size: 1rem; text-transform: uppercase; cursor: pointer; margin: 5px; transition: all 0.15s; }
-    .admin-btn:hover { background: #330000; box-shadow: 0 0 15px #ff4444; }
-    .admin-btn.save-btn { border-color: #44ff44; color: #44ff44; background: #001a00; }
-    .admin-btn.save-btn:hover { background: #003300; box-shadow: 0 0 15px #44ff44; }
+    .admin-input {
+      width: 100%; background: #0b1f0b; border: 2px solid #ff4444; color: #ff8888;
+      padding: 10px; font-family: 'Courier New', monospace; font-size: 0.95rem; outline: none; margin: 5px 0;
+    }
+    body.mobile .admin-input { padding: 14px; font-size: 1rem; }
+    .admin-textarea {
+      width: 100%; background: #0b1f0b; border: 2px solid #ff4444; color: #ff8888;
+      padding: 10px; font-family: 'Courier New', monospace; font-size: 0.9rem; outline: none; margin: 5px 0; resize: vertical; min-height: 80px;
+    }
+
+    .admin-btn {
+      background: #1a0000; border: 2px solid #ff4444; color: #ff6666;
+      padding: 10px 16px; font-family: inherit; font-size: 0.9rem;
+      text-transform: uppercase; cursor: pointer; margin: 4px; transition: all 0.15s;
+    }
+    body.mobile .admin-btn { padding: 14px; font-size: 1rem; }
+    .admin-btn:active { background: #330000; }
+    .admin-btn.save-btn { border-color: #44ff44; color: #44ff44; background: #001a00; width: 100%; }
     .admin-btn.accept-btn { border-color: #44ff44; color: #44ff44; background: #002200; }
     .admin-btn.reject-btn { border-color: #ff4444; color: #ff4444; background: #220000; }
 
-    .admin-member-list { max-height: 250px; overflow-y: auto; border: 1px solid #ff4444; padding: 10px; margin: 10px 0; }
-    .admin-member-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px dotted #552222; color: #ffaaaa; }
-    .admin-member-item button { background: #330000; border: 1px solid #ff4444; color: #ff4444; padding: 4px 10px; cursor: pointer; font-family: inherit; margin-left: 5px; font-size: 0.85rem; }
-    .admin-member-item button:hover { background: #ff4444; color: #000; }
+    .admin-member-list { max-height: 200px; overflow-y: auto; border: 1px solid #ff4444; padding: 8px; margin: 8px 0; }
+    .admin-member-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 6px; border-bottom: 1px dotted #552222; color: #ffaaaa; font-size: 0.9rem;
+    }
+    .admin-member-item button, .admin-list-item button {
+      background: #330000; border: 1px solid #ff4444; color: #ff4444;
+      padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 0.8rem; margin-left: 3px;
+    }
+    body.mobile .admin-member-item button, body.mobile .admin-list-item button { padding: 8px 14px; font-size: 0.85rem; }
 
-    .admin-tabs { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
-    .admin-tab { background: #1a0000; border: 1px solid #ff4444; color: #ff8888; padding: 8px 10px; cursor: pointer; font-family: inherit; text-transform: uppercase; font-size: 0.8rem; }
+    .admin-tabs { display: flex; gap: 3px; margin-bottom: 12px; flex-wrap: wrap; }
+    .admin-tab {
+      background: #1a0000; border: 1px solid #ff4444; color: #ff8888;
+      padding: 8px 10px; cursor: pointer; font-family: inherit; text-transform: uppercase; font-size: 0.75rem;
+    }
+    body.mobile .admin-tab { padding: 10px 12px; font-size: 0.8rem; }
     .admin-tab.active { background: #330000; color: #ff4444; border-bottom: 3px solid #ff4444; }
 
-    .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px dotted #552222; color: #ffaaaa; }
-    .admin-list-item button { background: #330000; border: 1px solid #ff4444; color: #ff4444; padding: 4px 10px; cursor: pointer; font-family: inherit; margin-left: 5px; font-size: 0.85rem; }
-    .admin-list-item button:hover { background: #ff4444; color: #000; }
+    .resource-slider { width: 100%; margin: 8px 0; height: 20px; -webkit-appearance: none; background: #1a0000; border: 2px solid #ff4444; border-radius: 10px; }
+    body.desktop .resource-slider { height: 10px; }
+    .resource-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: #ff4444; border-radius: 50%; cursor: pointer; }
+    body.desktop .resource-slider::-webkit-slider-thumb { width: 20px; height: 20px; }
 
-    .resource-slider { width: 100%; margin: 10px 0; -webkit-appearance: none; height: 10px; background: #1a0000; border: 1px solid #ff4444; }
-    .resource-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #ff4444; border-radius: 50%; cursor: pointer; }
+    .map-container { border: 2px solid #2a6b2a; padding: 8px; background: #0a1a0a; margin: 12px 0; text-align: center; }
+    .map-image { max-width: 100%; height: auto; border: 1px solid #1f4f1f; filter: sepia(1) hue-rotate(70deg) saturate(1.5) brightness(0.9); }
 
-    .map-container { border: 2px solid #2a6b2a; padding: 10px; background: #0a1a0a; box-shadow: inset 0 0 20px #000, 0 0 15px rgba(0, 255, 0, 0.2); margin: 20px 0; text-align: center; }
-    .map-image { max-width: 100%; height: auto; display: block; border: 1px solid #1f4f1f; filter: sepia(100%) hue-rotate(70deg) saturate(150%) brightness(0.9) contrast(1.1); }
+    .vault-controls { display: flex; gap: 6px; margin: 12px 0; flex-wrap: wrap; }
+    .vault-btn {
+      background: #0a1d0a; border: 1px solid #278027; color: #66dd66;
+      padding: 10px 14px; font-family: inherit; font-size: 0.9rem; cursor: pointer;
+    }
+    body.mobile .vault-btn { flex: 1; padding: 14px; font-size: 1rem; }
+    .vault-btn.active-floor { background: #1f461f; border-color: #33bb33; color: #c6ffc6; }
 
-    .vault-controls { display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
-    .vault-btn { background: #0a1d0a; border: 1px solid #278027; color: #66dd66; padding: 8px 16px; font-family: inherit; font-size: 1rem; text-transform: uppercase; cursor: pointer; }
-    .vault-btn.active-floor { background: #1f461f; border-color: #33bb33; color: #c6ffc6; box-shadow: 0 0 10px #1a5a1a; }
-    .vault-image { max-width: 100%; height: auto; border: 1px solid #1f4f1f; filter: sepia(100%) hue-rotate(70deg) saturate(150%) brightness(0.9) contrast(1.1); }
+    .radio-tuner { border: 2px solid #2a6b2a; padding: 14px; background: #0a1a0a; margin: 12px 0; }
+    .freq-display { font-size: 1.6rem; color: #9eff9e; text-align: center; font-family: 'VT323', monospace; letter-spacing: 3px; margin: 8px 0; }
+    body.desktop .freq-display { font-size: 2rem; letter-spacing: 4px; }
+    .freq-slider { width: 100%; margin: 10px 0; -webkit-appearance: none; height: 16px; background: #0a1a0a; border: 2px solid #278027; border-radius: 10px; }
+    body.desktop .freq-slider { height: 8px; }
+    .freq-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; background: #33ff33; border-radius: 50%; cursor: pointer; }
+    body.desktop .freq-slider::-webkit-slider-thumb { width: 20px; height: 20px; }
+    .intercept-message { background: #051005; padding: 12px; margin: 10px 0; border-left: 3px solid #33bb33; min-height: 50px; color: #b6fbb6; font-size: 0.9rem; }
 
-    .radio-tuner { border: 2px solid #2a6b2a; padding: 20px; background: #0a1a0a; margin: 20px 0; }
-    .freq-display { font-size: 2rem; color: #9eff9e; text-align: center; font-family: 'VT323', monospace; letter-spacing: 4px; margin: 10px 0; border-bottom: 1px dashed #1f4f1f; }
-    .freq-slider { width: 100%; margin: 15px 0; -webkit-appearance: none; height: 8px; background: #0a1a0a; border: 1px solid #278027; }
-    .freq-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #33ff33; border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px #33ff33; }
-    .intercept-message { background: #051005; padding: 15px; margin: 15px 0; border-left: 3px solid #33bb33; min-height: 60px; color: #b6fbb6; font-style: italic; }
+    .terminal-button {
+      background: #0a1d0a; border: 1px solid #278027; color: #66dd66;
+      padding: 10px 16px; font-family: inherit; font-size: 1rem; text-transform: uppercase; cursor: pointer; margin-top: 12px;
+    }
+    body.mobile .terminal-button { width: 100%; padding: 14px; }
 
-    .terminal-button { background: #0a1d0a; border: 1px solid #278027; color: #66dd66; padding: 8px 18px; font-family: inherit; font-size: 1.1rem; text-transform: uppercase; cursor: pointer; margin-top: 20px; }
-    .terminal-footer { padding: 10px 20px; display: flex; justify-content: space-between; color: #2f812f; background: #061006; border-top: 1px solid #1d491d; border-radius: 0 0 10px 10px; text-transform: uppercase; }
+    .terminal-footer {
+      padding: 10px 14px; display: flex; justify-content: space-between;
+      color: #2f812f; background: #061006; border-top: 1px solid #1d491d;
+      font-size: 0.7rem; text-transform: uppercase; flex-shrink: 0;
+    }
+    body.desktop .terminal-footer { padding: 10px 20px; border-radius: 0 0 10px 10px; }
 
-    .cursor-blink { display: inline-block; width: 10px; height: 18px; background: #22dd22; margin-left: 5px; animation: blink 1.2s step-end infinite; }
-    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
-
-    .admin-badge { color: #ff4444; font-size: 0.9rem; margin-left: 10px; text-shadow: 0 0 8px #ff4444; display: none; }
+    .admin-badge { color: #ff4444; font-size: 0.8rem; text-shadow: 0 0 6px #ff4444; display: none; }
     .admin-badge.visible { display: inline; }
-    .click-hint { font-size: 0.8rem; color: #3d8f3d; margin-top: 8px; font-style: italic; }
+    .click-hint { font-size: 0.75rem; color: #3d8f3d; margin: 4px 0; }
+    .log-message { border-left: 3px solid #459a45; padding-left: 12px; margin: 12px 0; color: #b6fbb6; font-size: 0.85rem; }
 
-    /* Просмотр заявки */
-    .app-view { border: 2px solid #ffaa00; padding: 16px; background: #0a0a0a; margin: 10px 0; color: #ffcc88; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.5; max-height: 300px; overflow-y: auto; }
-
-    @media (max-width: 600px) { .terminal-header-center { font-size: 1.2rem; letter-spacing: 4px; } }
+    .app-view { border: 2px solid #ffaa00; padding: 14px; background: #0a0a0a; margin: 8px 0; color: #ffcc88; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.4; max-height: 250px; overflow-y: auto; }
+    .admin-scroll { flex: 1; overflow-y: auto; }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
@@ -278,7 +425,6 @@
     <div class="terminal-header-left"><div class="led active"></div><div class="led"></div><div class="led"></div></div>
     <div class="terminal-header-center">Vault-Tec</div>
     <div class="terminal-header-right">
-      <span>▲</span><span>■</span><span>●</span>
       <button class="admin-access-btn" id="adminAccessBtn">◈ АДМИН ◈</button>
       <span class="sync-indicator" id="syncIndicator">◈ ОБЛАКО ◈</span>
     </div>
@@ -290,103 +436,89 @@
     <div id="loginOverlay" class="login-overlay" style="display:none;">
       <div class="login-container">
         <div class="login-header">ВХОД В СЕТЬ</div>
-        <div class="login-field"><span class="login-label">> ЛОГИН:</span><input type="text" id="fakeLogin" class="login-input" placeholder="██████████" readonly></div>
-        <div class="login-field"><span class="login-label">> ПАРОЛЬ:</span><input type="password" id="fakePassword" class="login-input" placeholder="••••••••" readonly></div>
-        <div class="fake-keystroke-hint" id="loginHint">[ НАЖМИТЕ ЛЮБУЮ КЛАВИШУ ]</div>
-        <button class="login-button" id="loginConfirmBtn" disabled>■ ПОДТВЕРДИТЬ</button>
+        <div class="login-field"><span class="login-label">ЛОГИН</span><input type="text" id="fakeLogin" class="login-input" placeholder="██████" readonly></div>
+        <div class="login-field"><span class="login-label">ПАРОЛЬ</span><input type="password" id="fakePassword" class="login-input" placeholder="••••••" readonly></div>
+        <div class="login-status" id="loginStatus"></div>
+        <button class="login-button" id="loginConfirmBtn" disabled>■ ВОЙТИ</button>
       </div>
     </div>
 
     <div id="mainContent" style="display:none;">
-      <div class="robco-banner"><span class="robco">ROBCO INDUSTRIES (TM) UNIFIED OS</span><span>v.4.77.12 / CORE</span></div>
+      <div class="robco-banner"><span>ROBCO OS v.4.77</span><span>☁ ОБЛАКО</span></div>
 
       <div class="clan-status">
-        <div class="status-item"><span class="status-label">КЛАН:</span><span class="status-value">О.И.Д.Л.</span></div>
-        <div class="status-item"><span class="status-label">РЕСУРСЫ:</span><span class="status-value" id="resourcesDisplay">◼◼◼◻◻◻◻◻◻</span></div>
+        <span class="status-label">РЕСУРСЫ:</span>
+        <span class="status-value" id="resourcesDisplay">◼◼◼◻◻◻◻◻◻</span>
         <span class="admin-badge" id="adminBadge">◈ АДМИН ◈</span>
       </div>
 
-      <div class="nav-menu">
-        <div class="nav-item active" data-tab="dosier">► ДОСЬЕ</div>
-        <div class="nav-item" data-tab="tasks">► ЗАДАЧИ</div>
-        <div class="nav-item" data-tab="drones">► ДРОНЫ</div>
-        <div class="nav-item" data-tab="recruit">► НАБОР</div>
-        <div class="nav-item" data-tab="map">► КАРТА</div>
-        <div class="nav-item" data-tab="radio">► РАДИО</div>
-        <div class="nav-item" data-tab="vault">► УБЕЖИЩЕ</div>
+      <div class="nav-menu" id="navMenu">
+        <div class="nav-item active" data-tab="dosier">ДОСЬЕ</div>
+        <div class="nav-item" data-tab="tasks">ЗАДАЧИ</div>
+        <div class="nav-item" data-tab="drones">ДРОНЫ</div>
+        <div class="nav-item" data-tab="recruit">НАБОР</div>
+        <div class="nav-item" data-tab="map">КАРТА</div>
+        <div class="nav-item" data-tab="radio">РАДИО</div>
+        <div class="nav-item" data-tab="vault">БАЗА</div>
       </div>
 
-      <!-- ДОСЬЕ -->
       <div id="tab-dosier" class="content-pane">
-        <div style="margin-bottom:8px; color:#8bef8b;">ЗАГРУЗКА ЛИЧНОГО СОСТАВА</div>
         <div class="click-hint">[ НАЖМИТЕ НА СТРОКУ ]</div>
-        <table class="data-table"><thead><tr><th>ИМЯ</th><th>РОЛЬ</th><th>СТАТУС</th></tr></thead><tbody id="clanMembersBody"></tbody></table>
-        <div style="margin-top:20px; border-left:3px solid #248f24; padding-left:16px;">
-          <div>> СКЛАД АРСЕНАЛА: <span id="arsenalPercent">27%</span></div>
-          <div>> ВОДА / ПАЁК: <span id="waterSupply">[НЕТ ДАННЫХ]</span></div>
+        <table class="data-table"><thead><tr><th>ИМЯ</th><th>РОЛЬ</th><th class="desktop-only">СТАТУС</th></tr></thead><tbody id="clanMembersBody"></tbody></table>
+        <div style="margin-top:14px; border-left:3px solid #248f24; padding-left:12px; font-size:0.85rem;">
+          <div>> АРСЕНАЛ: <span id="arsenalPercent">27%</span></div>
+          <div>> ВОДА: <span id="waterSupply">[НЕТ ДАННЫХ]</span></div>
           <div>> АКТИВНОСТЬ: <span id="lastActivity">23.04.2026</span></div>
         </div>
-        <div class="log-message" id="systemMessage">[СИСТЕМА] СБОР ДАННЫХ, ОРУЖИЯ, РЕСУРСОВ.</div>
+        <div class="log-message" id="systemMessage">[СИСТЕМА] СБОР ДАННЫХ.</div>
       </div>
 
-      <!-- ЗАДАЧИ -->
       <div id="tab-tasks" class="content-pane hidden">
-        <div style="color:#bcffbc;">== АКТИВНЫЕ ЗАДАЧИ ==</div>
-        <table class="data-table"><thead><tr><th>ID</th><th>ОПИСАНИЕ</th><th>СРОК</th></tr></thead><tbody id="tasksTableBody"></tbody></table>
-        <button class="terminal-button" id="taskConfirmBtn">■ ПОДТВЕРДИТЬ</button>
-        <div id="taskFeedback" style="margin-top:6px;"></div>
+        <div style="color:#bcffbc;">== ЗАДАЧИ ==</div>
+        <table class="data-table"><thead><tr><th>ID</th><th>ОПИСАНИЕ</th><th class="desktop-only">СРОК</th></tr></thead><tbody id="tasksTableBody"></tbody></table>
       </div>
 
-      <!-- ДРОНЫ -->
       <div id="tab-drones" class="content-pane hidden">
-        <div style="color:#bcffbc;margin-bottom:16px;">◆ ДРОНЫ СВЯЗИ ◆</div>
+        <div style="color:#bcffbc;margin-bottom:12px;">◆ ДРОНЫ СВЯЗИ ◆</div>
         <div id="dronesContainer"></div>
-        <div class="diagnostic-log" id="diagnosticLog">[ ДИАГНОСТИКА ] ОЖИДАНИЕ ЗАПУСКА...</div>
-        <button class="terminal-button" id="diagAllBtn">■ ДИАГНОСТИКА ВСЕХ ДРОНОВ</button>
+        <div class="diagnostic-log" id="diagnosticLog">[ ДИАГНОСТИКА ] ОЖИДАНИЕ...</div>
+        <button class="terminal-button" id="diagAllBtn">■ ДИАГНОСТИКА ВСЕХ</button>
       </div>
 
-      <!-- НАБОР -->
       <div id="tab-recruit" class="content-pane hidden">
-        <div style="color:#ffaa00;margin-bottom:16px;text-align:center;font-size:1.3rem;letter-spacing:3px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ НА ВСТУПЛЕНИЕ ◆</div>
-        <div class="application-form" id="applicationForm">
-          <div style="color:#ffaa00;margin-bottom:16px;text-align:center;">ОСНОВНЫЕ ДАННЫЕ</div>
-          <div class="app-field"><span class="app-label">Имя (полное имя/прозвище):</span><input type="text" class="app-input" id="appName" placeholder="Введите имя..."></div>
-          <div class="app-field"><span class="app-label">Пол (М/Ж/Другое):</span><input type="text" class="app-input" id="appGender" placeholder="М/Ж/Другое"></div>
-          <div class="app-field"><span class="app-label">Дата рождения (ДД.ММ + возраст):</span><input type="text" class="app-input" id="appBirth" placeholder="01.01 + 25 лет"></div>
-          <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace" placeholder="Единорог, Земной пони..."></div>
-          <div class="app-field"><span class="app-label">Желаемая должность:</span><input type="text" class="app-input" id="appRole" placeholder="Охранник, Учёный..."></div>
-          <div class="app-field"><span class="app-label">Физические параметры (Рост/Вес/Особые черты):</span><textarea class="app-textarea" id="appPhysical" placeholder="Рост: см&#10;Вес: кг&#10;Отличительные черты: ..."></textarea></div>
-
-          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ПРОФЕССИОНАЛЬНЫЕ ДАННЫЕ</div>
-          <div class="app-field"><span class="app-label">Отдел/Специализация:</span><input type="text" class="app-input" id="appSpecialization" placeholder="Боевой/Медицинский/Разведывательный..."></div>
-          <div class="app-field"><span class="app-label">Навыки (3 ключевых + уровень):</span><textarea class="app-textarea" id="appSkills" placeholder="1) ...&#10;2) ...&#10;3) ..."></textarea></div>
-          <div class="app-field"><span class="app-label">Наставник (если есть):</span><input type="text" class="app-input" id="appMentor" placeholder="Имя наставника или нет"></div>
-
-          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ЛИЧНОСТЬ И БИОГРАФИЯ</div>
-          <div class="app-field"><span class="app-label">Краткая история:</span><textarea class="app-textarea" id="appHistory" placeholder="Происхождение, важные события, причина вступления в клан..."></textarea></div>
-          <div class="app-field"><span class="app-label">Характер:</span><textarea class="app-textarea" id="appCharacter" placeholder="Основные качества, принципы..."></textarea></div>
-          <div class="app-field"><span class="app-label">Фобии/Слабости:</span><textarea class="app-textarea" id="appPhobias" placeholder="Что влияет на решения..."></textarea></div>
-
-          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ОСОБЫЕ ОТМЕТКИ</div>
-          <div class="app-field"><span class="app-label">Вредные привычки:</span><input type="text" class="app-input" id="appHabits" placeholder="Курение, агрессия..."></div>
-          <div class="app-field"><span class="app-label">Хронические болезни:</span><input type="text" class="app-input" id="appIllnesses" placeholder="Если имеются..."></div>
-          <div class="app-field"><span class="app-label">Аллергии/Непереносимости:</span><input type="text" class="app-input" id="appAllergies" placeholder="Пищевые, медицинские..."></div>
-
-          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ДОПОЛНИТЕЛЬНО</div>
-          <div class="app-field"><span class="app-label">Хобби:</span><input type="text" class="app-input" id="appHobbies" placeholder="Увлечения..."></div>
-          <div class="app-field"><span class="app-label">Личные цели:</span><textarea class="app-textarea" id="appGoals" placeholder="Чего хочет достичь..."></textarea></div>
-
-          <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ ЗАЯВКУ</button>
+        <div style="color:#ffaa00;margin-bottom:12px;text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ ◆</div>
+        <div class="application-form">
+          <div style="color:#ffaa00;margin-bottom:12px;text-align:center;">ОСНОВНЫЕ ДАННЫЕ</div>
+          <div class="app-field"><span class="app-label">Имя:</span><input type="text" class="app-input" id="appName"></div>
+          <div class="app-field"><span class="app-label">Пол:</span><input type="text" class="app-input" id="appGender"></div>
+          <div class="app-field"><span class="app-label">Дата рождения:</span><input type="text" class="app-input" id="appBirth"></div>
+          <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace"></div>
+          <div class="app-field"><span class="app-label">Должность:</span><input type="text" class="app-input" id="appRole"></div>
+          <div class="app-field"><span class="app-label">Физические параметры:</span><textarea class="app-textarea" id="appPhysical"></textarea></div>
+          <div style="color:#ffaa00;margin:12px 0;text-align:center;">ПРОФЕССИОНАЛЬНЫЕ ДАННЫЕ</div>
+          <div class="app-field"><span class="app-label">Специализация:</span><input type="text" class="app-input" id="appSpecialization"></div>
+          <div class="app-field"><span class="app-label">Навыки:</span><textarea class="app-textarea" id="appSkills"></textarea></div>
+          <div class="app-field"><span class="app-label">Наставник:</span><input type="text" class="app-input" id="appMentor"></div>
+          <div style="color:#ffaa00;margin:12px 0;text-align:center;">ЛИЧНОСТЬ</div>
+          <div class="app-field"><span class="app-label">История:</span><textarea class="app-textarea" id="appHistory"></textarea></div>
+          <div class="app-field"><span class="app-label">Характер:</span><textarea class="app-textarea" id="appCharacter"></textarea></div>
+          <div class="app-field"><span class="app-label">Фобии:</span><textarea class="app-textarea" id="appPhobias"></textarea></div>
+          <div style="color:#ffaa00;margin:12px 0;text-align:center;">ОСОБЫЕ ОТМЕТКИ</div>
+          <div class="app-field"><span class="app-label">Привычки:</span><input type="text" class="app-input" id="appHabits"></div>
+          <div class="app-field"><span class="app-label">Болезни:</span><input type="text" class="app-input" id="appIllnesses"></div>
+          <div class="app-field"><span class="app-label">Аллергии:</span><input type="text" class="app-input" id="appAllergies"></div>
+          <div style="color:#ffaa00;margin:12px 0;text-align:center;">ДОПОЛНИТЕЛЬНО</div>
+          <div class="app-field"><span class="app-label">Хобби:</span><input type="text" class="app-input" id="appHobbies"></div>
+          <div class="app-field"><span class="app-label">Цели:</span><textarea class="app-textarea" id="appGoals"></textarea></div>
+          <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ</button>
         </div>
       </div>
 
-      <!-- КАРТА -->
       <div id="tab-map" class="content-pane hidden">
-        <div style="color:#bcffbc;">◆ КАРТА ПУСТОШИ ◆</div>
+        <div style="color:#bcffbc;">◆ КАРТА ◆</div>
         <div class="map-container"><img src="map.png" alt="КАРТА" class="map-image" id="mapImage"></div>
       </div>
 
-      <!-- РАДИО -->
       <div id="tab-radio" class="content-pane hidden">
         <div style="color:#bcffbc;">◆ РАДИО ◆</div>
         <div class="radio-tuner">
@@ -397,21 +529,20 @@
         </div>
       </div>
 
-      <!-- УБЕЖИЩЕ -->
       <div id="tab-vault" class="content-pane hidden">
-        <div style="color:#bcffbc;">◆ СХЕМА УБЕЖИЩА 42 ◆</div>
+        <div style="color:#bcffbc;">◆ УБЕЖИЩЕ 42 ◆</div>
         <div class="vault-controls">
           <button class="vault-btn active-floor" data-floor="0">ЭТАЖ 1</button>
           <button class="vault-btn" data-floor="1">ЭТАЖ 2</button>
           <button class="vault-btn" data-floor="2">ЭТАЖ 3</button>
           <button class="vault-btn" data-floor="3">ЭТАЖ 4</button>
         </div>
-        <div class="map-container"><img src="vault_floor_1.png" alt="ЭТАЖ 1" class="vault-image" id="vaultImage"></div>
+        <div class="map-container"><img src="vault_floor_1.png" alt="ЭТАЖ" class="vault-image" id="vaultImage"></div>
       </div>
 
       <div class="command-line">
-        <span class="command-prompt">> ВВЕДИТЕ КОМАНДУ_</span>
-        <input type="text" class="command-input" id="commandInput" placeholder="help">
+        <span style="color:#2fa32f;">></span>
+        <input type="text" class="command-input" id="commandInput" placeholder="команда...">
         <span class="cursor-blink"></span>
       </div>
     </div>
@@ -426,9 +557,9 @@
 
   <div id="adminPanel" class="admin-panel hidden">
     <div class="admin-window">
-      <div class="admin-header"><div class="admin-title">◈ АДМИНИСТРИРОВАНИЕ ◈</div><button class="admin-close" id="adminClose">✕</button></div>
+      <div class="admin-header"><div class="admin-title">АДМИН</div><button class="admin-close" id="adminClose">✕</button></div>
       <div class="admin-tabs">
-        <button class="admin-tab active" data-admin-tab="members">УЧАСТНИКИ</button>
+        <button class="admin-tab active" data-admin-tab="members">СОСТАВ</button>
         <button class="admin-tab" data-admin-tab="tasks">ЗАДАЧИ</button>
         <button class="admin-tab" data-admin-tab="drones">ДРОНЫ</button>
         <button class="admin-tab" data-admin-tab="apps">ЗАЯВКИ</button>
@@ -439,12 +570,21 @@
     </div>
   </div>
 
-  <div class="terminal-footer"><span>СИСТЕМА: ОПЕРАТИВНАЯ</span><span>О.И.Д.Л. v.2.8</span><span>ЯДРО: 99%</span></div>
+  <div class="terminal-footer"><span>О.И.Д.Л. v.3.0</span><span>ЯДРО: 99%</span></div>
 </div>
 
 <script>
 (function(){
   "use strict";
+
+  // ОПРЕДЕЛЕНИЕ УСТРОЙСТВА
+  const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) || window.innerWidth < 768;
+  document.body.className = isMobile ? 'mobile' : 'desktop';
+  
+  // Скрываем desktop-only колонки на мобилке
+  if (isMobile) {
+    document.querySelectorAll('.desktop-only').forEach(el => el.style.display = 'none');
+  }
 
   // FIREBASE
   firebase.initializeApp({
@@ -466,11 +606,16 @@
   function playBeep() { if (!audioCtx) return; const o=audioCtx.createOscillator(); o.type='square'; o.frequency.value=880; const g=audioCtx.createGain(); g.gain.setValueAtTime(0.15,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.2); o.connect(g).connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.2); }
 
   // BOOT
-  const bootLines = ["ROBCO OS v.4.77","ИНИЦИАЛИЗАЦИЯ...","> ПАМЯТЬ OK","> ОБЛАКО OK","> ДРОНЫ: ПОИСК...","> ГОТОВО","НАЖМИТЕ КЛАВИШУ"];
+  const bootLines = isMobile ? 
+    ["ROBCO OS v.4.77","ИНИЦИАЛИЗАЦИЯ...","> ПАМЯТЬ OK","> ОБЛАКО OK","> ГОТОВО"] :
+    ["ROBCO OS v.4.77","ИНИЦИАЛИЗАЦИЯ...","> ПАМЯТЬ OK","> ОБЛАКО OK","> ДРОНЫ: ПОИСК...","> ГОТОВО","НАЖМИТЕ КЛАВИШУ"];
+
   function runBoot() {
-    const el=document.getElementById('bootSequence'); if(!el)return; el.style.display='block'; let d=0;
-    bootLines.forEach(l=>{ setTimeout(()=>{ const div=document.createElement('div'); div.className='boot-line'; div.textContent=l; el.appendChild(div); el.scrollTop=el.scrollHeight; },d); d+=300; });
-    setTimeout(()=>{ el.style.display='none'; document.getElementById('loginOverlay').style.display='flex'; initAudio(); },d+500);
+    const el=document.getElementById('bootSequence'); if(!el)return;
+    el.style.display = isMobile ? 'flex' : 'block';
+    let d=0;
+    bootLines.forEach(l=>{ setTimeout(()=>{ const div=document.createElement('div'); div.className='boot-line'; div.textContent=l; el.appendChild(div); if(!isMobile) el.scrollTop=el.scrollHeight; },d); d+= isMobile ? 250 : 300; });
+    setTimeout(()=>{ el.style.display='none'; document.getElementById('loginOverlay').style.display='flex'; initAudio(); if(isMobile) startAutoLogin(); },d+500);
   }
 
   // DATA
@@ -491,26 +636,26 @@
   }
 
   function renderDrones() {
-    const container = document.getElementById('dronesContainer'); if (!container) return; container.innerHTML = '';
-    drones.forEach((drone, i) => {
-      const hc = drone.health < 30 ? 'danger' : (drone.health < 60 ? 'warning' : '');
-      const card = document.createElement('div'); card.className = 'drone-card';
-      card.innerHTML = `<div class="drone-info"><div class="drone-name">◆ ${drone.name}</div><div class="drone-status">СТАТУС: ${drone.status}</div><div class="drone-health">РАБОТОСПОСОБНОСТЬ: ${drone.health}%<div class="drone-health-bar"><div class="drone-health-fill ${hc}" style="width:${drone.health}%"></div></div></div></div><div class="drone-actions"><button class="drone-btn diag-btn" onclick="window._diagDrone(${i})">▶ ДИАГНОСТИКА</button></div>`;
+    const container=document.getElementById('dronesContainer'); if(!container)return; container.innerHTML='';
+    drones.forEach((d,i)=>{
+      const hc=d.health<30?'danger':(d.health<60?'warning':'');
+      const card=document.createElement('div'); card.className='drone-card';
+      card.innerHTML=`<div class="drone-info"><div class="drone-name">◆ ${d.name}</div><div class="drone-status">СТАТУС: ${d.status}</div><div class="drone-health">РАБОТОСПОСОБНОСТЬ: ${d.health}%<div class="drone-health-bar"><div class="drone-health-fill ${hc}" style="width:${d.health}%"></div></div></div></div><div class="drone-actions"><button class="drone-btn diag-btn" onclick="window._diagDrone(${i})">▶ ДИАГНОСТИКА</button></div>`;
       container.appendChild(card);
     });
   }
 
-  window._diagDrone = function(i) {
-    const drone = drones[i]; const log = document.getElementById('diagnosticLog');
-    const msgs = [`[${drone.name}] ЗАПУСК ДИАГНОСТИКИ...`,`[${drone.name}] СВЯЗЬ: OK`,`[${drone.name}] БАТАРЕЯ: ${drone.health}%`,`[${drone.name}] КАНАЛ: СТАБИЛЕН`,`[${drone.name}] ДИАГНОСТИКА ЗАВЕРШЕНА.`];
-    log.textContent = ''; let idx = 0;
-    const iv = setInterval(() => { if (idx < msgs.length) { log.textContent += msgs[idx] + '\n'; log.scrollTop = log.scrollHeight; idx++; } else clearInterval(iv); }, 400);
+  window._diagDrone=function(i){
+    const d=drones[i], log=document.getElementById('diagnosticLog');
+    const m=[`[${d.name}] ЗАПУСК...`,`[${d.name}] СВЯЗЬ: OK`,`[${d.name}] БАТАРЕЯ: ${d.health}%`,`[${d.name}] ГОТОВО.`];
+    log.textContent=''; let idx=0;
+    const iv=setInterval(()=>{ if(idx<m.length){ log.textContent+=m[idx]+'\n'; log.scrollTop=log.scrollHeight; idx++; } else clearInterval(iv); },400);
     playKey();
   };
 
-  document.getElementById('diagAllBtn')?.addEventListener('click', () => {
-    const log = document.getElementById('diagnosticLog'); log.textContent = '[ДИАГНОСТИКА ВСЕХ ДРОНОВ]\n';
-    drones.forEach((d, i) => { setTimeout(() => { log.textContent += `[${d.name}] РАБОТОСПОСОБНОСТЬ: ${d.health}% | СТАТУС: ${d.status}\n`; log.scrollTop = log.scrollHeight; }, (i+1)*500); });
+  document.getElementById('diagAllBtn')?.addEventListener('click',()=>{
+    const log=document.getElementById('diagnosticLog'); log.textContent='[ВСЕ ДРОНЫ]\n';
+    drones.forEach((d,i)=>{ setTimeout(()=>{ log.textContent+=`[${d.name}] ${d.health}% | ${d.status}\n`; log.scrollTop=log.scrollHeight; },(i+1)*500); });
     playBeep();
   });
 
@@ -520,65 +665,90 @@
     db.ref('tasks').on('value',sn=>{ if(sn.exists()){ tasks=sn.val(); renderT(); } });
     db.ref('system').on('value',sn=>{ if(sn.exists()){ sys=sn.val(); renderSys(); } });
     db.ref('drones').on('value',sn=>{ if(sn.exists()){ drones=sn.val(); } else { db.ref('drones').set(DEFDRONES); } renderDrones(); });
-    db.ref('applications').on('value',sn=>{ if(sn.exists()){ applications=sn.val(); } else { applications=[]; } });
+    db.ref('applications').on('value',sn=>{ applications=sn.exists()?sn.val():[]; });
   }
 
-  function renderM() { const t=document.getElementById('clanMembersBody'); if(!t)return; t.innerHTML=''; members.forEach((m,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${m.name}</td><td>${m.role}</td><td>${m.status||'Активен'}</td>`; tr.style.cursor='pointer'; tr.addEventListener('click',()=>openProfile(i)); t.appendChild(tr); }); }
-  function renderT() { const t=document.getElementById('tasksTableBody'); if(!t)return; t.innerHTML=''; tasks.forEach(td=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${td.id}</td><td>${td.description}</td><td>${td.deadline}</td>`; t.appendChild(tr); }); }
+  function renderM() {
+    const t=document.getElementById('clanMembersBody'); if(!t)return; t.innerHTML='';
+    const cols = isMobile ? 2 : 3;
+    members.forEach((m,i)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML = isMobile ? `<td>${m.name}</td><td>${m.role}</td>` : `<td>${m.name}</td><td>${m.role}</td><td>${m.status||'Активен'}</td>`;
+      tr.style.cursor='pointer'; tr.addEventListener('click',()=>openProfile(i)); t.appendChild(tr);
+    });
+  }
 
-  function openProfile(i) { const m=members[i]; if(!m)return; document.getElementById('profileName').textContent=m.name; document.getElementById('profileRole').textContent=m.role; document.getElementById('profileContent').innerHTML=m.profileHTML||'<div class="profile-text">[ НЕТ ДАННЫХ ]</div>'; document.getElementById('profileOverlay').classList.remove('hidden'); }
+  function renderT() {
+    const t=document.getElementById('tasksTableBody'); if(!t)return; t.innerHTML='';
+    if (!tasks.length) { t.innerHTML = isMobile ? '<tr><td colspan="2">НЕТ ЗАДАЧ</td></tr>' : '<tr><td colspan="3">НЕТ ЗАДАЧ</td></tr>'; return; }
+    tasks.forEach(td=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML = isMobile ? `<td>${td.id}</td><td>${td.description}</td>` : `<td>${td.id}</td><td>${td.description}</td><td>${td.deadline}</td>`;
+      t.appendChild(tr);
+    });
+  }
+
+  function openProfile(i) {
+    const m=members[i]; if(!m)return;
+    document.getElementById('profileName').textContent=m.name;
+    document.getElementById('profileRole').textContent=m.role;
+    document.getElementById('profileContent').innerHTML=m.profileHTML||'<div class="profile-text">[ НЕТ ДАННЫХ ]</div>';
+    document.getElementById('profileOverlay').classList.remove('hidden');
+  }
 
   document.getElementById('profileClose').addEventListener('click',()=>document.getElementById('profileOverlay').classList.add('hidden'));
   document.getElementById('profileOverlay').addEventListener('click',function(e){ if(e.target===this)this.classList.add('hidden'); });
 
   // LOGIN
-  const loginO=document.getElementById('loginOverlay'), mainC=document.getElementById('mainContent');
-  const fLogin=document.getElementById('fakeLogin'), fPass=document.getElementById('fakePassword');
-  const loginBtn=document.getElementById('loginConfirmBtn'), loginHint=document.getElementById('loginHint');
   const LOG='OPERATIVE.OIDL', PASS='********';
-  let lf=false, pf=false, ta=false, cl=0, cp=0, li=null, pi=null;
 
-  function startL() { if(ta)return; ta=true; loginHint.textContent='[ ЛОГИН ]'; cl=0; fLogin.value=''; lf=false; if(li)clearInterval(li); li=setInterval(()=>{ if(cl<LOG.length){ fLogin.value+=LOG[cl]; playKey(); cl++; } else { clearInterval(li); li=null; lf=true; ta=false; loginHint.textContent='[ ПАРОЛЬ ]'; } },80); }
-  function startP() { if(ta||!lf)return; ta=true; loginHint.textContent='[ ПАРОЛЬ ]'; cp=0; fPass.value=''; pf=false; if(pi)clearInterval(pi); pi=setInterval(()=>{ if(cp<PASS.length){ fPass.value+=PASS[cp]; playKey(); cp++; } else { clearInterval(pi); pi=null; pf=true; ta=false; checkBoth(); } },100); }
-  function checkBoth() { if(lf&&pf){ loginBtn.disabled=false; loginBtn.textContent='■ ВОЙТИ'; loginHint.textContent='[ ГОТОВО ]'; } }
+  function startAutoLogin() {
+    const fL=document.getElementById('fakeLogin'), fP=document.getElementById('fakePassword');
+    const lB=document.getElementById('loginConfirmBtn'), lS=document.getElementById('loginStatus');
+    fL.value=''; fP.value=''; lB.disabled=true; lS.textContent='[ АВТОМАТИЧЕСКИЙ ВХОД... ]';
+    let i=0;
+    const iv1=setInterval(()=>{ if(i<LOG.length){ fL.value+=LOG[i]; playKey(); i++; } else { clearInterval(iv1); lS.textContent='[ ПАРОЛЬ... ]';
+      let j=0;
+      const iv2=setInterval(()=>{ if(j<PASS.length){ fP.value+=PASS[j]; playKey(); j++; } else { clearInterval(iv2); lS.textContent='[ ГОТОВО ]'; lB.disabled=false; lB.classList.add('ready'); } },100);
+    }},80);
+  }
 
-  window.addEventListener('keydown',function(e){ if(!loginO||loginO.style.display==='none')return; if(!audioCtx)initAudio(); if(!lf&&!ta)startL(); else if(lf&&!pf&&!ta)startP(); });
-  loginBtn.addEventListener('click',()=>{ if(!lf||!pf)return; if(li)clearInterval(li); if(pi)clearInterval(pi); playBeep(); loginO.style.display='none'; mainC.style.display='block'; document.querySelector('.nav-item').click(); });
+  // ДЕСКТОП: ручной ввод
+  if (!isMobile) {
+    let lf=false, pf=false, ta=false, cl=0, cp=0, li=null, pi=null;
+    const loginHint=document.getElementById('loginStatus');
+    function startL() { if(ta)return; ta=true; loginHint.textContent='[ НАЖМИТЕ КЛАВИШУ ДЛЯ ЛОГИНА ]'; cl=0; document.getElementById('fakeLogin').value=''; lf=false; if(li)clearInterval(li); li=setInterval(()=>{ if(cl<LOG.length){ document.getElementById('fakeLogin').value+=LOG[cl]; playKey(); cl++; } else { clearInterval(li); li=null; lf=true; ta=false; loginHint.textContent='[ НАЖМИТЕ КЛАВИШУ ДЛЯ ПАРОЛЯ ]'; } },80); }
+    function startP() { if(ta||!lf)return; ta=true; loginHint.textContent='[ ВВОД ПАРОЛЯ... ]'; cp=0; document.getElementById('fakePassword').value=''; pf=false; if(pi)clearInterval(pi); pi=setInterval(()=>{ if(cp<PASS.length){ document.getElementById('fakePassword').value+=PASS[cp]; playKey(); cp++; } else { clearInterval(pi); pi=null; pf=true; ta=false; loginHint.textContent='[ ГОТОВО ]'; document.getElementById('loginConfirmBtn').disabled=false; } },100); }
+    window.addEventListener('keydown',function(e){ if(!document.getElementById('loginOverlay')||document.getElementById('loginOverlay').style.display==='none')return; if(!audioCtx)initAudio(); if(!lf&&!ta)startL(); else if(lf&&!pf&&!ta)startP(); });
+  }
+
+  document.getElementById('loginConfirmBtn').addEventListener('click',()=>{
+    playBeep();
+    document.getElementById('loginOverlay').style.display='none';
+    document.getElementById('mainContent').style.display='block';
+    document.querySelector('.nav-item').click();
+  });
 
   // NAVIGATION
   document.querySelectorAll('.nav-item').forEach(n=>{ n.addEventListener('click',()=>{ document.querySelectorAll('.content-pane').forEach(p=>p.classList.add('hidden')); const tab=document.getElementById('tab-'+n.dataset.tab); if(tab)tab.classList.remove('hidden'); document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active')); n.classList.add('active'); }); });
-  document.getElementById('taskConfirmBtn')?.addEventListener('click',()=>{ const fb=document.getElementById('taskFeedback'); if(fb){ fb.textContent='✓ ПРИНЯТО.'; setTimeout(()=>fb.textContent='',3000); } });
 
-  // APPLICATION SUBMIT
-  document.getElementById('appSubmitBtn')?.addEventListener('click', () => {
-    const app = {
-      name: document.getElementById('appName').value.trim(),
-      gender: document.getElementById('appGender').value.trim(),
-      birth: document.getElementById('appBirth').value.trim(),
-      race: document.getElementById('appRace').value.trim(),
-      role: document.getElementById('appRole').value.trim(),
-      physical: document.getElementById('appPhysical').value.trim(),
-      specialization: document.getElementById('appSpecialization').value.trim(),
-      skills: document.getElementById('appSkills').value.trim(),
-      mentor: document.getElementById('appMentor').value.trim(),
-      history: document.getElementById('appHistory').value.trim(),
-      character: document.getElementById('appCharacter').value.trim(),
-      phobias: document.getElementById('appPhobias').value.trim(),
-      habits: document.getElementById('appHabits').value.trim(),
-      illnesses: document.getElementById('appIllnesses').value.trim(),
-      allergies: document.getElementById('appAllergies').value.trim(),
-      hobbies: document.getElementById('appHobbies').value.trim(),
-      goals: document.getElementById('appGoals').value.trim(),
-      date: new Date().toLocaleString('ru-RU')
+  // APPLICATION
+  document.getElementById('appSubmitBtn')?.addEventListener('click',()=>{
+    const app={
+      name:document.getElementById('appName').value.trim(), gender:document.getElementById('appGender').value.trim(),
+      birth:document.getElementById('appBirth').value.trim(), race:document.getElementById('appRace').value.trim(),
+      role:document.getElementById('appRole').value.trim(), physical:document.getElementById('appPhysical').value.trim(),
+      specialization:document.getElementById('appSpecialization').value.trim(), skills:document.getElementById('appSkills').value.trim(),
+      mentor:document.getElementById('appMentor').value.trim(), history:document.getElementById('appHistory').value.trim(),
+      character:document.getElementById('appCharacter').value.trim(), phobias:document.getElementById('appPhobias').value.trim(),
+      habits:document.getElementById('appHabits').value.trim(), illnesses:document.getElementById('appIllnesses').value.trim(),
+      allergies:document.getElementById('appAllergies').value.trim(), hobbies:document.getElementById('appHobbies').value.trim(),
+      goals:document.getElementById('appGoals').value.trim(), date:new Date().toLocaleString('ru-RU')
     };
-    if (!app.name) { alert('ИМЯ ОБЯЗАТЕЛЬНО!'); return; }
-    applications.push(app);
-    db.ref('applications').set(applications);
-    alert('ЗАЯВКА ОТПРАВЛЕНА НА РАССМОТРЕНИЕ!');
-    // Очистить форму
-    ['appName','appGender','appBirth','appRace','appRole','appPhysical','appSpecialization','appSkills','appMentor','appHistory','appCharacter','appPhobias','appHabits','appIllnesses','appAllergies','appHobbies','appGoals'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.value = '';
-    });
+    if(!app.name){ alert('ИМЯ ОБЯЗАТЕЛЬНО!'); return; }
+    applications.push(app); db.ref('applications').set(applications);
+    alert('ЗАЯВКА ОТПРАВЛЕНА!');
+    ['appName','appGender','appBirth','appRace','appRole','appPhysical','appSpecialization','appSkills','appMentor','appHistory','appCharacter','appPhobias','appHabits','appIllnesses','appAllergies','appHobbies','appGoals'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
     playBeep();
   });
 
@@ -593,7 +763,7 @@
   document.getElementById('adminClose').addEventListener('click',()=>adminPanel.classList.add('hidden'));
 
   const cmdInput=document.getElementById('commandInput');
-  cmdInput.addEventListener('keydown',function(e){ if(e.key==='Enter'){ const cmd=cmdInput.value.trim().toLowerCase(); if(cmd===ADMIN){ setAdmin(true); alert('*** ДОСТУП РАЗРЕШЁН ***'); playBeep(); } else if(cmd==='help'){ alert('КОМАНДЫ: help, time, status, drones'); } else if(cmd==='time'){ alert(new Date().toLocaleString('ru-RU')); } else if(cmd==='drones'){ alert(drones.map(d=>`${d.name}: ${d.health}% [${d.status}]`).join('\n')); } else { alert('НЕИЗВЕСТНАЯ КОМАНДА'); } cmdInput.value=''; } });
+  cmdInput.addEventListener('keydown',function(e){ if(e.key==='Enter'){ const cmd=cmdInput.value.trim().toLowerCase(); if(cmd===ADMIN){ setAdmin(true); alert('*** ДОСТУП РАЗРЕШЁН ***'); playBeep(); } else if(cmd==='help'){ alert('help, time, status, drones'); } else { alert('НЕИЗВЕСТНАЯ КОМАНДА'); } cmdInput.value=''; } });
 
   window.addEventListener('keydown',e=>{ if(e.key==='Escape'){ document.getElementById('profileOverlay').classList.add('hidden'); adminPanel.classList.add('hidden'); } });
 
@@ -602,135 +772,46 @@
   function switchATab(t){ adminTabs.forEach(tb=>tb.classList.toggle('active',tb.dataset.adminTab===t)); if(t==='members')renderAM(); else if(t==='tasks')renderAT(); else if(t==='drones')renderADr(); else if(t==='apps')renderAApps(); else if(t==='system')renderAS(); else if(t==='data')renderAD(); }
   adminTabs.forEach(t=>t.addEventListener('click',()=>switchATab(t.dataset.adminTab)));
 
-  // ADMIN: APPLICATIONS
-  function renderAApps() {
-    adminContent.innerHTML = `<div class="profile-label" style="color:#ffaa00;">ЗАЯВКИ НА ВСТУПЛЕНИЕ (${applications.length})</div><div class="admin-member-list" id="adminAppList"></div><div id="appViewContainer"></div>`;
-    renderAAppList();
-  }
-
-  function renderAAppList() {
-    const l = document.getElementById('adminAppList'); if (!l) return; l.innerHTML = '';
-    if (!applications.length) { l.innerHTML = '<div style="color:#ffaa00;text-align:center;padding:20px;">НЕТ ЗАЯВОК</div>'; return; }
-    applications.forEach((a, i) => {
-      const div = document.createElement('div'); div.className = 'admin-list-item';
-      div.innerHTML = `<span style="color:#ffaa00;">${a.name}</span><span>${a.role||'БЕЗ ДОЛЖНОСТИ'}</span><span>
-        <button onclick="window._viewApp(${i})">СМ</button>
-        <button class="accept-btn" onclick="window._acceptApp(${i})">ПРИНЯТЬ</button>
-        <button class="reject-btn" onclick="window._rejectApp(${i})">ОТКЛ</button></span>`;
-      l.appendChild(div);
-    });
-  }
-
-  window._viewApp = function(i) {
-    const a = applications[i];
-    const container = document.getElementById('appViewContainer');
-    container.innerHTML = `
-      <div class="app-view">
-        <strong>ОСНОВНЫЕ ДАННЫЕ</strong>
-        Имя: ${a.name}
-        Пол: ${a.gender}
-        Дата рождения: ${a.birth}
-        Раса: ${a.race}
-        Должность: ${a.role}
-        Физические параметры: ${a.physical}
-
-        <strong>ПРОФЕССИОНАЛЬНЫЕ ДАННЫЕ</strong>
-        Специализация: ${a.specialization}
-        Навыки: ${a.skills}
-        Наставник: ${a.mentor}
-
-        <strong>ЛИЧНОСТЬ И БИОГРАФИЯ</strong>
-        История: ${a.history}
-        Характер: ${a.character}
-        Фобии: ${a.phobias}
-
-        <strong>ОСОБЫЕ ОТМЕТКИ</strong>
-        Вредные привычки: ${a.habits}
-        Болезни: ${a.illnesses}
-        Аллергии: ${a.allergies}
-
-        <strong>ДОПОЛНИТЕЛЬНО</strong>
-        Хобби: ${a.hobbies}
-        Цели: ${a.goals}
-
-        Подана: ${a.date}
-      </div>`;
-  };
-
-  window._acceptApp = function(i) {
-    const a = applications[i];
-    if (confirm(`Принять "${a.name}" в клан?`)) {
-      const profileHTML = `<div class="profile-section"><div class="profile-label">ОСНОВНАЯ ИНФОРМАЦИЯ</div><div class="profile-text">Имя: ${a.name}\nПол: ${a.gender}\nРаса: ${a.race}\nДолжность: ${a.role||'Не указана'}</div></div><hr class="profile-divider"><div class="profile-section"><div class="profile-label">БИОГРАФИЯ</div><div class="profile-text">${a.history||'Не указана'}</div></div>`;
-      members.push({ name: a.name, role: a.role || 'Рекрут', status: 'Активен', profileHTML });
-      db.ref('members').set(members);
-      applications.splice(i, 1);
-      db.ref('applications').set(applications);
-      renderM();
-      renderAAppList();
-      document.getElementById('appViewContainer').innerHTML = '';
-      alert(`${a.name} ПРИНЯТ В КЛАН!`);
-      playBeep();
-    }
-  };
-
-  window._rejectApp = function(i) {
-    if (confirm(`Отклонить заявку "${applications[i].name}"?`)) {
-      applications.splice(i, 1);
-      db.ref('applications').set(applications);
-      renderAAppList();
-      document.getElementById('appViewContainer').innerHTML = '';
-      alert('ЗАЯВКА ОТКЛОНЕНА.');
-    }
-  };
+  // ADMIN: APPS
+  function renderAApps() { adminContent.innerHTML=`<div class="profile-label" style="color:#ffaa00;">ЗАЯВКИ (${applications.length})</div><div class="admin-member-list" id="adminAppList"></div><div id="appViewContainer"></div>`; renderAAppList(); }
+  function renderAAppList() { const l=document.getElementById('adminAppList'); if(!l)return; l.innerHTML=''; if(!applications.length){ l.innerHTML='<div style="color:#ffaa00;text-align:center;padding:20px;">НЕТ ЗАЯВОК</div>'; return; } applications.forEach((a,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span style="color:#ffaa00;">${a.name}</span><span><button onclick="window._viewApp(${i})">СМ</button><button class="accept-btn" onclick="window._acceptApp(${i})">✓</button><button class="reject-btn" onclick="window._rejectApp(${i})">✕</button></span>`; l.appendChild(d); }); }
+  window._viewApp=function(i){ const a=applications[i]; document.getElementById('appViewContainer').innerHTML=`<div class="app-view">Имя: ${a.name}\nПол: ${a.gender}\nДата: ${a.birth}\nРаса: ${a.race}\nДолжность: ${a.role}\nПараметры: ${a.physical}\n\nСпециализация: ${a.specialization}\nНавыки: ${a.skills}\nНаставник: ${a.mentor}\n\nИстория: ${a.history}\nХарактер: ${a.character}\nФобии: ${a.phobias}\n\nПривычки: ${a.habits}\nБолезни: ${a.illnesses}\nАллергии: ${a.allergies}\n\nХобби: ${a.hobbies}\nЦели: ${a.goals}\n\nПодана: ${a.date}</div>`; };
+  window._acceptApp=function(i){ const a=applications[i]; if(confirm(`Принять "${a.name}"?`)){ members.push({ name:a.name, role:a.role||'Рекрут', status:'Активен', profileHTML:`<div class="profile-section"><div class="profile-label">ИНФО</div><div class="profile-text">Имя: ${a.name}\nРаса: ${a.race}\nДолжность: ${a.role}</div></div>` }); db.ref('members').set(members); applications.splice(i,1); db.ref('applications').set(applications); renderM(); renderAAppList(); document.getElementById('appViewContainer').innerHTML=''; playBeep(); } };
+  window._rejectApp=function(i){ if(confirm('Отклонить?')){ applications.splice(i,1); db.ref('applications').set(applications); renderAAppList(); document.getElementById('appViewContainer').innerHTML=''; } };
 
   // ADMIN: DRONES
-  function renderADr() {
-    adminContent.innerHTML = `
-      <div class="profile-label" style="color:#ff6666;">РЕДАКТИРОВАНИЕ ДРОНОВ</div><div class="admin-member-list" id="adminDroneList"></div>
-      <input type="text" class="admin-input" id="drName" placeholder="НАЗВАНИЕ"><input type="text" class="admin-input" id="drStatus" placeholder="СТАТУС">
-      <div class="profile-label" style="color:#ff6666;">РАБОТОСПОСОБНОСТЬ (%)</div>
-      <input type="range" class="resource-slider" id="drHealth" min="0" max="100" value="85"><div style="color:#ffaaaa;text-align:center;font-size:1.2rem;" id="drHealthVal">85%</div>
-      <input type="hidden" id="drEditIdx" value="-1">
-      <button class="admin-btn save-btn" id="drSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="drCancel">■ ОТМЕНА</button>`;
-    renderADrList();
-    document.getElementById('drHealth').addEventListener('input', function() { document.getElementById('drHealthVal').textContent = this.value + '%'; });
-    document.getElementById('drSave').addEventListener('click', saveDrone);
-    document.getElementById('drCancel').addEventListener('click', clearDrForm);
-  }
-
-  function renderADrList() { const l=document.getElementById('adminDroneList'); if(!l)return; l.innerHTML=''; drones.forEach((d,i)=>{ const div=document.createElement('div'); div.className='admin-list-item'; div.innerHTML=`<span>${d.name} — ${d.health}% [${d.status}]</span><span><button onclick="window._eDr(${i})">РЕД</button></span>`; l.appendChild(div); }); }
+  function renderADr() { adminContent.innerHTML=`<div class="admin-member-list" id="adminDroneList"></div><input type="text" class="admin-input" id="drName" placeholder="НАЗВАНИЕ"><input type="text" class="admin-input" id="drStatus" placeholder="СТАТУС"><div class="profile-label" style="color:#ff6666;">ЗДОРОВЬЕ (%)</div><input type="range" class="resource-slider" id="drHealth" min="0" max="100" value="85"><div style="color:#ffaaaa;text-align:center;font-size:1.2rem;" id="drHealthVal">85%</div><input type="hidden" id="drEditIdx" value="-1"><button class="admin-btn save-btn" id="drSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="drCancel">■ ОТМЕНА</button>`; renderADrList(); document.getElementById('drHealth').addEventListener('input',function(){ document.getElementById('drHealthVal').textContent=this.value+'%'; }); document.getElementById('drSave').addEventListener('click',saveDrone); document.getElementById('drCancel').addEventListener('click',clearDrForm); }
+  function renderADrList(){ const l=document.getElementById('adminDroneList'); if(!l)return; l.innerHTML=''; drones.forEach((d,i)=>{ const div=document.createElement('div'); div.className='admin-list-item'; div.innerHTML=`<span>${d.name} — ${d.health}%</span><span><button onclick="window._eDr(${i})">РЕД</button></span>`; l.appendChild(div); }); }
   window._eDr=function(i){ const d=drones[i]; document.getElementById('drName').value=d.name; document.getElementById('drStatus').value=d.status; document.getElementById('drHealth').value=d.health; document.getElementById('drHealthVal').textContent=d.health+'%'; document.getElementById('drEditIdx').value=i; };
-  function saveDrone() { const name=document.getElementById('drName').value.trim(), status=document.getElementById('drStatus').value.trim(), health=parseInt(document.getElementById('drHealth').value); if(!name){ alert('ВВЕДИТЕ НАЗВАНИЕ!'); return; } const data={ name, status:status||'АКТИВЕН', health }; const ei=parseInt(document.getElementById('drEditIdx').value); if(ei>=0&&ei<drones.length) drones[ei]=data; db.ref('drones').set(drones); renderDrones(); renderADrList(); clearDrForm(); playBeep(); }
-  function clearDrForm() { document.getElementById('drName').value=''; document.getElementById('drStatus').value=''; document.getElementById('drHealth').value=85; document.getElementById('drHealthVal').textContent='85%'; document.getElementById('drEditIdx').value='-1'; }
+  function saveDrone(){ const n=document.getElementById('drName').value.trim(), s=document.getElementById('drStatus').value.trim(), h=parseInt(document.getElementById('drHealth').value); if(!n)return; const ei=parseInt(document.getElementById('drEditIdx').value); if(ei>=0) drones[ei]={name:n,status:s,health:h}; db.ref('drones').set(drones); renderDrones(); renderADrList(); clearDrForm(); playBeep(); }
+  function clearDrForm(){ document.getElementById('drName').value=''; document.getElementById('drStatus').value=''; document.getElementById('drHealth').value=85; document.getElementById('drHealthVal').textContent='85%'; document.getElementById('drEditIdx').value='-1'; }
 
   // ADMIN: SYSTEM
-  function renderAS() {
-    adminContent.innerHTML=`<div class="profile-section"><div class="profile-label" style="color:#ff6666;">РЕСУРСЫ (0-9)</div><input type="range" class="resource-slider" id="sr" min="0" max="9" value="${sys.resources}"><div style="color:#ffaaaa;text-align:center;font-size:1.3rem;" id="sp">${'◼'.repeat(sys.resources)+'◻'.repeat(9-sys.resources)}</div></div><hr class="profile-divider" style="border-color:#552222;"><div class="profile-section"><div class="profile-label" style="color:#ff6666;">АРСЕНАЛ (%)</div><input type="number" class="admin-input" id="sa" value="${sys.arsenal}"></div><div class="profile-section"><div class="profile-label" style="color:#ff6666;">ВОДА / ПАЁК</div><input type="text" class="admin-input" id="sw" value="${sys.water}"></div><div class="profile-section"><div class="profile-label" style="color:#ff6666;">АКТИВНОСТЬ</div><input type="text" class="admin-input" id="sl" value="${sys.activity}"></div><div class="profile-section"><div class="profile-label" style="color:#ff6666;">[СИСТЕМА]</div><input type="text" class="admin-input" id="ss" value="${sys.sysMsg}"></div><button class="admin-btn save-btn" id="ssBtn">■ СОХРАНИТЬ</button>`;
-    document.getElementById('sr').addEventListener('input',function(){ document.getElementById('sp').textContent='◼'.repeat(parseInt(this.value))+'◻'.repeat(9-parseInt(this.value)); });
-    document.getElementById('ssBtn').addEventListener('click',()=>{ sys.resources=parseInt(document.getElementById('sr').value); sys.arsenal=parseInt(document.getElementById('sa').value)||0; sys.water=document.getElementById('sw').value.trim(); sys.activity=document.getElementById('sl').value.trim(); sys.sysMsg=document.getElementById('ss').value.trim(); db.ref('system').set(sys); renderSys(); alert('СОХРАНЕНО В ОБЛАКЕ'); });
-  }
+  function renderAS(){ adminContent.innerHTML=`<div class="profile-label" style="color:#ff6666;">РЕСУРСЫ (0-9)</div><input type="range" class="resource-slider" id="sr" min="0" max="9" value="${sys.resources}"><div style="color:#ffaaaa;text-align:center;font-size:1.3rem;" id="sp">${'◼'.repeat(sys.resources)+'◻'.repeat(9-sys.resources)}</div><div class="profile-label" style="color:#ff6666;">АРСЕНАЛ (%)</div><input type="number" class="admin-input" id="sa" value="${sys.arsenal}"><div class="profile-label" style="color:#ff6666;">ВОДА</div><input type="text" class="admin-input" id="sw" value="${sys.water}"><div class="profile-label" style="color:#ff6666;">АКТИВНОСТЬ</div><input type="text" class="admin-input" id="sl" value="${sys.activity}"><div class="profile-label" style="color:#ff6666;">[СИСТЕМА]</div><input type="text" class="admin-input" id="ss" value="${sys.sysMsg}"><button class="admin-btn save-btn" id="ssBtn">■ СОХРАНИТЬ</button>`; document.getElementById('sr').addEventListener('input',function(){ document.getElementById('sp').textContent='◼'.repeat(parseInt(this.value))+'◻'.repeat(9-parseInt(this.value)); }); document.getElementById('ssBtn').addEventListener('click',()=>{ sys.resources=parseInt(document.getElementById('sr').value); sys.arsenal=parseInt(document.getElementById('sa').value)||0; sys.water=document.getElementById('sw').value.trim(); sys.activity=document.getElementById('sl').value.trim(); sys.sysMsg=document.getElementById('ss').value.trim(); db.ref('system').set(sys); renderSys(); alert('СОХРАНЕНО'); }); }
 
-  // ADMIN: MEMBERS, TASKS, DATA (кратко)
-  function renderAM() { adminContent.innerHTML=`<div class="admin-member-list" id="adminMemberList"></div><input type="text" class="admin-input" id="aName" placeholder="ИМЯ"><input type="text" class="admin-input" id="aRole" placeholder="РОЛЬ"><input type="text" class="admin-input" id="aStatus" placeholder="СТАТУС" value="Активен"><textarea class="admin-textarea" id="aProfile" placeholder="HTML анкеты..."></textarea><input type="hidden" id="aEditIdx" value="-1"><button class="admin-btn save-btn" id="mSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="mCancel">■ ОТМЕНА</button>`; renderAML(); document.getElementById('mSave').addEventListener('click',saveM); document.getElementById('mCancel').addEventListener('click',clearMF); }
-  function renderAML() { const l=document.getElementById('adminMemberList'); if(!l)return; l.innerHTML=''; members.forEach((m,i)=>{ const d=document.createElement('div'); d.className='admin-member-item'; d.innerHTML=`<span>${m.name} - ${m.role}</span><span><button onclick="window._eM(${i})">РЕД</button><button onclick="window._dM(${i})">УДЛ</button></span>`; l.appendChild(d); }); }
+  // ADMIN: MEMBERS
+  function renderAM(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminMemberList"></div><input type="text" class="admin-input" id="aName" placeholder="ИМЯ"><input type="text" class="admin-input" id="aRole" placeholder="РОЛЬ"><input type="text" class="admin-input" id="aStatus" placeholder="СТАТУС" value="Активен"><textarea class="admin-textarea" id="aProfile" placeholder="HTML анкеты..."></textarea><input type="hidden" id="aEditIdx" value="-1"><button class="admin-btn save-btn" id="mSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="mCancel">■ ОТМЕНА</button>`; renderAML(); document.getElementById('mSave').addEventListener('click',saveM); document.getElementById('mCancel').addEventListener('click',clearMF); }
+  function renderAML(){ const l=document.getElementById('adminMemberList'); if(!l)return; l.innerHTML=''; members.forEach((m,i)=>{ const d=document.createElement('div'); d.className='admin-member-item'; d.innerHTML=`<span>${m.name}</span><span><button onclick="window._eM(${i})">Р</button><button onclick="window._dM(${i})">У</button></span>`; l.appendChild(d); }); }
   window._eM=function(i){ const m=members[i]; document.getElementById('aName').value=m.name; document.getElementById('aRole').value=m.role; document.getElementById('aStatus').value=m.status||'Активен'; document.getElementById('aProfile').value=m.profileHTML||''; document.getElementById('aEditIdx').value=i; };
   window._dM=function(i){ if(confirm('Удалить?')){ members.splice(i,1); db.ref('members').set(members); renderM(); renderAML(); } };
-  function saveM() { const n=document.getElementById('aName').value.trim(), r=document.getElementById('aRole').value.trim(); if(!n||!r){ alert('ИМЯ И РОЛЬ!'); return; } const data={ name:n, role:r, status:document.getElementById('aStatus').value.trim()||'Активен', profileHTML:document.getElementById('aProfile').value }; const ei=parseInt(document.getElementById('aEditIdx').value); if(ei>=0&&ei<members.length) members[ei]=data; else members.push(data); db.ref('members').set(members); renderM(); renderAML(); clearMF(); }
+  function saveM(){ const n=document.getElementById('aName').value.trim(), r=document.getElementById('aRole').value.trim(); if(!n||!r)return; const d={ name:n, role:r, status:document.getElementById('aStatus').value.trim()||'Активен', profileHTML:document.getElementById('aProfile').value }; const ei=parseInt(document.getElementById('aEditIdx').value); if(ei>=0) members[ei]=d; else members.push(d); db.ref('members').set(members); renderM(); renderAML(); clearMF(); }
   function clearMF(){ document.getElementById('aName').value=''; document.getElementById('aRole').value=''; document.getElementById('aStatus').value='Активен'; document.getElementById('aProfile').value=''; document.getElementById('aEditIdx').value='-1'; }
 
-  function renderAT() { adminContent.innerHTML=`<div class="admin-member-list" id="adminTaskList"></div><input type="text" class="admin-input" id="tId" placeholder="ID"><input type="text" class="admin-input" id="tDesc" placeholder="ОПИСАНИЕ"><input type="text" class="admin-input" id="tDead" placeholder="СРОК"><input type="hidden" id="tEditIdx" value="-1"><button class="admin-btn save-btn" id="tSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="tCancel">■ ОТМЕНА</button>`; renderATL(); document.getElementById('tSave').addEventListener('click',saveT); document.getElementById('tCancel').addEventListener('click',clearTF); }
-  function renderATL() { const l=document.getElementById('adminTaskList'); if(!l)return; l.innerHTML=''; tasks.forEach((t,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${t.id} - ${t.description}</span><span><button onclick="window._eT(${i})">РЕД</button><button onclick="window._dT(${i})">УДЛ</button></span>`; l.appendChild(d); }); }
+  // ADMIN: TASKS
+  function renderAT(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminTaskList"></div><input type="text" class="admin-input" id="tId" placeholder="ID"><input type="text" class="admin-input" id="tDesc" placeholder="ОПИСАНИЕ"><input type="text" class="admin-input" id="tDead" placeholder="СРОК"><input type="hidden" id="tEditIdx" value="-1"><button class="admin-btn save-btn" id="tSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="tCancel">■ ОТМЕНА</button>`; renderATL(); document.getElementById('tSave').addEventListener('click',saveT); document.getElementById('tCancel').addEventListener('click',clearTF); }
+  function renderATL(){ const l=document.getElementById('adminTaskList'); if(!l)return; l.innerHTML=''; tasks.forEach((t,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${t.id}</span><span><button onclick="window._eT(${i})">Р</button><button onclick="window._dT(${i})">У</button></span>`; l.appendChild(d); }); }
   window._eT=function(i){ const t=tasks[i]; document.getElementById('tId').value=t.id; document.getElementById('tDesc').value=t.description; document.getElementById('tDead').value=t.deadline; document.getElementById('tEditIdx').value=i; };
   window._dT=function(i){ if(confirm('Удалить?')){ tasks.splice(i,1); db.ref('tasks').set(tasks); renderT(); renderATL(); } };
-  function saveT() { const id=document.getElementById('tId').value.trim(), d=document.getElementById('tDesc').value.trim(), dl=document.getElementById('tDead').value.trim(); if(!id||!d||!dl){ alert('ВСЕ ПОЛЯ!'); return; } const data={ id, description:d, deadline:dl }; const ei=parseInt(document.getElementById('tEditIdx').value); if(ei>=0&&ei<tasks.length) tasks[ei]=data; else tasks.push(data); db.ref('tasks').set(tasks); renderT(); renderATL(); clearTF(); }
+  function saveT(){ const id=document.getElementById('tId').value.trim(), d=document.getElementById('tDesc').value.trim(), dl=document.getElementById('tDead').value.trim(); if(!id||!d||!dl)return; const data={ id, description:d, deadline:dl }; const ei=parseInt(document.getElementById('tEditIdx').value); if(ei>=0) tasks[ei]=data; else tasks.push(data); db.ref('tasks').set(tasks); renderT(); renderATL(); clearTF(); }
   function clearTF(){ document.getElementById('tId').value=''; document.getElementById('tDesc').value=''; document.getElementById('tDead').value=''; document.getElementById('tEditIdx').value='-1'; }
 
-  function renderAD() { adminContent.innerHTML=`<button class="admin-btn" id="syncBtn">■ СИНХРОНИЗИРОВАТЬ</button><hr class="profile-divider" style="border-color:#552222;"><button class="admin-btn" id="expM">■ ЭКСПОРТ УЧАСТНИКОВ</button><button class="admin-btn" id="expT">■ ЭКСПОРТ ЗАДАЧ</button><button class="admin-btn" id="expDr">■ ЭКСПОРТ ДРОНОВ</button><button class="admin-btn" id="expApp">■ ЭКСПОРТ ЗАЯВОК</button><textarea class="admin-textarea" id="impM" placeholder="JSON участников..."></textarea><button class="admin-btn" id="impMBtn">■ ИМПОРТ УЧАСТНИКОВ</button><textarea class="admin-textarea" id="impT" placeholder="JSON задач..."></textarea><button class="admin-btn" id="impTBtn">■ ИМПОРТ ЗАДАЧ</button>`; document.getElementById('syncBtn').addEventListener('click',()=>{ loadData(); alert('ГОТОВО'); }); document.getElementById('expM').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(members,null,2)); alert('СКОПИРОВАНО'); }); document.getElementById('expT').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(tasks,null,2)); alert('СКОПИРОВАНО'); }); document.getElementById('expDr').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(drones,null,2)); alert('СКОПИРОВАНО'); }); document.getElementById('expApp').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(applications,null,2)); alert('СКОПИРОВАНО'); }); document.getElementById('impMBtn').addEventListener('click',()=>{ try{ const d=JSON.parse(document.getElementById('impM').value); if(Array.isArray(d)){ members=d; db.ref('members').set(members); renderM(); alert('ГОТОВО'); } }catch(e){ alert('ОШИБКА JSON'); } }); document.getElementById('impTBtn').addEventListener('click',()=>{ try{ const d=JSON.parse(document.getElementById('impT').value); if(Array.isArray(d)){ tasks=d; db.ref('tasks').set(tasks); renderT(); alert('ГОТОВО'); } }catch(e){ alert('ОШИБКА JSON'); } }); }
+  // ADMIN: DATA
+  function renderAD(){ adminContent.innerHTML=`<button class="admin-btn" id="syncBtn">■ СИНХРОНИЗИРОВАТЬ</button><button class="admin-btn" id="expM">■ ЭКСПОРТ УЧАСТНИКОВ</button><button class="admin-btn" id="expT">■ ЭКСПОРТ ЗАДАЧ</button><button class="admin-btn" id="expDr">■ ЭКСПОРТ ДРОНОВ</button><textarea class="admin-textarea" id="impM" placeholder="JSON участников..."></textarea><button class="admin-btn" id="impMBtn">■ ИМПОРТ УЧАСТНИКОВ</button><textarea class="admin-textarea" id="impT" placeholder="JSON задач..."></textarea><button class="admin-btn" id="impTBtn">■ ИМПОРТ ЗАДАЧ</button>`; document.getElementById('syncBtn').addEventListener('click',()=>{ loadData(); alert('ГОТОВО'); }); document.getElementById('expM').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(members,null,2)); alert('СКОПИРОВАНО'); }); document.getElementById('expT').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(tasks,null,2)); alert('СКОПИРОВАНО'); }); document.getElementById('expDr').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(drones,null,2)); alert('СКОПИРОВАНО'); }); document.getElementById('impMBtn').addEventListener('click',()=>{ try{ const d=JSON.parse(document.getElementById('impM').value); if(Array.isArray(d)){ members=d; db.ref('members').set(members); renderM(); alert('ГОТОВО'); } }catch(e){ alert('ОШИБКА'); } }); document.getElementById('impTBtn').addEventListener('click',()=>{ try{ const d=JSON.parse(document.getElementById('impT').value); if(Array.isArray(d)){ tasks=d; db.ref('tasks').set(tasks); renderT(); alert('ГОТОВО'); } }catch(e){ alert('ОШИБКА'); } }); }
 
   // RADIO
   const radioMessages={ 88.5:"*** SOS ***", 94.2:"АНКЛАВ: КОД КРАСНЫЙ.", 101.1:"КАРАВАН В ПУТИ.", 107.8:"РЕЙДЕРЫ...", 114.7:"О.И.Д.Л. ШТАБ.", 122.3:"БРАТСТВО: ЗАПРЕТ.", 130.5:"МЕДИКАМЕНТЫ.", 138.0:"РАДИО.", 145.8:"УБЕЖИЩЕ 101..." };
   document.getElementById('freqSlider')?.addEventListener('input',function(){ const f=parseFloat(this.value).toFixed(1); document.getElementById('freqDisplay').textContent=f+' МГц'; document.getElementById('interceptMessage').textContent=radioMessages[f]||'[ ШУМ ]'; });
-  document.getElementById('scanBtn')?.addEventListener('click',()=>{ let f=88; const iv=setInterval(()=>{ const s=document.getElementById('freqSlider'); s.value=f; s.dispatchEvent(new Event('input')); f+=0.5; if(f>150)clearInterval(iv); },50); });
+  document.getElementById('scanBtn')?.addEventListener('click',()=>{ let f=88; const iv=setInterval(()=>{ const s=document.getElementById('freqSlider'); s.value=f; s.dispatchEvent(new Event('input')); f+=0.5; if(f>150)clearInterval(iv); },60); });
 
   // VAULT
   document.querySelectorAll('.vault-btn').forEach(b=>{ b.addEventListener('click',()=>{ document.querySelectorAll('.vault-btn').forEach(x=>x.classList.remove('active-floor')); b.classList.add('active-floor'); const img=document.getElementById('vaultImage'); if(img)img.src=`vault_floor_${parseInt(b.dataset.floor)+1}.png`; }); });
