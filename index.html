@@ -388,14 +388,39 @@
         <div id="mailContent"></div>
       </div>
 
-      <div id="tab-recruit" class="content-pane hidden">
-        <div style="color:#ffaa00;text-align:center;">◆ ПОДАТЬ ЗАЯВКУ ◆</div>
-        <div class="application-form">
-          <div class="app-field"><span class="app-label">Имя:</span><input type="text" class="app-input" id="appName"></div>
-          <div class="app-field"><span class="app-label">Должность:</span><input type="text" class="app-input" id="appRole"></div>
-          <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ</button>
-        </div>
-      </div>
+ <div id="tab-recruit" class="content-pane hidden">
+  <div style="color:#ffaa00;margin-bottom:12px;text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ НА ВСТУПЛЕНИЕ ◆</div>
+  <div class="application-form" id="applicationForm">
+    <div style="color:#ffaa00;margin-bottom:12px;text-align:center;">ОСНОВНЫЕ ДАННЫЕ</div>
+    <div class="app-field"><span class="app-label">Имя (полное имя/прозвище):</span><input type="text" class="app-input" id="appName" placeholder="Введите имя..."></div>
+    <div class="app-field"><span class="app-label">Пол (М/Ж/Другое):</span><input type="text" class="app-input" id="appGender" placeholder="М/Ж/Другое"></div>
+    <div class="app-field"><span class="app-label">Дата рождения (ДД.ММ + возраст):</span><input type="text" class="app-input" id="appBirth" placeholder="01.01 + 25 лет"></div>
+    <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace" placeholder="Единорог, Земной пони..."></div>
+    <div class="app-field"><span class="app-label">Должность:</span><input type="text" class="app-input" id="appRole" placeholder="Охранник, Учёный..."></div>
+    <div class="app-field"><span class="app-label">Физические параметры:</span><textarea class="app-textarea" id="appPhysical" placeholder="Рост: см\nВес: кг\nОтличительные черты: ..."></textarea></div>
+
+    <div style="color:#ffaa00;margin:16px 0;text-align:center;">ПРОФЕССИОНАЛЬНЫЕ ДАННЫЕ</div>
+    <div class="app-field"><span class="app-label">Отдел/Специализация:</span><input type="text" class="app-input" id="appSpecialization" placeholder="Боевой/Медицинский/Разведывательный..."></div>
+    <div class="app-field"><span class="app-label">Навыки (3 ключевых + уровень):</span><textarea class="app-textarea" id="appSkills" placeholder="1) ...\n2) ...\n3) ..."></textarea></div>
+    <div class="app-field"><span class="app-label">Наставник:</span><input type="text" class="app-input" id="appMentor" placeholder="Имя наставника или нет">
+
+    <div style="color:#ffaa00;margin:16px 0;text-align:center;">ЛИЧНОСТЬ И БИОГРАФИЯ</div>
+    <div class="app-field"><span class="app-label">Краткая история:</span><textarea class="app-textarea" id="appHistory" placeholder="Происхождение, важные события, причина вступления в клан..."></textarea></div>
+    <div class="app-field"><span class="app-label">Характер:</span><textarea class="app-textarea" id="appCharacter" placeholder="Основные качества, принципы..."></textarea></div>
+    <div class="app-field"><span class="app-label">Фобии/Слабости:</span><textarea class="app-textarea" id="appPhobias" placeholder="Что влияет на решения..."></textarea></div>
+
+    <div style="color:#ffaa00;margin:16px 0;text-align:center;">ОСОБЫЕ ОТМЕТКИ</div>
+    <div class="app-field"><span class="app-label">Вредные привычки:</span><input type="text" class="app-input" id="appHabits" placeholder="Курение, агрессия..."></div>
+    <div class="app-field"><span class="app-label">Хронические болезни:</span><input type="text" class="app-input" id="appIllnesses" placeholder="Если имеются..."></div>
+    <div class="app-field"><span class="app-label">Аллергии/Непереносимости:</span><input type="text" class="app-input" id="appAllergies" placeholder="Пищевые, медицинские..."></div>
+
+    <div style="color:#ffaa00;margin:16px 0;text-align:center;">ДОПОЛНИТЕЛЬНО</div>
+    <div class="app-field"><span class="app-label">Хобби:</span><input type="text" class="app-input" id="appHobbies" placeholder="Увлечения..."></div>
+    <div class="app-field"><span class="app-label">Личные цели:</span><textarea class="app-textarea" id="appGoals" placeholder="Чего хочет достичь..."></textarea></div>
+
+    <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ ЗАЯВКУ</button>
+  </div>
+</div>
 
       <div id="tab-map" class="content-pane hidden">
         <div style="color:#bcffbc;">◆ КАРТА ◆</div>
