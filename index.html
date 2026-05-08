@@ -86,6 +86,12 @@
     }
     .user-indicator.show { display: inline-block; }
 
+    .caps-indicator {
+      color: #ffaa00; font-size: 0.8rem; font-family: 'Courier New', monospace;
+      border: 1px solid #ffaa00; padding: 3px 8px; display: none;
+    }
+    .caps-indicator.show { display: inline-block; }
+
     .admin-access-btn {
       background: #1a0000; border: 2px solid #ff4444; color: #ff4444;
       font-family: 'Courier New', monospace; cursor: pointer; position: relative;
@@ -152,6 +158,7 @@
     .login-button { background: #0a1d0a; border: 2px solid #278027; color: #66dd66; font-family: inherit; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 12px; letter-spacing: 2px; padding: 14px; font-size: 1.2rem; }
     .login-button:disabled { opacity: 0.4; }
     .login-button.ready { border-color: #33ff33; color: #33ff33; box-shadow: 0 0 20px #33ff33; animation: pulseReady 1s infinite; }
+    .guest-btn { background: #1a1a00; border-color: #aaaa00; color: #cccc44; margin-top: 8px; }
     @keyframes pulseReady { 0%,100%{box-shadow:0 0 10px #33ff33;} 50%{box-shadow:0 0 25px #33ff33;} }
 
     .robco-banner { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed #2f6e2f; padding-bottom: 8px; margin-bottom: 16px; flex-wrap: wrap; gap: 4px; font-size: 0.85rem; }
@@ -289,6 +296,7 @@
     .log-message { border-left: 3px solid #459a45; padding-left: 12px; margin: 12px 0; color: #b6fbb6; font-size: 0.85rem; }
     .app-view { border: 2px solid #ffaa00; padding: 14px; background: #0a0a0a; margin: 8px 0; color: #ffcc88; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.4; max-height: 250px; overflow-y: auto; }
     .admin-scroll { flex: 1; overflow-y: auto; }
+    .guest-warning { color: #ffaa00; font-size: 0.8rem; text-align: center; margin: 8px 0; }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
@@ -302,6 +310,7 @@
     <div class="terminal-header-center">Vault-Tec</div>
     <div class="terminal-header-right">
       <span class="user-indicator" id="userIndicator">👤 ГОСТЬ</span>
+      <span class="caps-indicator" id="capsIndicator">💰 0</span>
       <button class="logout-btn" id="logoutBtn">ВЫХОД</button>
       <button class="admin-access-btn" id="adminAccessBtn">◈ АДМИН ◈<span class="app-badge" id="appBadge">0</span></button>
       <span class="sync-indicator" id="syncIndicator">◈ ОБЛАКО ◈</span>
@@ -324,6 +333,7 @@
         </div>
         <div class="login-status" id="loginStatus">[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]</div>
         <button class="login-button" id="loginConfirmBtn" disabled>■ ВОЙТИ</button>
+        <button class="login-button guest-btn" id="guestLoginBtn">■ ВОЙТИ КАК ГОСТЬ</button>
       </div>
     </div>
 
@@ -335,15 +345,18 @@
         <span class="status-value" id="resourcesDisplay">◼◼◼◻◻◻◻◻◻</span>
         <span class="admin-badge" id="adminBadge">◈ АДМИН ◈</span>
       </div>
+      <div class="guest-warning" id="guestWarning" style="display:none;">⚠ ГОСТЕВОЙ РЕЖИМ — НЕКОТОРЫЕ ФУНКЦИИ ОГРАНИЧЕНЫ</div>
 
       <div class="nav-menu" id="navMenu">
         <div class="nav-item active" data-tab="dosier">ДОСЬЕ</div>
         <div class="nav-item" data-tab="tasks">ЗАДАЧИ</div>
         <div class="nav-item" data-tab="drones">ДРОНЫ</div>
         <div class="nav-item" data-tab="events">СОБЫТИЯ</div>
-        <a href="medical.html" class="nav-item" style="text-decoration:none;">МЕДПУНКТ</a>
+        <a href="shop.html" class="nav-item" style="text-decoration:none;">💎 МАГАЗИН</a>
+        <a href="medical.html" class="nav-item" style="text-decoration:none;">🏥 МЕДПУНКТ</a>
+        <a href="science.html" class="nav-item" style="text-decoration:none;">🔬 НАУКА</a>
         <div class="nav-item" data-tab="mail">ПОЧТА</div>
-        <div class="nav-item" data-tab="recruit">НАБОР</div>
+        <div class="nav-item recruit-tab" data-tab="recruit">НАБОР</div>
         <div class="nav-item" data-tab="map">КАРТА</div>
         <div class="nav-item" data-tab="radio">РАДИО</div>
         <div class="nav-item" data-tab="vault">БАЗА</div>
@@ -388,31 +401,16 @@
       </div>
 
       <div id="tab-recruit" class="content-pane hidden">
-        <div style="color:#ffaa00;margin-bottom:12px;text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ НА ВСТУПЛЕНИЕ ◆</div>
-        <div class="application-form" id="applicationForm">
+        <div style="color:#ffaa00;margin-bottom:12px;text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ ◆</div>
+        <div class="application-form">
           <div style="color:#ffaa00;margin-bottom:12px;text-align:center;">ОСНОВНЫЕ ДАННЫЕ</div>
-          <div class="app-field"><span class="app-label">Имя (полное имя/прозвище):</span><input type="text" class="app-input" id="appName" placeholder="Введите имя..."></div>
-          <div class="app-field"><span class="app-label">Пол (М/Ж/Другое):</span><input type="text" class="app-input" id="appGender" placeholder="М/Ж/Другое"></div>
-          <div class="app-field"><span class="app-label">Дата рождения (ДД.ММ + возраст):</span><input type="text" class="app-input" id="appBirth" placeholder="01.01 + 25 лет"></div>
-          <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace" placeholder="Единорог, Земной пони..."></div>
-          <div class="app-field"><span class="app-label">Должность:</span><input type="text" class="app-input" id="appRole" placeholder="Охранник, Учёный..."></div>
-          <div class="app-field"><span class="app-label">Физические параметры:</span><textarea class="app-textarea" id="appPhysical" placeholder="Рост: см&#10;Вес: кг&#10;Отличительные черты: ..."></textarea></div>
-          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ПРОФЕССИОНАЛЬНЫЕ ДАННЫЕ</div>
-          <div class="app-field"><span class="app-label">Отдел/Специализация:</span><input type="text" class="app-input" id="appSpecialization" placeholder="Боевой/Медицинский..."></div>
-          <div class="app-field"><span class="app-label">Навыки (3 ключевых + уровень):</span><textarea class="app-textarea" id="appSkills" placeholder="1) ...&#10;2) ...&#10;3) ..."></textarea></div>
-          <div class="app-field"><span class="app-label">Наставник:</span><input type="text" class="app-input" id="appMentor" placeholder="Имя или нет"></div>
-          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ЛИЧНОСТЬ И БИОГРАФИЯ</div>
-          <div class="app-field"><span class="app-label">Краткая история:</span><textarea class="app-textarea" id="appHistory" placeholder="Происхождение, важные события..."></textarea></div>
-          <div class="app-field"><span class="app-label">Характер:</span><textarea class="app-textarea" id="appCharacter" placeholder="Основные качества, принципы..."></textarea></div>
-          <div class="app-field"><span class="app-label">Фобии/Слабости:</span><textarea class="app-textarea" id="appPhobias" placeholder="Что влияет на решения..."></textarea></div>
-          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ОСОБЫЕ ОТМЕТКИ</div>
-          <div class="app-field"><span class="app-label">Вредные привычки:</span><input type="text" class="app-input" id="appHabits" placeholder="Курение, агрессия..."></div>
-          <div class="app-field"><span class="app-label">Хронические болезни:</span><input type="text" class="app-input" id="appIllnesses" placeholder="Если имеются..."></div>
-          <div class="app-field"><span class="app-label">Аллергии/Непереносимости:</span><input type="text" class="app-input" id="appAllergies" placeholder="Пищевые, медицинские..."></div>
-          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ДОПОЛНИТЕЛЬНО</div>
-          <div class="app-field"><span class="app-label">Хобби:</span><input type="text" class="app-input" id="appHobbies" placeholder="Увлечения..."></div>
-          <div class="app-field"><span class="app-label">Личные цели:</span><textarea class="app-textarea" id="appGoals" placeholder="Чего хочет достичь..."></textarea></div>
-          <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ ЗАЯВКУ</button>
+          <div class="app-field"><span class="app-label">Имя:</span><input type="text" class="app-input" id="appName"></div>
+          <div class="app-field"><span class="app-label">Пол:</span><input type="text" class="app-input" id="appGender"></div>
+          <div class="app-field"><span class="app-label">Дата рождения:</span><input type="text" class="app-input" id="appBirth"></div>
+          <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace"></div>
+          <div class="app-field"><span class="app-label">Должность:</span><input type="text" class="app-input" id="appRole"></div>
+          <div class="app-field"><span class="app-label">Физические параметры:</span><textarea class="app-textarea" id="appPhysical"></textarea></div>
+          <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ</button>
         </div>
       </div>
 
@@ -470,6 +468,7 @@
       <div class="admin-tabs">
         <button class="admin-tab active" data-admin-tab="members">СОСТАВ</button>
         <button class="admin-tab" data-admin-tab="access">ДОСТУП</button>
+        <button class="admin-tab" data-admin-tab="caps">КРЫШКИ</button>
         <button class="admin-tab" data-admin-tab="tasks">ЗАДАЧИ</button>
         <button class="admin-tab" data-admin-tab="drones">ДРОНЫ</button>
         <button class="admin-tab" data-admin-tab="events">СОБЫТИЯ</button>
@@ -484,7 +483,7 @@
     </div>
   </div>
 
-  <div class="terminal-footer"><span>О.И.Д.Л. v.3.5</span><span>ЯДРО: 99%</span></div>
+  <div class="terminal-footer"><span>О.И.Д.Л. v.4.0</span><span>ЯДРО: 99%</span></div>
 </div>
 
 <script>
@@ -524,7 +523,9 @@
   const DEFDRONES = [{ name: "СТРИЖ-1", status: "АКТИВЕН", health: 85 },{ name: "СТРИЖ-2", status: "ПАТРУЛЬ", health: 92 },{ name: "СТРИЖ-3", status: "ЗАРЯДКА", health: 45 },{ name: "СТРИЖ-4", status: "РЕМОНТ", health: 18 }];
   const DEFRADIO = { 88.5:"*** SOS ***", 94.2:"АНКЛАВ: КОД КРАСНЫЙ.", 101.1:"КАРАВАН В ПУТИ.", 107.8:"РЕЙДЕРЫ...", 114.7:"О.И.Д.Л. ШТАБ.", 122.3:"БРАТСТВО: ЗАПРЕТ.", 130.5:"МЕДИКАМЕНТЫ.", 138.0:"РАДИО.", 145.8:"УБЕЖИЩЕ 101..." };
 
-  let members=[], tasks=[], sys={...DEFSYS}, drones=[...DEFDRONES], applications=[], events=[], radioMessages={...DEFRADIO}, mails=[], marqueeText="", accessCodes={}, isAdmin=false, currentUser=null;
+  let members=[], tasks=[], sys={...DEFSYS}, drones=[...DEFDRONES], applications=[], events=[], radioMessages={...DEFRADIO}, mails=[], marqueeText="", accessCodes={}, wallets={}, isAdmin=false, currentUser=null;
+
+  function isGuest() { return currentUser === 'ГОСТЬ'; }
 
   function renderSys() {
     const r=sys.resources, el=document.getElementById('resourcesDisplay'); if(el)el.textContent='◼'.repeat(r)+'◻'.repeat(9-r);
@@ -537,7 +538,7 @@
     drones.forEach((d,i)=>{
       const hc=d.health<30?'danger':(d.health<60?'warning':'');
       const card=document.createElement('div'); card.className='drone-card';
-      card.innerHTML=`<div class="drone-info"><div class="drone-name">◆ ${d.name}</div><div class="drone-status">СТАТУС: ${d.status}</div><div class="drone-health">${d.health}%<div class="drone-health-bar"><div class="drone-health-fill ${hc}" style="width:${d.health}%"></div></div></div></div><div class="drone-actions"><button class="drone-btn diag-btn" onclick="window._diagDrone(${i})">▶ ДИАГНОСТИКА</button></div>`;
+      card.innerHTML=`<div class="drone-info"><div class="drone-name">◆ ${d.name}</div><div class="drone-status">СТАТУС: ${d.status}</div><div class="drone-health">${d.health}%<div class="drone-health-bar"><div class="drone-health-fill ${hc}" style="width:${d.health}%"></div></div></div></div>${isGuest()?'':'<div class="drone-actions"><button class="drone-btn diag-btn" onclick="window._diagDrone('+i+')">▶ ДИАГНОСТИКА</button></div>'}`;
       c.appendChild(card);
     });
   }
@@ -550,6 +551,7 @@
   }
 
   window._diagDrone=function(i){
+    if(isGuest()) return;
     const d=drones[i], log=document.getElementById('diagnosticLog');
     log.textContent=''; let idx=0;
     const m=[`[${d.name}] ЗАПУСК...`,`[${d.name}] СВЯЗЬ: OK`,`[${d.name}] БАТАРЕЯ: ${d.health}%`,`[${d.name}] ГОТОВО.`];
@@ -558,13 +560,14 @@
   };
 
   document.getElementById('diagAllBtn')?.addEventListener('click',()=>{
+    if(isGuest()) return;
     const log=document.getElementById('diagnosticLog'); log.textContent='[ВСЕ ДРОНЫ]\n';
     drones.forEach((d,i)=>{ setTimeout(()=>{ log.textContent+=`[${d.name}] ${d.health}% | ${d.status}\n`; log.scrollTop=log.scrollHeight; },(i+1)*500); });
     playBeep();
   });
 
-  // ПОЧТА
   function renderMailInbox() {
+    if(isGuest()){ document.getElementById('mailContent').innerHTML='<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ПРОСМАТРИВАТЬ ПОЧТУ</div>'; return; }
     const container=document.getElementById('mailContent');
     const inbox=mails.filter(m=>m.to===currentUser||m.to===''||m.to==='all');
     let html='';
@@ -574,6 +577,7 @@
   }
 
   function renderMailSent() {
+    if(isGuest()){ document.getElementById('mailContent').innerHTML='<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ПРОСМАТРИВАТЬ ПОЧТУ</div>'; return; }
     const container=document.getElementById('mailContent');
     const sent=mails.filter(m=>m.from===currentUser);
     let html='';
@@ -583,6 +587,7 @@
   }
 
   function renderMailWrite() {
+    if(isGuest()){ document.getElementById('mailContent').innerHTML='<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ОТПРАВЛЯТЬ СООБЩЕНИЯ</div>'; return; }
     const container=document.getElementById('mailContent');
     let opts='<option value="">ВСЕМ</option>';
     members.forEach(m=>{ opts+=`<option value="${m.name}">${m.name}</option>`; });
@@ -598,6 +603,7 @@
   }
 
   window.openMail=function(id){
+    if(isGuest()) return;
     const m=mails.find(x=>x.id===id); if(!m)return;
     if(!m.read){ m.read=true; db.ref('mails').set(mails); }
     document.getElementById('mailViewName').textContent=m.subject;
@@ -619,7 +625,7 @@
     });
   });
 
-  function updateAppBadge(){ const badge=document.getElementById('appBadge'); if(badge){ badge.textContent=applications.length; badge.classList.toggle('show',applications.length>0); } }
+  function updateAppBadge(){ const badge=document.getElementById('appBadge'); if(badge){ badge.textContent=applications.length; badge.classList.toggle('show',applications.length>0&&!isGuest()); } }
   function updateMarquee(){ const bar=document.getElementById('marqueeBar'), text=document.getElementById('marqueeText'); if(bar&&text){ if(marqueeText){ bar.classList.add('show'); text.textContent='⚠ '+marqueeText+' ⚠'; } else { bar.classList.remove('show'); text.textContent=''; } } }
 
   function loadData(){
@@ -634,12 +640,14 @@
     db.ref('mails').on('value',sn=>{ mails=sn.exists()?sn.val():[]; });
     db.ref('marquee').on('value',sn=>{ marqueeText=sn.exists()?sn.val():''; updateMarquee(); });
     db.ref('accessCodes').on('value',sn=>{ accessCodes=sn.exists()?sn.val():{}; });
+    db.ref('wallets').on('value',sn=>{ wallets=sn.exists()?sn.val():{}; updateCapsDisplay(); });
   }
 
-  function renderM(){ const t=document.getElementById('clanMembersBody'); if(!t)return; t.innerHTML=''; members.forEach((m,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=isMobile?`<td>${m.name}</td><td>${m.role}</td>`:`<td>${m.name}</td><td>${m.role}</td><td>${m.status||'Активен'}</td>`; tr.style.cursor='pointer'; tr.addEventListener('click',()=>openProfile(i)); t.appendChild(tr); }); }
+  function renderM(){ const t=document.getElementById('clanMembersBody'); if(!t)return; t.innerHTML=''; members.forEach((m,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=isMobile?`<td>${m.name}</td><td>${m.role}</td>`:`<td>${m.name}</td><td>${m.role}</td><td>${m.status||'Активен'}</td>`; tr.style.cursor='pointer'; tr.addEventListener('click',()=>{ if(!isGuest()) openProfile(i); }); t.appendChild(tr); }); }
   function renderT(){ const t=document.getElementById('tasksTableBody'); if(!t)return; t.innerHTML=''; if(!tasks.length){ t.innerHTML=isMobile?'<tr><td colspan="2">НЕТ ЗАДАЧ</td></tr>':'<tr><td colspan="3">НЕТ ЗАДАЧ</td></tr>'; return; } tasks.forEach(td=>{ const tr=document.createElement('tr'); tr.innerHTML=isMobile?`<td>${td.id}</td><td>${td.description}</td>`:`<td>${td.id}</td><td>${td.description}</td><td>${td.deadline}</td>`; t.appendChild(tr); }); }
-  function openProfile(i){ const m=members[i]; if(!m)return; document.getElementById('profileName').textContent=m.name; document.getElementById('profileRole').textContent=m.role; document.getElementById('profileContent').innerHTML=m.profileHTML||'<div class="profile-text">[ НЕТ ДАННЫХ ]</div>'; document.getElementById('profileOverlay').classList.remove('hidden'); }
+  function openProfile(i){ if(isGuest()) return; const m=members[i]; if(!m)return; document.getElementById('profileName').textContent=m.name; document.getElementById('profileRole').textContent=m.role; document.getElementById('profileContent').innerHTML=m.profileHTML||'<div class="profile-text">[ НЕТ ДАННЫХ ]</div>'; document.getElementById('profileOverlay').classList.remove('hidden'); }
   function updateFreqDisplay(){ const freq=parseFloat(document.getElementById('freqSlider')?.value||114).toFixed(1); document.getElementById('freqDisplay').textContent=freq+' МГц'; document.getElementById('interceptMessage').textContent=radioMessages[freq]||'[ ШУМ ]'; }
+  function updateCapsDisplay(){ const el=document.getElementById('capsIndicator'); if(el&&currentUser&&currentUser!=='ГОСТЬ'){ const caps=wallets[currentUser]||0; el.textContent='💰 '+caps+' кр.'; el.classList.add('show'); } else if(el){ el.classList.remove('show'); } }
 
   document.getElementById('profileClose').addEventListener('click',()=>document.getElementById('profileOverlay').classList.add('hidden'));
   document.getElementById('profileOverlay').addEventListener('click',function(e){ if(e.target===this)this.classList.add('hidden'); });
@@ -675,8 +683,21 @@
     currentUser=name;
     document.getElementById('loginOverlay').style.display='none';
     document.getElementById('mainContent').style.display='block';
+    document.getElementById('guestWarning').style.display='none';
+    updateUserUI(); updateCapsDisplay();
+    document.querySelector('.nav-item').click();
+    playBeep();
+  }
+
+  function guestLogin(){
+    currentUser='ГОСТЬ';
+    document.getElementById('loginOverlay').style.display='none';
+    document.getElementById('mainContent').style.display='block';
+    document.getElementById('guestWarning').style.display='block';
     updateUserUI();
     document.querySelector('.nav-item').click();
+    // Скрываем кнопки действий для гостей
+    document.querySelector('.recruit-tab').style.display='none';
     playBeep();
   }
 
@@ -689,39 +710,35 @@
     document.getElementById('loginConfirmBtn').disabled=true;
     document.getElementById('loginConfirmBtn').classList.remove('ready');
     document.getElementById('loginStatus').textContent='[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]';
+    document.getElementById('guestWarning').style.display='none';
+    document.querySelector('.recruit-tab').style.display='';
     updateUserUI(); updateLoginForm();
   }
 
   function updateUserUI(){
-    const ind=document.getElementById('userIndicator'), lb=document.getElementById('logoutBtn');
-    if(currentUser){ ind.textContent='👤 '+currentUser.toUpperCase(); ind.classList.add('show'); lb.classList.add('show'); }
-    else { ind.classList.remove('show'); lb.classList.remove('show'); document.getElementById('adminAccessBtn').classList.remove('visible'); document.getElementById('adminBadge').classList.remove('visible'); }
+    const ind=document.getElementById('userIndicator'), lb=document.getElementById('logoutBtn'), caps=document.getElementById('capsIndicator');
+    if(currentUser){
+      ind.textContent='👤 '+currentUser.toUpperCase(); ind.classList.add('show'); lb.classList.add('show');
+    } else {
+      ind.classList.remove('show'); lb.classList.remove('show'); caps.classList.remove('show');
+      document.getElementById('adminAccessBtn').classList.remove('visible'); document.getElementById('adminBadge').classList.remove('visible');
+    }
   }
 
   document.getElementById('loginConfirmBtn').addEventListener('click',doLogin);
   document.getElementById('loginPassInput').addEventListener('keydown',function(e){ if(e.key==='Enter')doLogin(); });
   document.getElementById('logoutBtn').addEventListener('click',logout);
+  document.getElementById('guestLoginBtn').addEventListener('click',guestLogin);
 
   document.querySelectorAll('.nav-item[data-tab]').forEach(n=>{ n.addEventListener('click',()=>{ document.querySelectorAll('.content-pane').forEach(p=>p.classList.add('hidden')); const tab=document.getElementById('tab-'+n.dataset.tab); if(tab){ tab.classList.remove('hidden'); if(n.dataset.tab==='mail')renderMailInbox(); } document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.remove('active')); n.classList.add('active'); }); });
 
   // ЗАЯВКА
   document.getElementById('appSubmitBtn')?.addEventListener('click',()=>{
-    const app={
-      name:document.getElementById('appName').value.trim(), gender:document.getElementById('appGender').value.trim(),
-      birth:document.getElementById('appBirth').value.trim(), race:document.getElementById('appRace').value.trim(),
-      role:document.getElementById('appRole').value.trim(), physical:document.getElementById('appPhysical').value.trim(),
-      specialization:document.getElementById('appSpecialization').value.trim(), skills:document.getElementById('appSkills').value.trim(),
-      mentor:document.getElementById('appMentor').value.trim(), history:document.getElementById('appHistory').value.trim(),
-      character:document.getElementById('appCharacter').value.trim(), phobias:document.getElementById('appPhobias').value.trim(),
-      habits:document.getElementById('appHabits').value.trim(), illnesses:document.getElementById('appIllnesses').value.trim(),
-      allergies:document.getElementById('appAllergies').value.trim(), hobbies:document.getElementById('appHobbies').value.trim(),
-      goals:document.getElementById('appGoals').value.trim(), date:new Date().toLocaleString('ru-RU')
-    };
+    if(isGuest()){ alert('ГОСТИ НЕ МОГУТ ПОДАВАТЬ ЗАЯВКИ'); return; }
+    const app={name:document.getElementById('appName').value.trim(),role:document.getElementById('appRole').value.trim(),date:new Date().toLocaleString('ru-RU')};
     if(!app.name){ alert('ИМЯ ОБЯЗАТЕЛЬНО!'); return; }
     applications.push(app); db.ref('applications').set(applications);
-    alert('ЗАЯВКА ОТПРАВЛЕНА!');
-    ['appName','appGender','appBirth','appRace','appRole','appPhysical','appSpecialization','appSkills','appMentor','appHistory','appCharacter','appPhobias','appHabits','appIllnesses','appAllergies','appHobbies','appGoals'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
-    playBeep();
+    alert('ЗАЯВКА ОТПРАВЛЕНА!'); playBeep();
   });
 
   // АДМИН
@@ -732,13 +749,18 @@
   document.getElementById('adminClose').addEventListener('click',()=>adminPanel.classList.add('hidden'));
   
   const cmdInput=document.getElementById('commandInput');
-  cmdInput.addEventListener('keydown',function(e){ if(e.key==='Enter'){ const cmd=cmdInput.value.trim().toLowerCase(); if(cmd===ADMIN){ setAdmin(true); alert('*** ДОСТУП РАЗРЕШЁН ***'); playBeep(); } else if(cmd==='logout'){ logout(); } cmdInput.value=''; } });
+  cmdInput.addEventListener('keydown',function(e){ if(e.key==='Enter'){ const cmd=cmdInput.value.trim().toLowerCase(); if(cmd===ADMIN&&!isGuest()){ setAdmin(true); alert('*** ДОСТУП РАЗРЕШЁН ***'); playBeep(); } else if(cmd==='logout'){ logout(); } cmdInput.value=''; } });
   
   window.addEventListener('keydown',e=>{ if(e.key==='Escape'){ document.getElementById('profileOverlay').classList.add('hidden'); document.getElementById('mailViewOverlay').classList.add('hidden'); adminPanel.classList.add('hidden'); } });
 
   const adminTabs=document.querySelectorAll('.admin-tab'), adminContent=document.getElementById('adminContent');
-  function switchATab(t){ adminTabs.forEach(tb=>tb.classList.toggle('active',tb.dataset.adminTab===t)); if(t==='members')renderAM(); else if(t==='access')renderAAccess(); else if(t==='tasks')renderAT(); else if(t==='drones')renderADr(); else if(t==='events')renderAEv(); else if(t==='mail')renderAMail(); else if(t==='marquee')renderAMarquee(); else if(t==='apps')renderAApps(); else if(t==='radio')renderARadio(); else if(t==='system')renderAS(); else if(t==='data')renderAD(); }
+  function switchATab(t){ adminTabs.forEach(tb=>tb.classList.toggle('active',tb.dataset.adminTab===t)); if(t==='members')renderAM(); else if(t==='access')renderAAccess(); else if(t==='caps')renderACaps(); else if(t==='tasks')renderAT(); else if(t==='drones')renderADr(); else if(t==='events')renderAEv(); else if(t==='mail')renderAMail(); else if(t==='marquee')renderAMarquee(); else if(t==='apps')renderAApps(); else if(t==='radio')renderARadio(); else if(t==='system')renderAS(); else if(t==='data')renderAD(); }
   adminTabs.forEach(t=>t.addEventListener('click',()=>switchATab(t.dataset.adminTab)));
+
+  // ADMIN: CAPS
+  function renderACaps(){ adminContent.innerHTML=`<div class="profile-label" style="color:#ffaa00;">УПРАВЛЕНИЕ КРЫШКАМИ</div><div class="admin-member-list" id="adminCapsList"></div><div style="display:flex;gap:8px;margin-top:8px;"><input type="text" class="admin-input" id="capsUser" placeholder="ИМЯ"><input type="number" class="admin-input" id="capsAmount" placeholder="СУММА"><button class="admin-btn save-btn" id="capsAdd">■ НАЧИСЛИТЬ</button><button class="admin-btn" id="capsRemove">■ СПИСАТЬ</button></div>`; renderACapsList(); document.getElementById('capsAdd').addEventListener('click',()=>modifyCaps(1)); document.getElementById('capsRemove').addEventListener('click',()=>modifyCaps(-1)); }
+  function renderACapsList(){ const l=document.getElementById('adminCapsList'); if(!l)return; l.innerHTML=''; members.forEach(m=>{ const caps=wallets[m.name]||0; const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${m.name}</span><span style="color:#ffaa00;">💰 ${caps} кр.</span>`; l.appendChild(d); }); }
+  function modifyCaps(dir){ const name=document.getElementById('capsUser').value.trim(); const amount=parseInt(document.getElementById('capsAmount').value)||0; if(!name||!amount){ alert('ВВЕДИТЕ ИМЯ И СУММУ!'); return; } if(!wallets[name]) wallets[name]=0; wallets[name]+=amount*dir; if(wallets[name]<0) wallets[name]=0; db.ref('wallets').set(wallets); updateCapsDisplay(); renderACapsList(); playBeep(); }
 
   // ADMIN: ACCESS
   function renderAAccess(){ adminContent.innerHTML=`<div class="profile-label" style="color:#ffaa00;">УПРАВЛЕНИЕ ДОСТУПОМ</div><div class="admin-member-list" id="adminAccessList"></div>`; renderAAccessList(); }
