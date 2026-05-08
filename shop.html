@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>К.И. - КРИСТАЛЬНАЯ ИМПЕРИЯ</title>
+  
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: #020503; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      font-family: 'Courier New', 'VT323', monospace; position: relative; overflow-x: hidden;
+    }
+
+    body::before {
+      content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.5) 0px, rgba(20,20,0,0.2) 3px, rgba(255,255,0,0.02) 4px, transparent 5px);
+      pointer-events: none; z-index: 100; animation: scan 10s linear infinite; opacity: 0.7;
+    }
+
+    body.desktop { padding: 16px; }
+    body.desktop::after {
+      content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at center, transparent 30%, rgba(30,20,0,0.25) 100%);
+      pointer-events: none; z-index: 99;
+    }
+    body.mobile { padding: 0; }
+    @keyframes scan { 0% { background-position: 0 0; } 100% { background-position: 0 20px; } }
+
+    .terminal {
+      background-color: #0b0c0e; display: flex; flex-direction: column; position: relative; z-index: 20;
+    }
+    body.desktop .terminal {
+      max-width: 1000px; width: 100%; border: 4px solid #886600;
+      box-shadow: 0 0 0 2px #443300, 0 0 20px #ffaa00 inset, 0 0 30px rgba(255,170,0,0.3);
+      border-radius: 12px 12px 20px 20px; padding: 0 0 6px 0;
+    }
+    body.mobile .terminal { width: 100%; min-height: 100vh; border: none; }
+
+    .terminal-header {
+      background: #0a0500; border-bottom: 2px solid #886600;
+      display: flex; align-items: center; justify-content: space-between; padding: 12px 18px;
+      flex-shrink: 0;
+    }
+
+    .header-left { display: flex; align-items: center; gap: 14px; }
+
+    .crystal {
+      width: 44px; height: 44px; position: relative;
+      background: linear-gradient(135deg, #ffdd44, #ff8800, #ffdd44);
+      clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+      box-shadow: 0 0 20px #ffaa00, inset 0 0 10px #fff;
+      animation: glow 2s infinite;
+    }
+    body.mobile .crystal { width: 34px; height: 34px; }
+    @keyframes glow { 0%,100%{box-shadow:0 0 15px #ffaa00;} 50%{box-shadow:0 0 30px #ffdd44;} }
+
+    .header-title { font-weight: bold; letter-spacing: 3px; color: #ffaa00; text-shadow: 0 0 10px #ffaa00; font-family: 'VT323', monospace; }
+    body.desktop .header-title { font-size: 1.3rem; }
+    body.mobile .header-title { font-size: 1rem; }
+
+    .header-right { display: flex; align-items: center; gap: 10px; }
+
+    .user-indicator {
+      color: #ffaa00; font-size: 0.8rem; border: 1px solid #ffaa00; padding: 3px 8px; display: none;
+    }
+    .user-indicator.show { display: inline-block; }
+
+    .caps-indicator {
+      color: #ffdd44; font-size: 0.8rem; border: 1px solid #ffaa00; padding: 3px 8px; display: none;
+    }
+    .caps-indicator.show { display: inline-block; }
+
+    .logout-btn {
+      background: #1a0000; border: 1px solid #ffaa00; color: #ffaa00;
+      font-family: 'Courier New', monospace; font-size: 0.75rem;
+      padding: 3px 8px; cursor: pointer; display: none;
+    }
+    .logout-btn.show { display: inline-block; }
+
+    .back-btn {
+      background: #1a0a00; border: 2px solid #ffaa00; color: #ffaa00;
+      font-family: 'Courier New', monospace; font-size: 0.85rem; padding: 6px 14px;
+      cursor: pointer; text-decoration: none; text-transform: uppercase;
+    }
+
+    .admin-shop-btn {
+      background: #1a0000; border: 2px solid #ff4444; color: #ff4444;
+      font-family: 'Courier New', monospace; font-size: 0.8rem; padding: 6px 12px;
+      cursor: pointer; text-transform: uppercase; display: none;
+    }
+    .admin-shop-btn.visible { display: inline-block; }
+
+    .screen {
+      color: #ffcc88; text-shadow: 0 0 6px rgba(255,170,0,0.3);
+      background: #050300; font-size: 0.95rem; line-height: 1.4;
+      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    }
+    body.desktop .screen { padding: 20px 18px; }
+    body.mobile .screen { padding: 14px 10px; }
+
+    /* Экран входа */
+    .login-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(5,3,0,0.98); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; z-index: 50; padding: 20px;
+    }
+    .login-overlay.hidden { display: none; }
+
+    .login-container {
+      border: 2px solid #886600; background: #0a0500;
+      box-shadow: inset 0 0 20px #000, 0 0 20px rgba(255,170,0,0.3);
+      padding: 30px; width: 100%; max-width: 450px;
+    }
+
+    .login-header {
+      color: #ffaa00; font-size: 1.8rem; text-align: center;
+      margin-bottom: 25px; text-transform: uppercase; letter-spacing: 4px;
+      border-bottom: 1px dashed #886600; padding-bottom: 10px;
+    }
+
+    .login-field { margin-bottom: 20px; }
+    .login-label { color: #cc8800; display: block; margin-bottom: 4px; }
+    .login-select, .login-input {
+      width: 100%; background: #0a0500; border: 2px solid #886600;
+      color: #ffcc88; padding: 14px 12px; font-family: 'Courier New', monospace;
+      outline: none; font-size: 1.2rem;
+    }
+    .login-select option { background: #0a0500; color: #ffcc88; }
+
+    .login-status { color: #cc8800; text-align: center; font-size: 0.9rem; margin-top: 8px; min-height: 20px; }
+
+    .login-button {
+      background: #1a0a00; border: 2px solid #ffaa00; color: #ffaa00;
+      font-family: inherit; text-transform: uppercase; cursor: pointer;
+      width: 100%; margin-top: 12px; letter-spacing: 2px; padding: 14px; font-size: 1.2rem;
+    }
+    .login-button:disabled { opacity: 0.4; }
+    .login-button.ready { border-color: #44ff44; color: #44ff44; box-shadow: 0 0 20px #44ff44; }
+    .guest-btn { background: #1a1a00; border-color: #aaaa00; color: #cccc44; margin-top: 8px; }
+
+    .shop-title { text-align: center; color: #ffaa00; font-size: 1.4rem; font-family: 'VT323', monospace; letter-spacing: 3px; margin-bottom: 8px; }
+    .shop-subtitle { text-align: center; color: #886600; font-size: 0.8rem; margin-bottom: 20px; }
+
+    .shop-item {
+      border: 2px solid #886600; background: #0a0500; padding: 14px; margin: 10px 0;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .item-info { flex: 1; }
+    .item-name { color: #ffdd44; font-size: 1.1rem; }
+    .item-price { color: #ffaa00; font-size: 0.9rem; }
+    .item-stock { color: #886600; font-size: 0.8rem; }
+    .buy-btn {
+      background: #1a0a00; border: 2px solid #ffaa00; color: #ffaa00;
+      padding: 10px 18px; cursor: pointer; font-family: inherit; font-size: 0.9rem; text-transform: uppercase;
+    }
+    .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .delivery-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9); z-index: 400;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .delivery-overlay.hidden { display: none; }
+
+    .delivery-window {
+      background: #0b0c0e; border: 3px solid #ffaa00;
+      box-shadow: 0 0 30px rgba(255,170,0,0.5), inset 0 0 20px #000;
+      padding: 25px 20px; max-width: 500px; width: 90%;
+    }
+    .delivery-title {
+      color: #ffaa00; font-size: 1.3rem; text-align: center;
+      font-family: 'VT323', monospace; letter-spacing: 2px;
+      border-bottom: 2px solid #886600; padding-bottom: 10px; margin-bottom: 20px;
+    }
+    .delivery-item-name { color: #ffdd44; font-size: 1rem; text-align: center; margin-bottom: 20px; }
+    .delivery-options { display: flex; flex-direction: column; gap: 10px; }
+    .delivery-option {
+      border: 2px solid #886600; background: #0a0500; padding: 14px;
+      cursor: pointer; color: #ffcc88; display: flex; justify-content: space-between; align-items: center;
+    }
+    .delivery-option:hover { border-color: #ffaa00; background: #1a0a00; }
+    .delivery-option-name { color: #ffdd44; font-size: 1rem; }
+    .delivery-option-desc { color: #886600; font-size: 0.8rem; }
+    .delivery-option-price { color: #ffaa00; font-weight: bold; }
+    .delivery-cancel {
+      background: #1a0000; border: 2px solid #886600; color: #664400;
+      padding: 12px; cursor: pointer; font-family: inherit; text-transform: uppercase;
+      text-align: center; margin-top: 10px;
+    }
+
+    .admin-panel {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95); z-index: 300;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .admin-panel.hidden { display: none; }
+
+    .admin-window {
+      background: #0b0c0e; border: 2px solid #ff4444; overflow-y: auto;
+    }
+    body.desktop .admin-window { max-width: 600px; width: 95%; max-height: 90vh; padding: 25px 30px; }
+    body.mobile .admin-window { width: 100%; height: 100%; padding: 20px 14px; }
+
+    .admin-header { border-bottom: 2px solid #ff4444; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .admin-title { font-size: 1.4rem; color: #ff4444; text-transform: uppercase; letter-spacing: 3px; font-family: 'VT323', monospace; }
+    .admin-close { background: none; border: 2px solid #ff4444; color: #ff4444; font-size: 1.5rem; width: 44px; height: 44px; cursor: pointer; text-align: center; line-height: 40px; }
+
+    .admin-input { width: 100%; background: #0b1f0b; border: 2px solid #ff4444; color: #ff8888; padding: 10px; font-family: 'Courier New', monospace; font-size: 0.95rem; outline: none; margin: 5px 0; }
+
+    .admin-btn { background: #1a0000; border: 2px solid #ff4444; color: #ff6666; padding: 10px 16px; font-family: inherit; font-size: 0.9rem; text-transform: uppercase; cursor: pointer; margin: 4px; }
+    .admin-btn.save-btn { border-color: #44ff44; color: #44ff44; background: #001a00; width: 100%; }
+
+    .admin-list { max-height: 200px; overflow-y: auto; border: 1px solid #ff4444; padding: 8px; margin: 8px 0; }
+    .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 6px; border-bottom: 1px dotted #552222; color: #ffaaaa; font-size: 0.9rem; }
+    .admin-list-item button { background: #330000; border: 1px solid #ff4444; color: #ff4444; padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 0.8rem; margin-left: 3px; }
+
+    .history-section { margin-top: 30px; border-top: 2px solid #886600; padding-top: 15px; }
+    .history-title { color: #ffaa00; font-size: 1rem; font-family: 'VT323', monospace; letter-spacing: 2px; margin-bottom: 10px; }
+    .history-item { border: 1px solid #443300; background: #050300; padding: 8px 12px; margin: 5px 0; font-size: 0.8rem; color: #886600; }
+
+    .terminal-footer { padding: 10px 14px; display: flex; justify-content: space-between; color: #664400; background: #060300; border-top: 1px solid #443300; font-size: 0.7rem; text-transform: uppercase; flex-shrink: 0; }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="terminal">
+  <div class="terminal-header">
+    <div class="header-left">
+      <div class="crystal"></div>
+      <div>
+        <div class="header-title">КРИСТАЛЬНАЯ ИМПЕРИЯ</div>
+        <div style="color:#886600;font-size:0.65rem;letter-spacing:2px;">ТОРГОВЫЙ АВТОМАТ</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="user-indicator" id="shopUserIndicator">👤 ГОСТЬ</span>
+      <span class="caps-indicator" id="shopCapsIndicator">💰 0</span>
+      <button class="logout-btn" id="shopLogoutBtn">ВЫХОД</button>
+      <button class="admin-shop-btn" id="adminShopBtn">◈ АДМИН ◈</button>
+      <a href="index.html" class="back-btn">◄ ТЕРМИНАЛ</a>
+    </div>
+  </div>
+
+  <div class="screen" id="shopMainScreen">
+    <!-- ЭКРАН ВХОДА -->
+    <div class="login-overlay" id="shopLoginOverlay">
+      <div class="login-container">
+        <div class="login-header">ВХОД В К.И.</div>
+        <div class="login-field">
+          <span class="login-label">ПОЛЬЗОВАТЕЛЬ:</span>
+          <select class="login-select" id="shopLoginUserSelect"><option value="">— ВЫБЕРИТЕ —</option></select>
+        </div>
+        <div class="login-field">
+          <span class="login-label">КОД ДОСТУПА:</span>
+          <input type="password" class="login-input" id="shopLoginPassInput" placeholder="········">
+        </div>
+        <div class="login-status" id="shopLoginStatus">[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]</div>
+        <button class="login-button" id="shopLoginConfirmBtn" disabled>■ ВОЙТИ</button>
+        <button class="login-button guest-btn" id="shopGuestLoginBtn">■ ВОЙТИ КАК ГОСТЬ</button>
+      </div>
+    </div>
+
+    <!-- КОНТЕНТ МАГАЗИНА -->
+    <div id="shopContent" style="display:none; padding: 20px 18px;">
+      <div class="shop-title">◆ К.И. - КРИСТАЛЬНАЯ ИМПЕРИЯ ◆</div>
+      <div class="shop-subtitle">ОФИЦИАЛЬНЫЙ ТОРГОВЫЙ ПРЕДСТАВИТЕЛЬ О.И.Д.Л.</div>
+
+      <div id="shopItems"></div>
+
+      <div class="history-section" id="historySection" style="display:none;">
+        <div class="history-title">📋 ИСТОРИЯ ПОКУПОК</div>
+        <div id="purchaseHistory"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="delivery-overlay hidden" id="deliveryOverlay">
+    <div class="delivery-window">
+      <div class="delivery-title">🚚 СПОСОБ ДОСТАВКИ</div>
+      <div class="delivery-item-name" id="deliveryItemName"></div>
+      <div class="delivery-options">
+        <div class="delivery-option" onclick="selectDelivery('member')">
+          <div><div class="delivery-option-name">👤 УЧАСТНИК К.И.</div><div class="delivery-option-desc">Лично в руки • Надёжно</div></div>
+          <div class="delivery-option-price">БЕСПЛАТНО</div>
+        </div>
+        <div class="delivery-option" onclick="selectDelivery('drone')">
+          <div><div class="delivery-option-name">🚁 ДРОН-КУРЬЕР</div><div class="delivery-option-desc">Доставка дроном • 5 крышек</div></div>
+          <div class="delivery-option-price">+5 кр.</div>
+        </div>
+        <div class="delivery-option" onclick="selectDelivery('mercenary')">
+          <div><div class="delivery-option-name">🗡 ТИХАЯ ЛАГУНА</div><div class="delivery-option-desc">Сопровождение наёмником • 15 крышек</div></div>
+          <div class="delivery-option-price">+15 кр.</div>
+        </div>
+      </div>
+      <button class="delivery-cancel" onclick="cancelDelivery()">✕ ОТМЕНА</button>
+    </div>
+  </div>
+
+  <div id="adminPanel" class="admin-panel hidden">
+    <div class="admin-window">
+      <div class="admin-header"><div class="admin-title">РЕДАКТИРОВАНИЕ</div><button class="admin-close" id="adminClose">✕</button></div>
+      <div class="admin-list" id="adminShopList"></div>
+      <hr style="border-color:#552222;margin:10px 0;">
+      <input type="text" class="admin-input" id="itemName" placeholder="НАЗВАНИЕ">
+      <input type="text" class="admin-input" id="itemEmoji" placeholder="ЭМОДЗИ">
+      <input type="number" class="admin-input" id="itemPrice" placeholder="ЦЕНА">
+      <input type="number" class="admin-input" id="itemStock" placeholder="СКЛАД (0=∞)">
+      <input type="hidden" id="itemEditIdx" value="-1">
+      <button class="admin-btn save-btn" id="itemSaveBtn">■ СОХРАНИТЬ</button>
+    </div>
+  </div>
+
+  <div class="terminal-footer"><span>К.И. v.2.0</span><span>О.И.Д.Л.</span></div>
+</div>
+
+<script>
+  const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) || window.innerWidth < 768;
+  document.body.className = isMobile ? 'mobile' : 'desktop';
+
+  firebase.initializeApp({
+    apiKey: "AIzaSyCAfEXo57oLviomSjUm4dC23-uHTS11HHU",
+    authDomain: "oidl-rule.firebaseapp.com",
+    databaseURL: "https://oidl-rule-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "oidl-rule",
+    storageBucket: "oidl-rule.firebasestorage.app",
+    messagingSenderId: "46225230611",
+    appId: "1:46225230611:web:f2017e047a52925420e8e6"
+  });
+  const db = firebase.database();
+
+  const DEFAULT_SHOP = [
+    { name: "СТИМПАК", emoji: "💉", price: 25, stock: 0 },
+    { name: "АНТИРАДИН", emoji: "☢", price: 30, stock: 0 },
+    { name: "ПАТРОНЫ (10 шт)", emoji: "🔫", price: 15, stock: 0 },
+    { name: "НАБОР ДЛЯ РЕМОНТА", emoji: "🔧", price: 50, stock: 0 },
+    { name: "СУХПАЁК", emoji: "🥫", price: 10, stock: 0 },
+    { name: "БАТАРЕЙКА", emoji: "🔋", price: 20, stock: 0 },
+    { name: "КАРТА СЕКТОРА G", emoji: "🗺", price: 40, stock: 0 },
+    { name: "ШОКОЛАДКА", emoji: "🍫", price: 5, stock: 0 }
+  ];
+
+  const ADMIN_CODE = 'pipboy42';
+  let members = [], shopItems = [], wallets = {}, purchaseHistory = [], accessCodes = {};
+  let currentShopUser = null, isShopAdmin = false, pendingPurchaseItem = null;
+
+  // ==================== ЗАГРУЗКА ДАННЫХ ====================
+  function loadData() {
+    db.ref('members').on('value', sn => { members = sn.exists() ? sn.val() : []; updateShopLoginForm(); });
+    db.ref('accessCodes').on('value', sn => { accessCodes = sn.exists() ? sn.val() : {}; });
+    db.ref('shopItems').on('value', sn => { shopItems = sn.exists() ? sn.val() : [...DEFAULT_SHOP]; renderShop(); });
+    db.ref('wallets').on('value', sn => { wallets = sn.exists() ? sn.val() : {}; updateCapsDisplay(); renderShop(); });
+    db.ref('purchaseHistory').on('value', sn => { purchaseHistory = sn.exists() ? sn.val() : []; renderHistory(); });
+  }
+
+  // ==================== ОТОБРАЖЕНИЕ ====================
+  function renderShop() {
+    const container = document.getElementById('shopItems');
+    if (!container || document.getElementById('shopContent').style.display === 'none') return;
+
+    container.innerHTML = '';
+    shopItems.forEach((item, i) => {
+      const div = document.createElement('div');
+      div.className = 'shop-item';
+      const stockText = item.stock > 0 ? ` | В НАЛИЧИИ: ${item.stock}` : '';
+      const outOfStock = item.stock > 0 && item.stock <= 0;
+      const isRealUser = currentShopUser && currentShopUser !== 'ГОСТЬ';
+      const caps = isRealUser ? (wallets[currentShopUser] || 0) : 0;
+      const canBuy = isRealUser && !outOfStock && caps >= item.price;
+
+      div.innerHTML = `
+        <div class="item-info">
+          <div class="item-name">${item.emoji||''} ${item.name}</div>
+          <div class="item-price">💰 ${item.price} крышек${stockText}</div>
+        </div>
+        <button class="buy-btn" ${!canBuy?'disabled':''} onclick="startBuyItem(${i})">
+          ${isRealUser ? 'КУПИТЬ' : (currentShopUser === 'ГОСТЬ' ? 'ГОСТЬ' : 'ВОЙДИТЕ')}
+        </button>`;
+      container.appendChild(div);
+    });
+  }
+
+  function renderHistory() {
+    const container = document.getElementById('purchaseHistory');
+    if (!container || !currentShopUser || currentShopUser === 'ГОСТЬ') return;
+    const userHistory = purchaseHistory.filter(h => h.user === currentShopUser).reverse().slice(0, 10);
+    container.innerHTML = userHistory.length ? '' : '<div style="color:#664400;text-align:center;padding:10px;">НЕТ ПОКУПОК</div>';
+    userHistory.forEach(h => {
+      const div = document.createElement('div'); div.className = 'history-item';
+      div.textContent = `${h.date} — ${h.item} | ${h.delivery} | -${h.total} кр.`;
+      container.appendChild(div);
+    });
+  }
+
+  // ==================== ВХОД ====================
+  function updateShopLoginForm() {
+    const select = document.getElementById('shopLoginUserSelect');
+    select.innerHTML = '<option value="">— ВЫБЕРИТЕ —</option>';
+    members.forEach(m => { const o = document.createElement('option'); o.value = m.name; o.textContent = m.name; select.appendChild(o); });
+    select.onchange = function() {
+      if (this.value) { document.getElementById('shopLoginStatus').textContent = '[ ВВЕДИТЕ КОД ]'; document.getElementById('shopLoginPassInput').disabled = false; document.getElementById('shopLoginPassInput').focus(); checkShopLoginReady(); }
+      else { document.getElementById('shopLoginStatus').textContent = '[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]'; document.getElementById('shopLoginPassInput').disabled = true; document.getElementById('shopLoginConfirmBtn').disabled = true; document.getElementById('shopLoginConfirmBtn').classList.remove('ready'); }
+    };
+    document.getElementById('shopLoginPassInput').oninput = checkShopLoginReady;
+  }
+
+  function checkShopLoginReady() {
+    const n = document.getElementById('shopLoginUserSelect').value;
+    const p = document.getElementById('shopLoginPassInput').value;
+    const btn = document.getElementById('shopLoginConfirmBtn'), st = document.getElementById('shopLoginStatus');
+    if (n && p.length >= 3) { btn.disabled = false; btn.classList.add('ready'); st.textContent = '[ НАЖМИТЕ "ВОЙТИ" ]'; }
+    else if (n && p.length > 0) { btn.disabled = true; btn.classList.remove('ready'); st.textContent = '[ МИНИМУМ 3 СИМВОЛА ]'; }
+  }
+
+  function doShopLogin() {
+    const name = document.getElementById('shopLoginUserSelect').value;
+    const pass = document.getElementById('shopLoginPassInput').value;
+    const st = document.getElementById('shopLoginStatus');
+    if (!name || pass.length < 3) return;
+    if (!accessCodes[name] || accessCodes[name] === '0000') { accessCodes[name] = pass; db.ref('accessCodes').set(accessCodes); st.textContent = '[ ПАРОЛЬ УСТАНОВЛЕН! ]'; setTimeout(() => completeShopLogin(name), 800); }
+    else if (accessCodes[name] === pass) { st.textContent = '[ ВХОД... ]'; setTimeout(() => completeShopLogin(name), 500); }
+    else { st.textContent = '[ НЕВЕРНЫЙ КОД ]'; document.getElementById('shopLoginPassInput').value = ''; document.getElementById('shopLoginConfirmBtn').disabled = true; document.getElementById('shopLoginConfirmBtn').classList.remove('ready'); }
+  }
+
+  function completeShopLogin(name) {
+    currentShopUser = name;
+    localStorage.setItem('oidl_current_user', name);
+    document.getElementById('shopLoginOverlay').classList.add('hidden');
+    document.getElementById('shopContent').style.display = 'block';
+    updateShopUI();
+    renderShop();
+  }
+
+  function guestShopLogin() {
+    currentShopUser = 'ГОСТЬ';
+    localStorage.setItem('oidl_current_user', 'ГОСТЬ');
+    document.getElementById('shopLoginOverlay').classList.add('hidden');
+    document.getElementById('shopContent').style.display = 'block';
+    document.getElementById('historySection').style.display = 'none';
+    updateShopUI();
+    renderShop();
+  }
+
+  function shopLogout() {
+    currentShopUser = null; isShopAdmin = false;
+    localStorage.removeItem('oidl_current_user');
+    document.getElementById('shopContent').style.display = 'none';
+    document.getElementById('shopLoginOverlay').classList.remove('hidden');
+    document.getElementById('shopLoginUserSelect').value = '';
+    document.getElementById('shopLoginPassInput').value = '';
+    document.getElementById('shopLoginConfirmBtn').disabled = true;
+    document.getElementById('shopLoginConfirmBtn').classList.remove('ready');
+    document.getElementById('shopLoginStatus').textContent = '[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]';
+    document.getElementById('adminPanel').classList.add('hidden');
+    updateShopUI();
+  }
+
+  function updateShopUI() {
+    const ind = document.getElementById('shopUserIndicator'), caps = document.getElementById('shopCapsIndicator'), lb = document.getElementById('shopLogoutBtn');
+    if (currentShopUser && currentShopUser !== 'ГОСТЬ') {
+      ind.textContent = '👤 ' + currentShopUser.toUpperCase(); ind.classList.add('show');
+      lb.classList.add('show'); updateCapsDisplay();
+    } else if (currentShopUser === 'ГОСТЬ') {
+      ind.textContent = '👁 ГОСТЬ'; ind.classList.add('show');
+      caps.classList.remove('show'); lb.classList.add('show');
+    } else {
+      ind.classList.remove('show'); caps.classList.remove('show'); lb.classList.remove('show');
+      document.getElementById('adminShopBtn').classList.remove('visible');
+    }
+  }
+
+  function updateCapsDisplay() {
+    const el = document.getElementById('shopCapsIndicator');
+    if (el && currentShopUser && currentShopUser !== 'ГОСТЬ') {
+      const c = wallets[currentShopUser] || 0;
+      el.textContent = '💰 ' + c + ' кр.'; el.classList.add('show');
+    } else if (el) { el.classList.remove('show'); }
+  }
+
+  // ==================== ПОКУПКА ====================
+  window.startBuyItem = function(i) {
+    if (!currentShopUser || currentShopUser === 'ГОСТЬ') { alert('ВОЙДИТЕ ДЛЯ ПОКУПОК!'); return; }
+    pendingPurchaseItem = i;
+    const item = shopItems[i];
+    document.getElementById('deliveryItemName').textContent = (item.emoji||'') + ' ' + item.name + ' — ' + item.price + ' кр.';
+    document.getElementById('deliveryOverlay').classList.remove('hidden');
+  };
+
+  window.selectDelivery = function(type) {
+    const item = shopItems[pendingPurchaseItem];
+    const basePrice = item.price;
+    let dc = 0, dn = '';
+    if (type === 'member') { dc = 0; dn = 'Участник К.И.'; }
+    else if (type === 'drone') { dc = 5; dn = 'Дрон-курьер'; }
+    else if (type === 'mercenary') { dc = 15; dn = 'Тихая Лагуна'; }
+    const total = basePrice + dc;
+    const caps = wallets[currentShopUser] || 0;
+    if (caps < total) { alert('НЕДОСТАТОЧНО КРЫШЕК!'); cancelDelivery(); return; }
+    if (confirm(`Подтвердить?\n\n${item.emoji||''} ${item.name}: ${basePrice} кр.\nДоставка: ${dn} (${dc} кр.)\nИТОГО: ${total} кр.`)) {
+      wallets[currentShopUser] -= total;
+      if (item.stock > 0) { item.stock--; const idx = shopItems.indexOf(item); if (idx >= 0) shopItems[idx] = item; db.ref('shopItems').set(shopItems); }
+      purchaseHistory.push({ user: currentShopUser, item: item.name, basePrice, delivery: dn, deliveryCost: dc, total, date: new Date().toLocaleString('ru-RU') });
+      db.ref('wallets').set(wallets); db.ref('purchaseHistory').set(purchaseHistory);
+      cancelDelivery(); renderShop(); updateCapsDisplay();
+      alert('✅ ПОКУПКА СОВЕРШЕНА!\nДоставка: ' + dn);
+    }
+  };
+
+  window.cancelDelivery = function() { document.getElementById('deliveryOverlay').classList.add('hidden'); pendingPurchaseItem = null; };
+
+  // ==================== АДМИН ====================
+  const adminBtn = document.getElementById('adminShopBtn'), adminPanel = document.getElementById('adminPanel');
+  adminBtn.addEventListener('click', function() {
+    if (!isShopAdmin) { const cmd = prompt('ВВЕДИТЕ КОД АДМИНА:'); if (cmd === ADMIN_CODE) { isShopAdmin = true; adminBtn.classList.add('visible'); alert('*** ДОСТУП РАЗРЕШЁН ***'); } else { alert('НЕВЕРНЫЙ КОД'); return; } }
+    adminPanel.classList.remove('hidden'); renderAdminShopList();
+  });
+  document.getElementById('adminClose').addEventListener('click', () => adminPanel.classList.add('hidden'));
+
+  function renderAdminShopList() {
+    const l = document.getElementById('adminShopList'); if (!l) return; l.innerHTML = '';
+    shopItems.forEach((item, i) => { const d = document.createElement('div'); d.className = 'admin-list-item'; d.innerHTML = `<span>${item.emoji||''} ${item.name} — ${item.price} кр.</span><span><button onclick="editShopItem(${i})">РЕД</button><button onclick="deleteShopItem(${i})">УДЛ</button></span>`; l.appendChild(d); });
+  }
+
+  window.editShopItem = function(i) { const item = shopItems[i]; document.getElementById('itemName').value = item.name; document.getElementById('itemEmoji').value = item.emoji||''; document.getElementById('itemPrice').value = item.price; document.getElementById('itemStock').value = item.stock||0; document.getElementById('itemEditIdx').value = i; };
+  window.deleteShopItem = function(i) { if (confirm('Удалить?')) { shopItems.splice(i, 1); db.ref('shopItems').set(shopItems); renderShop(); } };
+
+  document.getElementById('itemSaveBtn').addEventListener('click', () => {
+    const name = document.getElementById('itemName').value.trim(), emoji = document.getElementById('itemEmoji').value.trim();
+    const price = parseInt(document.getElementById('itemPrice').value) || 0, stock = parseInt(document.getElementById('itemStock').value) || 0;
+    if (!name || price <= 0) { alert('ИМЯ И ЦЕНА!'); return; }
+    const data = { name, emoji, price, stock };
+    const ei = parseInt(document.getElementById('itemEditIdx').value);
+    if (ei >= 0 && ei < shopItems.length) shopItems[ei] = data; else shopItems.push(data);
+    db.ref('shopItems').set(shopItems); renderShop();
+    ['itemName','itemEmoji','itemPrice','itemStock'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('itemEditIdx').value = '-1'; alert('СОХРАНЕНО!');
+  });
+
+  // ==================== ОБРАБОТЧИКИ КНОПОК ====================
+  document.getElementById('shopLoginConfirmBtn').addEventListener('click', doShopLogin);
+  document.getElementById('shopLoginPassInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') doShopLogin(); });
+  document.getElementById('shopGuestLoginBtn').addEventListener('click', guestShopLogin);
+  document.getElementById('shopLogoutBtn').addEventListener('click', shopLogout);
+
+  // ==================== ЗАПУСК ====================
+  loadData();
+  // Проверяем, вошёл ли уже через терминал
+  const stored = localStorage.getItem('oidl_current_user');
+  if (stored && stored !== 'ГОСТЬ') {
+    currentShopUser = stored;
+    document.getElementById('shopLoginOverlay').classList.add('hidden');
+    document.getElementById('shopContent').style.display = 'block';
+    updateShopUI();
+    setTimeout(renderShop, 500);
+  } else if (stored === 'ГОСТЬ') {
+    guestShopLogin();
+  }
+</script>
+</body>
+</html>
