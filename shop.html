@@ -547,19 +547,29 @@
   document.getElementById('shopGuestLoginBtn').addEventListener('click', guestShopLogin);
   document.getElementById('shopLogoutBtn').addEventListener('click', shopLogout);
 
-  // ==================== ЗАПУСК ====================
-  loadData();
-  // Проверяем, вошёл ли уже через терминал
-  const stored = localStorage.getItem('oidl_current_user');
-  if (stored && stored !== 'ГОСТЬ') {
+// ==================== ЗАПУСК ====================
+loadData();
+
+// ★ Кнопка админа всегда доступна
+const adminBtn2 = document.getElementById('adminShopBtn');
+adminBtn2.classList.add('visible');
+
+// Проверяем, вошёл ли уже через терминал
+const stored = localStorage.getItem('oidl_current_user');
+if (stored && stored !== 'ГОСТЬ') {
     currentShopUser = stored;
     document.getElementById('shopLoginOverlay').classList.add('hidden');
     document.getElementById('shopContent').style.display = 'block';
     updateShopUI();
     setTimeout(renderShop, 500);
-  } else if (stored === 'ГОСТЬ') {
-    guestShopLogin();
-  }
+} else if (stored === 'ГОСТЬ') {
+    currentShopUser = 'ГОСТЬ';
+    document.getElementById('shopLoginOverlay').classList.add('hidden');
+    document.getElementById('shopContent').style.display = 'block';
+    document.getElementById('historySection').style.display = 'none';
+    updateShopUI();
+    renderShop();
+}
 </script>
 </body>
 </html>
