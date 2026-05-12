@@ -323,14 +323,8 @@
     <div id="loginOverlay" class="login-overlay" style="display:none;">
       <div class="login-container">
         <div class="login-header">ВХОД В СЕТЬ</div>
-        <div class="login-field">
-          <span class="login-label">ПОЛЬЗОВАТЕЛЬ:</span>
-          <select class="login-select" id="loginUserSelect"><option value="">— ВЫБЕРИТЕ —</option></select>
-        </div>
-        <div class="login-field">
-          <span class="login-label">КОД ДОСТУПА:</span>
-          <input type="password" class="login-input" id="loginPassInput" placeholder="········">
-        </div>
+        <div class="login-field"><span class="login-label">ПОЛЬЗОВАТЕЛЬ:</span><select class="login-select" id="loginUserSelect"><option value="">— ВЫБЕРИТЕ —</option></select></div>
+        <div class="login-field"><span class="login-label">КОД ДОСТУПА:</span><input type="password" class="login-input" id="loginPassInput" placeholder="········"></div>
         <div class="login-status" id="loginStatus">[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]</div>
         <button class="login-button" id="loginConfirmBtn" disabled>■ ВОЙТИ</button>
         <button class="login-button guest-btn" id="guestLoginBtn">■ ВОЙТИ КАК ГОСТЬ</button>
@@ -339,13 +333,11 @@
 
     <div id="mainContent" style="display:none;">
       <div class="robco-banner"><span>ROBCO OS v.4.77</span><span>☁ ОБЛАКО</span></div>
-
       <div class="clan-status">
-        <span class="status-label">РЕСУРСЫ:</span>
-        <span class="status-value" id="resourcesDisplay">◼◼◼◻◻◻◻◻◻</span>
+        <span class="status-label">РЕСУРСЫ:</span><span class="status-value" id="resourcesDisplay">◼◼◼◻◻◻◻◻◻</span>
         <span class="admin-badge" id="adminBadge">◈ АДМИН ◈</span>
       </div>
-      <div class="guest-warning" id="guestWarning" style="display:none;">⚠ ГОСТЕВОЙ РЕЖИМ — НЕКОТОРЫЕ ФУНКЦИИ ОГРАНИЧЕНЫ</div>
+      <div class="guest-warning" id="guestWarning" style="display:none;">⚠ ГОСТЕВОЙ РЕЖИМ — НЕКОТОРЫЕ ФУНКЦИИ ОГРАНИЧЕНЫ. ВЫ МОЖЕТЕ ПОДАТЬ ЗАЯВКУ НА ВСТУПЛЕНИЕ.</div>
 
       <div class="nav-menu" id="navMenu">
         <div class="nav-item active" data-tab="dosier">ДОСЬЕ</div>
@@ -401,16 +393,31 @@
       </div>
 
       <div id="tab-recruit" class="content-pane hidden">
-        <div style="color:#ffaa00;margin-bottom:12px;text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ ◆</div>
-        <div class="application-form">
+        <div style="color:#ffaa00;margin-bottom:12px;text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ НА ВСТУПЛЕНИЕ ◆</div>
+        <div class="application-form" id="applicationForm">
           <div style="color:#ffaa00;margin-bottom:12px;text-align:center;">ОСНОВНЫЕ ДАННЫЕ</div>
-          <div class="app-field"><span class="app-label">Имя:</span><input type="text" class="app-input" id="appName"></div>
-          <div class="app-field"><span class="app-label">Пол:</span><input type="text" class="app-input" id="appGender"></div>
-          <div class="app-field"><span class="app-label">Дата рождения:</span><input type="text" class="app-input" id="appBirth"></div>
-          <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace"></div>
-          <div class="app-field"><span class="app-label">Должность:</span><input type="text" class="app-input" id="appRole"></div>
-          <div class="app-field"><span class="app-label">Физические параметры:</span><textarea class="app-textarea" id="appPhysical"></textarea></div>
-          <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ</button>
+          <div class="app-field"><span class="app-label">Имя (полное имя/прозвище):</span><input type="text" class="app-input" id="appName" placeholder="Введите имя..."></div>
+          <div class="app-field"><span class="app-label">Пол (М/Ж/Другое):</span><input type="text" class="app-input" id="appGender" placeholder="М/Ж/Другое"></div>
+          <div class="app-field"><span class="app-label">Дата рождения (ДД.ММ + возраст):</span><input type="text" class="app-input" id="appBirth" placeholder="01.01 + 25 лет"></div>
+          <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace" placeholder="Единорог, Земной пони..."></div>
+          <div class="app-field"><span class="app-label">Должность:</span><input type="text" class="app-input" id="appRole" placeholder="Охранник, Учёный..."></div>
+          <div class="app-field"><span class="app-label">Физические параметры:</span><textarea class="app-textarea" id="appPhysical" placeholder="Рост: см&#10;Вес: кг&#10;Отличительные черты: ..."></textarea></div>
+          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ПРОФЕССИОНАЛЬНЫЕ ДАННЫЕ</div>
+          <div class="app-field"><span class="app-label">Отдел/Специализация:</span><input type="text" class="app-input" id="appSpecialization" placeholder="Боевой/Медицинский..."></div>
+          <div class="app-field"><span class="app-label">Навыки (3 ключевых + уровень):</span><textarea class="app-textarea" id="appSkills" placeholder="1) ...&#10;2) ...&#10;3) ..."></textarea></div>
+          <div class="app-field"><span class="app-label">Наставник:</span><input type="text" class="app-input" id="appMentor" placeholder="Имя или нет"></div>
+          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ЛИЧНОСТЬ И БИОГРАФИЯ</div>
+          <div class="app-field"><span class="app-label">Краткая история:</span><textarea class="app-textarea" id="appHistory" placeholder="Происхождение, важные события..."></textarea></div>
+          <div class="app-field"><span class="app-label">Характер:</span><textarea class="app-textarea" id="appCharacter" placeholder="Основные качества, принципы..."></textarea></div>
+          <div class="app-field"><span class="app-label">Фобии/Слабости:</span><textarea class="app-textarea" id="appPhobias" placeholder="Что влияет на решения..."></textarea></div>
+          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ОСОБЫЕ ОТМЕТКИ</div>
+          <div class="app-field"><span class="app-label">Вредные привычки:</span><input type="text" class="app-input" id="appHabits" placeholder="Курение, агрессия..."></div>
+          <div class="app-field"><span class="app-label">Хронические болезни:</span><input type="text" class="app-input" id="appIllnesses" placeholder="Если имеются..."></div>
+          <div class="app-field"><span class="app-label">Аллергии/Непереносимости:</span><input type="text" class="app-input" id="appAllergies" placeholder="Пищевые, медицинские..."></div>
+          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ДОПОЛНИТЕЛЬНО</div>
+          <div class="app-field"><span class="app-label">Хобби:</span><input type="text" class="app-input" id="appHobbies" placeholder="Увлечения..."></div>
+          <div class="app-field"><span class="app-label">Личные цели:</span><textarea class="app-textarea" id="appGoals" placeholder="Чего хочет достичь..."></textarea></div>
+          <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ ЗАЯВКУ</button>
         </div>
       </div>
 
@@ -483,7 +490,7 @@
     </div>
   </div>
 
-  <div class="terminal-footer"><span>О.И.Д.Л. v.4.0</span><span>ЯДРО: 99%</span></div>
+  <div class="terminal-footer"><span>О.И.Д.Л. v.4.1</span><span>ЯДРО: 99%</span></div>
 </div>
 
 <script>
@@ -647,7 +654,7 @@
   function renderT(){ const t=document.getElementById('tasksTableBody'); if(!t)return; t.innerHTML=''; if(!tasks.length){ t.innerHTML=isMobile?'<tr><td colspan="2">НЕТ ЗАДАЧ</td></tr>':'<tr><td colspan="3">НЕТ ЗАДАЧ</td></tr>'; return; } tasks.forEach(td=>{ const tr=document.createElement('tr'); tr.innerHTML=isMobile?`<td>${td.id}</td><td>${td.description}</td>`:`<td>${td.id}</td><td>${td.description}</td><td>${td.deadline}</td>`; t.appendChild(tr); }); }
   function openProfile(i){ if(isGuest()) return; const m=members[i]; if(!m)return; document.getElementById('profileName').textContent=m.name; document.getElementById('profileRole').textContent=m.role; document.getElementById('profileContent').innerHTML=m.profileHTML||'<div class="profile-text">[ НЕТ ДАННЫХ ]</div>'; document.getElementById('profileOverlay').classList.remove('hidden'); }
   function updateFreqDisplay(){ const freq=parseFloat(document.getElementById('freqSlider')?.value||114).toFixed(1); document.getElementById('freqDisplay').textContent=freq+' МГц'; document.getElementById('interceptMessage').textContent=radioMessages[freq]||'[ ШУМ ]'; }
-  function updateCapsDisplay(){ const el=document.getElementById('capsIndicator'); if(el&&currentUser&&currentUser!=='ГОСТЬ'){ const caps=wallets[currentUser]||0; el.textContent='💰 '+caps+' кр.'; el.classList.add('show'); } else if(el){ el.classList.remove('show'); } }
+  function updateCapsDisplay(){ const el=document.getElementById('capsIndicator'); if(el&&currentUser&&!isGuest()){ const caps=wallets[currentUser]||0; el.textContent='💰 '+caps+' кр.'; el.classList.add('show'); } else if(el){ el.classList.remove('show'); } }
 
   document.getElementById('profileClose').addEventListener('click',()=>document.getElementById('profileOverlay').classList.add('hidden'));
   document.getElementById('profileOverlay').addEventListener('click',function(e){ if(e.target===this)this.classList.add('hidden'); });
@@ -681,6 +688,7 @@
 
   function completeLogin(name){
     currentUser=name;
+    localStorage.setItem('oidl_current_user', name);
     document.getElementById('loginOverlay').style.display='none';
     document.getElementById('mainContent').style.display='block';
     document.getElementById('guestWarning').style.display='none';
@@ -691,18 +699,18 @@
 
   function guestLogin(){
     currentUser='ГОСТЬ';
+    localStorage.setItem('oidl_current_user', 'ГОСТЬ');
     document.getElementById('loginOverlay').style.display='none';
     document.getElementById('mainContent').style.display='block';
     document.getElementById('guestWarning').style.display='block';
     updateUserUI();
     document.querySelector('.nav-item').click();
-    // Скрываем кнопки действий для гостей
-    document.querySelector('.recruit-tab').style.display='none';
     playBeep();
   }
 
   function logout(){
     currentUser=null; isAdmin=false;
+    localStorage.removeItem('oidl_current_user');
     document.getElementById('mainContent').style.display='none';
     document.getElementById('loginOverlay').style.display='flex';
     document.getElementById('loginUserSelect').value='';
@@ -711,7 +719,6 @@
     document.getElementById('loginConfirmBtn').classList.remove('ready');
     document.getElementById('loginStatus').textContent='[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]';
     document.getElementById('guestWarning').style.display='none';
-    document.querySelector('.recruit-tab').style.display='';
     updateUserUI(); updateLoginForm();
   }
 
@@ -732,13 +739,34 @@
 
   document.querySelectorAll('.nav-item[data-tab]').forEach(n=>{ n.addEventListener('click',()=>{ document.querySelectorAll('.content-pane').forEach(p=>p.classList.add('hidden')); const tab=document.getElementById('tab-'+n.dataset.tab); if(tab){ tab.classList.remove('hidden'); if(n.dataset.tab==='mail')renderMailInbox(); } document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.remove('active')); n.classList.add('active'); }); });
 
-  // ЗАЯВКА
+  // ЗАЯВКА — ГОСТИ МОГУТ!
   document.getElementById('appSubmitBtn')?.addEventListener('click',()=>{
-    if(isGuest()){ alert('ГОСТИ НЕ МОГУТ ПОДАВАТЬ ЗАЯВКИ'); return; }
-    const app={name:document.getElementById('appName').value.trim(),role:document.getElementById('appRole').value.trim(),date:new Date().toLocaleString('ru-RU')};
+    const app={
+      name:document.getElementById('appName').value.trim(),
+      gender:document.getElementById('appGender').value.trim(),
+      birth:document.getElementById('appBirth').value.trim(),
+      race:document.getElementById('appRace').value.trim(),
+      role:document.getElementById('appRole').value.trim(),
+      physical:document.getElementById('appPhysical').value.trim(),
+      specialization:document.getElementById('appSpecialization').value.trim(),
+      skills:document.getElementById('appSkills').value.trim(),
+      mentor:document.getElementById('appMentor').value.trim(),
+      history:document.getElementById('appHistory').value.trim(),
+      character:document.getElementById('appCharacter').value.trim(),
+      phobias:document.getElementById('appPhobias').value.trim(),
+      habits:document.getElementById('appHabits').value.trim(),
+      illnesses:document.getElementById('appIllnesses').value.trim(),
+      allergies:document.getElementById('appAllergies').value.trim(),
+      hobbies:document.getElementById('appHobbies').value.trim(),
+      goals:document.getElementById('appGoals').value.trim(),
+      date:new Date().toLocaleString('ru-RU'),
+      fromGuest: isGuest()
+    };
     if(!app.name){ alert('ИМЯ ОБЯЗАТЕЛЬНО!'); return; }
     applications.push(app); db.ref('applications').set(applications);
-    alert('ЗАЯВКА ОТПРАВЛЕНА!'); playBeep();
+    alert('ЗАЯВКА ОТПРАВЛЕНА НА РАССМОТРЕНИЕ!');
+    ['appName','appGender','appBirth','appRace','appRole','appPhysical','appSpecialization','appSkills','appMentor','appHistory','appCharacter','appPhobias','appHabits','appIllnesses','appAllergies','appHobbies','appGoals'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
+    playBeep();
   });
 
   // АДМИН
@@ -784,29 +812,33 @@
   function clearEvForm(){ document.getElementById('evDate').value=''; document.getElementById('evTime').value=''; document.getElementById('evTitle').value=''; document.getElementById('evDesc').value=''; document.getElementById('evEditIdx').value='-1'; }
 
   // ADMIN: APPS
-  function renderAApps(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminAppList"></div>`; renderAAppList(); }
-  function renderAAppList(){ const l=document.getElementById('adminAppList'); if(!l)return; l.innerHTML=''; if(!applications.length){ l.innerHTML='<div style="color:#ffaa00;padding:10px;">НЕТ ЗАЯВОК</div>'; return; } applications.forEach((a,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${a.name}</span><span><button onclick="window._acceptApp(${i})">✓</button><button onclick="window._rejectApp(${i})">✕</button></span>`; l.appendChild(d); }); }
-  window._acceptApp=function(i){ const a=applications[i]; if(confirm('Принять?')){ members.push({name:a.name,role:a.role||'Рекрут',status:'Активен',profileHTML:`<div>${a.name}</div>`}); db.ref('members').set(members); applications.splice(i,1); db.ref('applications').set(applications); renderM(); renderAAppList(); } };
-  window._rejectApp=function(i){ if(confirm('Отклонить?')){ applications.splice(i,1); db.ref('applications').set(applications); renderAAppList(); } };
+  function renderAApps(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminAppList"></div><div id="appViewContainer"></div>`; renderAAppList(); }
+  function renderAAppList(){ const l=document.getElementById('adminAppList'); if(!l)return; l.innerHTML=''; if(!applications.length){ l.innerHTML='<div style="color:#ffaa00;padding:10px;">НЕТ ЗАЯВОК</div>'; return; } applications.forEach((a,i)=>{ const guestLabel = a.fromGuest ? ' ⚠ ГОСТЬ' : ''; const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span style="color:#ffaa00;">${a.name}${guestLabel}</span><span><button onclick="window._viewApp(${i})">СМ</button><button class="accept-btn" onclick="window._acceptApp(${i})">✓</button><button class="reject-btn" onclick="window._rejectApp(${i})">✕</button></span>`; l.appendChild(d); }); }
+  
+  window._viewApp=function(i){ 
+    const a=applications[i]; 
+    const guestLabel = a.fromGuest ? '\n⚠ ЗАЯВКА ОТ ГОСТЯ' : '';
+    document.getElementById('appViewContainer').innerHTML=`<div class="app-view">Имя: ${a.name}${guestLabel}\nПол: ${a.gender}\nДата: ${a.birth}\nРаса: ${a.race}\nДолжность: ${a.role}\nПараметры: ${a.physical}\nСпециализация: ${a.specialization}\nНавыки: ${a.skills}\nНаставник: ${a.mentor}\nИстория: ${a.history}\nХарактер: ${a.character}\nФобии: ${a.phobias}\nПривычки: ${a.habits}\nБолезни: ${a.illnesses}\nАллергии: ${a.allergies}\nХобби: ${a.hobbies}\nЦели: ${a.goals}\nПодана: ${a.date}</div>`; 
+  };
+  
+  window._acceptApp=function(i){ const a=applications[i]; if(confirm('Принять?')){ members.push({name:a.name,role:a.role||'Рекрут',status:'Активен',profileHTML:`<div>${a.name}</div>`}); db.ref('members').set(members); applications.splice(i,1); db.ref('applications').set(applications); renderM(); renderAAppList(); document.getElementById('appViewContainer').innerHTML=''; } };
+  window._rejectApp=function(i){ if(confirm('Отклонить?')){ applications.splice(i,1); db.ref('applications').set(applications); renderAAppList(); document.getElementById('appViewContainer').innerHTML=''; } };
 
-  // ADMIN: DRONES
+  // ADMIN: DRONES, RADIO, SYSTEM, MEMBERS, TASKS, DATA
   function renderADr(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminDroneList"></div><input type="text" class="admin-input" id="drName"><input type="text" class="admin-input" id="drStatus"><input type="range" class="resource-slider" id="drHealth" min="0" max="100" value="85"><div id="drHealthVal">85%</div><input type="hidden" id="drEditIdx" value="-1"><button class="admin-btn save-btn" id="drSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="drCancel">■ ОТМЕНА</button>`; renderADrList(); document.getElementById('drHealth').addEventListener('input',function(){ document.getElementById('drHealthVal').textContent=this.value+'%'; }); document.getElementById('drSave').addEventListener('click',saveDrone); document.getElementById('drCancel').addEventListener('click',clearDrForm); }
   function renderADrList(){ const l=document.getElementById('adminDroneList'); if(!l)return; l.innerHTML=''; drones.forEach((d,i)=>{ const div=document.createElement('div'); div.className='admin-list-item'; div.innerHTML=`<span>${d.name}</span><span><button onclick="window._eDr(${i})">РЕД</button></span>`; l.appendChild(div); }); }
   window._eDr=function(i){ const d=drones[i]; document.getElementById('drName').value=d.name; document.getElementById('drStatus').value=d.status; document.getElementById('drHealth').value=d.health; document.getElementById('drHealthVal').textContent=d.health+'%'; document.getElementById('drEditIdx').value=i; };
   function saveDrone(){ const n=document.getElementById('drName').value.trim(), s=document.getElementById('drStatus').value.trim(), h=parseInt(document.getElementById('drHealth').value); if(!n)return; const ei=parseInt(document.getElementById('drEditIdx').value); if(ei>=0) drones[ei]={name:n,status:s,health:h}; db.ref('drones').set(drones); renderDrones(); renderADrList(); clearDrForm(); }
   function clearDrForm(){ document.getElementById('drName').value=''; document.getElementById('drStatus').value=''; document.getElementById('drHealth').value=85; document.getElementById('drHealthVal').textContent='85%'; document.getElementById('drEditIdx').value='-1'; }
 
-  // ADMIN: RADIO
   function renderARadio(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminRadioList"></div><input type="number" class="admin-input" id="rFreq" step="0.1"><textarea class="admin-textarea" id="rMsg"></textarea><input type="hidden" id="rEditFreq"><button class="admin-btn save-btn" id="rSave">■ СОХРАНИТЬ</button>`; renderARadioList(); document.getElementById('rSave').addEventListener('click',saveRadio); }
   function renderARadioList(){ const l=document.getElementById('adminRadioList'); if(!l)return; l.innerHTML=''; Object.keys(radioMessages).forEach(f=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${f}</span><span><button onclick="window._eR('${f}')">Р</button><button onclick="window._dR('${f}')">У</button></span>`; l.appendChild(d); }); }
   window._eR=function(f){ document.getElementById('rFreq').value=f; document.getElementById('rMsg').value=radioMessages[f]; document.getElementById('rEditFreq').value=f; };
   window._dR=function(f){ if(confirm('Удалить?')){ delete radioMessages[f]; db.ref('radioMessages').set(radioMessages); updateFreqDisplay(); renderARadioList(); } };
   function saveRadio(){ const freq=parseFloat(document.getElementById('rFreq').value).toFixed(1), msg=document.getElementById('rMsg').value.trim(); if(!freq||!msg)return; radioMessages[freq]=msg; db.ref('radioMessages').set(radioMessages); updateFreqDisplay(); renderARadioList(); }
 
-  // ADMIN: SYSTEM
   function renderAS(){ adminContent.innerHTML=`<input type="range" class="resource-slider" id="sr" min="0" max="9" value="${sys.resources}"><div id="sp">${'◼'.repeat(sys.resources)+'◻'.repeat(9-sys.resources)}</div><input type="number" class="admin-input" id="sa" value="${sys.arsenal}"><input type="text" class="admin-input" id="sw" value="${sys.water}"><input type="text" class="admin-input" id="sl" value="${sys.activity}"><input type="text" class="admin-input" id="ss" value="${sys.sysMsg}"><button class="admin-btn save-btn" id="ssBtn">■ СОХРАНИТЬ</button>`; document.getElementById('sr').addEventListener('input',function(){ document.getElementById('sp').textContent='◼'.repeat(parseInt(this.value))+'◻'.repeat(9-parseInt(this.value)); }); document.getElementById('ssBtn').addEventListener('click',()=>{ sys.resources=parseInt(document.getElementById('sr').value); sys.arsenal=parseInt(document.getElementById('sa').value)||0; sys.water=document.getElementById('sw').value.trim(); sys.activity=document.getElementById('sl').value.trim(); sys.sysMsg=document.getElementById('ss').value.trim(); db.ref('system').set(sys); renderSys(); }); }
 
-  // ADMIN: MEMBERS
   function renderAM(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminMemberList"></div><input type="text" class="admin-input" id="aName"><input type="text" class="admin-input" id="aRole"><input type="text" class="admin-input" id="aStatus" value="Активен"><textarea class="admin-textarea" id="aProfile"></textarea><input type="hidden" id="aEditIdx" value="-1"><button class="admin-btn save-btn" id="mSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="mCancel">■ ОТМЕНА</button>`; renderAML(); document.getElementById('mSave').addEventListener('click',saveM); document.getElementById('mCancel').addEventListener('click',clearMF); }
   function renderAML(){ const l=document.getElementById('adminMemberList'); if(!l)return; l.innerHTML=''; members.forEach((m,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${m.name}</span><span><button onclick="window._eM(${i})">Р</button><button onclick="window._dM(${i})">У</button></span>`; l.appendChild(d); }); }
   window._eM=function(i){ const m=members[i]; document.getElementById('aName').value=m.name; document.getElementById('aRole').value=m.role; document.getElementById('aStatus').value=m.status||'Активен'; document.getElementById('aProfile').value=m.profileHTML||''; document.getElementById('aEditIdx').value=i; };
@@ -814,21 +846,18 @@
   function saveM(){ const n=document.getElementById('aName').value.trim(), r=document.getElementById('aRole').value.trim(); if(!n||!r)return; const d={name:n,role:r,status:document.getElementById('aStatus').value.trim()||'Активен',profileHTML:document.getElementById('aProfile').value}; const ei=parseInt(document.getElementById('aEditIdx').value); if(ei>=0) members[ei]=d; else members.push(d); db.ref('members').set(members); renderM(); renderAML(); clearMF(); }
   function clearMF(){ document.getElementById('aName').value=''; document.getElementById('aRole').value=''; document.getElementById('aStatus').value='Активен'; document.getElementById('aProfile').value=''; document.getElementById('aEditIdx').value='-1'; }
 
-  // ADMIN: TASKS
   function renderAT(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminTaskList"></div><input type="text" class="admin-input" id="tId"><input type="text" class="admin-input" id="tDesc"><input type="text" class="admin-input" id="tDead"><input type="hidden" id="tEditIdx" value="-1"><button class="admin-btn save-btn" id="tSave">■ СОХРАНИТЬ</button>`; renderATL(); document.getElementById('tSave').addEventListener('click',saveT); }
   function renderATL(){ const l=document.getElementById('adminTaskList'); if(!l)return; l.innerHTML=''; tasks.forEach((t,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${t.id}</span><span><button onclick="window._eT(${i})">Р</button><button onclick="window._dT(${i})">У</button></span>`; l.appendChild(d); }); }
   window._eT=function(i){ const t=tasks[i]; document.getElementById('tId').value=t.id; document.getElementById('tDesc').value=t.description; document.getElementById('tDead').value=t.deadline; document.getElementById('tEditIdx').value=i; };
   window._dT=function(i){ if(confirm('Удалить?')){ tasks.splice(i,1); db.ref('tasks').set(tasks); renderT(); renderATL(); } };
   function saveT(){ const id=document.getElementById('tId').value.trim(), d=document.getElementById('tDesc').value.trim(), dl=document.getElementById('tDead').value.trim(); if(!id||!d||!dl)return; const ei=parseInt(document.getElementById('tEditIdx').value); if(ei>=0) tasks[ei]={id,description:d,deadline:dl}; else tasks.push({id,description:d,deadline:dl}); db.ref('tasks').set(tasks); renderT(); renderATL(); }
 
-  // ADMIN: DATA
   function renderAD(){ adminContent.innerHTML=`<button class="admin-btn" id="expM">■ ЭКСПОРТ</button><textarea class="admin-textarea" id="impM"></textarea><button class="admin-btn" id="impMBtn">■ ИМПОРТ</button>`; document.getElementById('expM').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(members,null,2)); }); document.getElementById('impMBtn').addEventListener('click',()=>{ try{ const d=JSON.parse(document.getElementById('impM').value); if(Array.isArray(d)){ members=d; db.ref('members').set(members); renderM(); } }catch(e){} }); }
 
-  // RADIO
+  // RADIO, VAULT
   document.getElementById('freqSlider')?.addEventListener('input', updateFreqDisplay);
   document.getElementById('scanBtn')?.addEventListener('click',()=>{ let f=88; const iv=setInterval(()=>{ const s=document.getElementById('freqSlider'); s.value=f; updateFreqDisplay(); f+=0.5; if(f>150)clearInterval(iv); },60); });
 
-  // VAULT
   document.querySelectorAll('.vault-btn').forEach(b=>{ b.addEventListener('click',()=>{ document.querySelectorAll('.vault-btn').forEach(x=>x.classList.remove('active-floor')); b.classList.add('active-floor'); const img=document.getElementById('vaultImage'); if(img)img.src=`vault_floor_${parseInt(b.dataset.floor)+1}.png`; }); });
 
   loadData();
