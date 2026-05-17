@@ -409,6 +409,46 @@
             z-index: 500; font-family: 'Courier New', monospace; font-size: 0.85rem;
             cursor: pointer; animation: fadeIn 0.3s ease;
         }
+
+        /* ============ МОБИЛЬНАЯ АДАПТАЦИЯ ВХОДА ============ */
+        @media (max-width: 768px) {
+            .login-container-animated {
+                width: 95%;
+                gap: 15px;
+            }
+            .login-logo-icon {
+                font-size: 2.5rem;
+            }
+            .login-logo-text {
+                font-size: 1.8rem;
+                letter-spacing: 10px;
+            }
+            .login-terminal-window {
+                padding: 15px;
+            }
+            .login-code-lines {
+                font-size: 0.65rem;
+                min-height: 80px;
+                max-height: 120px;
+            }
+            .login-progress-label {
+                font-size: 0.55rem;
+            }
+            .login-submit-btn {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+            .login-select, .login-input {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+            .login-form-container {
+                margin-top: 10px;
+            }
+            .login-form-container.visible {
+                animation: fadeIn 0.5s ease;
+            }
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
@@ -829,7 +869,16 @@
   const loginFormContainer = document.getElementById('loginFormContainer');
   const loginGlitchOverlay = document.getElementById('loginGlitchOverlay');
 
-  const codeLines = [
+  const codeLines = isMobile ? [
+    {text:'<span class="code-comment">// ROBCO OS MOBILE v.4.77</span>',delay:200},
+    {text:'<span class="code-keyword">INIT</span> <span class="code-string">"SECURE_TERMINAL"</span>',delay:300},
+    {text:'',delay:100},
+    {text:'<span class="code-bracket">[</span> SYSTEM <span class="code-bracket">]</span> Загрузка...',delay:300},
+    {text:'  ├─ <span class="code-string">memory</span> <span class="code-bracket">::</span> <span class="code-success">OK</span>',delay:300},
+    {text:'  └─ <span class="code-string">network</span> <span class="code-bracket">::</span> <span class="code-success">CONNECTED</span>',delay:300},
+    {text:'',delay:100},
+    {text:'<span class="code-bracket">[</span> О.И.Д.Л. <span class="code-bracket">]</span> Готово к авторизации...',delay:300},
+  ] : [
     {text:'<span class="code-comment">// ROBCO INDUSTRIES UNIFIED OS</span>',delay:300},
     {text:'<span class="code-keyword">INIT</span> <span class="code-string">"VAULT-TEC_SECURE_TERMINAL"</span>',delay:500},
     {text:'',delay:200},
@@ -860,7 +909,18 @@
         loginProgressFill.style.width = '100%';
         loginProgressPercent.textContent = '100%';
         loginProgressStage.textContent = 'ГОТОВ';
-        loginFormContainer.classList.add('visible');
+        
+        if (isMobile) {
+          // На мобильных: скрываем консоль, показываем только форму
+          loginCodeLinesEl.style.display = 'none';
+          document.querySelector('.login-progress-container').style.display = 'none';
+          loginFormContainer.classList.add('visible');
+          loginFormContainer.style.marginTop = '0';
+        } else {
+          // На ПК: форма под консолью
+          loginFormContainer.classList.add('visible');
+        }
+        
         updateLoginForm();
         playSuccessSound();
       }, 500);
@@ -875,9 +935,9 @@
     const prog = Math.floor((index / totalCodeLines) * 100);
     loginProgressFill.style.width = prog + '%';
     loginProgressPercent.textContent = prog + '%';
-    if (index === 4) { loginProgressStage.textContent = stagesArr[1]; stageIdx = 1; }
-    if (index === 9) { loginProgressStage.textContent = stagesArr[2]; stageIdx = 2; }
-    if (index === 14) { loginProgressStage.textContent = stagesArr[3]; stageIdx = 3; }
+    if (index === 4 && !isMobile) { loginProgressStage.textContent = stagesArr[1]; stageIdx = 1; }
+    if (index === 9 && !isMobile) { loginProgressStage.textContent = stagesArr[2]; stageIdx = 2; }
+    if (index === 14 && !isMobile) { loginProgressStage.textContent = stagesArr[3]; stageIdx = 3; }
     if (Math.random() > 0.7) {
       loginGlitchOverlay.classList.add('active');
       setTimeout(() => loginGlitchOverlay.classList.remove('active'), 100);
@@ -887,7 +947,11 @@
     setTimeout(() => addCodeLine(index + 1), ld.delay);
   }
 
-  setTimeout(() => addCodeLine(0), 800);
+  if (isMobile) {
+    setTimeout(() => addCodeLine(0), 500);
+  } else {
+    setTimeout(() => addCodeLine(0), 800);
+  }
 
   // ============ ДАННЫЕ ============
   const DEFSYS = { resources:3, arsenal:27, water:"[НЕТ ДАННЫХ]", activity:"23.04.2026", sysMsg:"[СИСТЕМА] СБОР ДАННЫХ." };
