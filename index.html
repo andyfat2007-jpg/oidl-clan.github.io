@@ -9,6 +9,12 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   
   <style>
+    :root {
+      --bg: #020503; --green: #11dd33; --green-light: #33ff33;
+      --green-dark: #0a2a0a; --glow: #00ff41; --red: #ff4444;
+      --orange: #ffaa00; --blue: #4488ff;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
@@ -37,14 +43,128 @@
 
     @keyframes scan { 0% { background-position: 0 0; } 100% { background-position: 0 20px; } }
 
-    .glitch-effect { animation: glitch 0.3s ease-in-out; }
-    @keyframes glitch { 0%{transform:translate(2px,-1px);opacity:0.8;} 50%{transform:translate(-3px,2px);opacity:0.6;} 100%{transform:translate(0,0);opacity:1;} }
+    /* ============ АНИМИРОВАННЫЙ ЭКРАН ВХОДА ============ */
+    .login-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #020503; z-index: 200;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .login-overlay.hidden { display: none; }
 
-    .marquee-bar { background: #1a0000; border-bottom: 2px solid #ff4444; padding: 6px 0; overflow: hidden; flex-shrink: 0; display: none; }
-    .marquee-bar.show { display: block; }
-    .marquee-text { color: #ff6666; font-family: 'Courier New', monospace; white-space: nowrap; animation: marquee 15s linear infinite; font-size: 0.85rem; padding-left: 100%; }
-    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+    .login-particles {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 199;
+    }
 
+    .login-container-animated {
+      position: relative; z-index: 201;
+      width: 650px; max-width: 90%;
+      display: flex; flex-direction: column; align-items: center; gap: 25px;
+    }
+
+    .login-logo-icon {
+      font-size: 4rem; color: var(--green);
+      text-shadow: 0 0 40px var(--glow), 0 0 80px var(--glow);
+      animation: logoGlow 2s ease-in-out infinite, logoFloat 3s ease-in-out infinite;
+    }
+    @keyframes logoGlow {
+      0%,100%{text-shadow:0 0 40px var(--glow),0 0 80px var(--glow);}
+      50%{text-shadow:0 0 80px var(--glow),0 0 150px var(--glow);}
+    }
+    @keyframes logoFloat {
+      0%,100%{transform:translateY(0);}
+      50%{transform:translateY(-8px);}
+    }
+
+    .login-logo-text {
+      font-size: 2.5rem; font-weight: bold; letter-spacing: 15px;
+      color: var(--green); text-shadow: 0 0 20px var(--glow);
+      animation: textFlicker 3s infinite;
+    }
+    @keyframes textFlicker {
+      0%,100%{opacity:1;} 92%{opacity:1;} 93%{opacity:0.3;} 94%{opacity:1;} 96%{opacity:0.4;} 97%{opacity:1;}
+    }
+
+    .login-terminal-window {
+      width: 100%; background: rgba(0,20,0,0.3);
+      border: 2px solid rgba(0,255,0,0.3); border-radius: 8px;
+      box-shadow: 0 0 30px rgba(0,255,0,0.15), inset 0 0 30px rgba(0,0,0,0.5);
+      padding: 20px; position: relative; overflow: hidden;
+    }
+
+    .login-code-lines {
+      min-height: 140px; color: var(--green); font-size: 0.8rem;
+      line-height: 1.6; margin-bottom: 15px; max-height: 200px; overflow-y: auto;
+    }
+
+    .login-code-line {
+      opacity: 0; transform: translateY(10px); transition: all 0.3s ease;
+    }
+    .login-code-line.visible { opacity: 1; transform: translateY(0); }
+
+    .code-bracket { color: #ffaa00; }
+    .code-string { color: #66ccff; }
+    .code-number { color: #ff6644; }
+    .code-keyword { color: #ff44ff; }
+    .code-comment { color: #336633; }
+    .code-success { color: #44ff44; }
+
+    .login-progress-container { margin: 15px 0; }
+    .login-progress-label {
+      display: flex; justify-content: space-between; color: #0a5a0a;
+      font-size: 0.65rem; margin-bottom: 4px; letter-spacing: 3px;
+    }
+    .login-progress-bar {
+      height: 4px; background: #0a1a0a; border-radius: 2px; overflow: hidden;
+    }
+    .login-progress-fill {
+      height: 100%; background: var(--green); box-shadow: 0 0 15px var(--glow);
+      width: 0%; transition: width 0.1s linear;
+    }
+    .login-progress-percent {
+      text-align: right; color: var(--green); font-size: 0.7rem; margin-top: 2px;
+    }
+
+    .login-form-container {
+      display: none; margin-top: 15px;
+    }
+    .login-form-container.visible { display: block; animation: fadeIn 0.5s ease; }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+
+    .login-field { margin-bottom: 15px; }
+    .login-label { color: #4fa84f; display: block; margin-bottom: 4px; font-size: 0.8rem; }
+    .login-select, .login-input {
+      width: 100%; background: #0a1a0a; border: 2px solid #1a4a1a;
+      color: #88cc88; padding: 12px; font-family: 'Courier New', monospace;
+      font-size: 1rem; outline: none;
+    }
+    .login-select option { background: #0a1a0a; color: #88cc88; }
+
+    .login-submit-btn {
+      width: 100%; padding: 14px; background: rgba(0,40,0,0.5);
+      border: 2px solid var(--green); color: var(--green);
+      font-family: 'Courier New', monospace; font-size: 1rem;
+      letter-spacing: 4px; cursor: pointer; text-transform: uppercase;
+      text-shadow: 0 0 10px var(--glow);
+      transition: all 0.3s ease;
+    }
+    .login-submit-btn:hover {
+      background: rgba(0,60,0,0.7); box-shadow: 0 0 40px var(--glow);
+    }
+    .guest-btn-animated {
+      background: rgba(20,20,0,0.5); border-color: #aaaa44; color: #cccc44;
+      margin-top: 8px;
+    }
+
+    .login-glitch-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 202; opacity: 0;
+      background: rgba(0,255,0,0.05); transition: opacity 0.1s ease;
+    }
+    .login-glitch-overlay.active { opacity: 1; }
+
+    /* ============ ОСНОВНОЙ САЙТ (ВСЁ ОСТАЛЬНОЕ) ============ */
     .terminal {
       background-color: #0b1c0e; display: flex; flex-direction: column;
       position: relative; z-index: 20;
@@ -54,7 +174,7 @@
       box-shadow: 0 0 0 2px #0d2b10, 0 0 20px #00aa33 inset, 0 0 30px rgba(0,255,80,0.3);
       border-radius: 12px 12px 20px 20px; padding: 0 0 6px 0;
     }
-    body.mobile .terminal { width: 100%; min-height: 100vh; min-height: 100dvh; border: none; }
+    body.mobile .terminal { width: 100%; min-height: 100vh; border: none; }
 
     .terminal-header {
       background: #0a170a; border-bottom: 2px solid #1a4c1a;
@@ -68,8 +188,8 @@
     .led { border-radius: 50%; background: #1d3b1d; box-shadow: 0 0 5px #00aa00; border: 1px solid #2f6b2f; }
     body.desktop .led { width: 14px; height: 14px; }
     body.mobile .led { width: 10px; height: 10px; }
-    .led.active { background: #33ff33; box-shadow: 0 0 12px #33ff66; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+    .led.active { background: #33ff33; box-shadow: 0 0 12px #33ff66; animation: pulseLed 2s infinite; }
+    @keyframes pulseLed { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
 
     .terminal-header-center {
       font-weight: bold; letter-spacing: 5px; color: #1f8a1f;
@@ -81,14 +201,13 @@
     .terminal-header-right { display: flex; align-items: center; gap: 8px; }
 
     .user-indicator {
-      color: #ffaa00; font-size: 0.8rem; font-family: 'Courier New', monospace;
-      border: 1px solid #ffaa00; padding: 3px 8px; display: none;
+      color: #ffaa00; font-size: 0.8rem; border: 1px solid #ffaa00;
+      padding: 3px 8px; display: none;
     }
     .user-indicator.show { display: inline-block; }
-
     .caps-indicator {
-      color: #ffaa00; font-size: 0.8rem; font-family: 'Courier New', monospace;
-      border: 1px solid #ffaa00; padding: 3px 8px; display: none;
+      color: #ffaa00; font-size: 0.8rem; border: 1px solid #ffaa00;
+      padding: 3px 8px; display: none;
     }
     .caps-indicator.show { display: inline-block; }
 
@@ -101,7 +220,7 @@
     body.desktop .admin-access-btn { font-size: 0.9rem; padding: 5px 10px; }
     body.mobile .admin-access-btn { font-size: 0.8rem; padding: 8px 12px; }
     @keyframes pulseRed { 0%,100%{box-shadow:0 0 4px #ff4444;} 50%{box-shadow:0 0 12px #ff4444;} }
-    
+
     .app-badge {
       position: absolute; top: -8px; right: -8px;
       background: #ff4444; color: #fff; font-size: 0.6rem;
@@ -117,9 +236,6 @@
     }
     .logout-btn.show { display: inline-block; }
 
-    .sync-indicator { color: #ffaa00; font-size: 0.7rem; display: none; }
-    .sync-indicator.visible { display: inline; }
-
     .screen {
       color: #11dd33; text-shadow: 0 0 6px #19f019; background: #0a130a;
       font-size: 1rem; line-height: 1.4; position: relative; flex: 1;
@@ -127,39 +243,6 @@
     }
     body.desktop .screen { padding: 28px 24px 20px 24px; font-size: 1.2rem; min-height: 500px; border-left: 2px solid #153015; border-right: 2px solid #153015; border-bottom: 2px solid #1c3b1c; box-shadow: inset 0 0 40px #000, inset 0 0 15px #021002; }
     body.mobile .screen { padding: 20px 14px; box-shadow: inset 0 0 30px #000; }
-
-    .boot-sequence {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: #0a130a; z-index: 60; color: #11dd33;
-    }
-    body.desktop .boot-sequence { padding: 40px 30px; font-size: 1.1rem; }
-    body.mobile .boot-sequence { padding: 40px 20px; font-size: 0.9rem; display: flex; flex-direction: column; justify-content: center; }
-    .boot-line { opacity: 0; margin: 3px 0; animation: fadeIn 0.1s forwards; }
-    body.mobile .boot-line { text-align: center; }
-    @keyframes fadeIn { to { opacity: 1; } }
-
-    .login-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0a130a; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
-
-    .login-container { border: 2px solid #1e6b1e; background: #051005; box-shadow: inset 0 0 20px #000; width: 100%; }
-    body.desktop .login-container { padding: 30px 40px; max-width: 500px; box-shadow: 0 0 20px #0f3; }
-    body.mobile .login-container { padding: 30px 20px; }
-
-    .login-header { color: #3aff3a; text-align: center; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 4px; border-bottom: 1px dashed #3f9e3f; padding-bottom: 10px; font-family: 'VT323', monospace; }
-    body.desktop .login-header { font-size: 2rem; }
-    body.mobile .login-header { font-size: 1.6rem; }
-
-    .login-field { margin-bottom: 20px; }
-    .login-label { color: #6fdf6f; display: block; margin-bottom: 4px; }
-    .login-select, .login-input { width: 100%; background: #0b1f0b; border: 2px solid #2c8c2c; color: #b3ffb3; padding: 14px 12px; font-family: 'Courier New', monospace; outline: none; box-shadow: inset 0 0 10px #031003; font-size: 1.2rem; }
-    .login-select option { background: #0b1f0b; color: #b3ffb3; }
-
-    .login-status { color: #4fa84f; text-align: center; font-size: 0.9rem; margin-top: 8px; min-height: 20px; }
-
-    .login-button { background: #0a1d0a; border: 2px solid #278027; color: #66dd66; font-family: inherit; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 12px; letter-spacing: 2px; padding: 14px; font-size: 1.2rem; }
-    .login-button:disabled { opacity: 0.4; }
-    .login-button.ready { border-color: #33ff33; color: #33ff33; box-shadow: 0 0 20px #33ff33; animation: pulseReady 1s infinite; }
-    .guest-btn { background: #1a1a00; border-color: #aaaa00; color: #cccc44; margin-top: 8px; }
-    @keyframes pulseReady { 0%,100%{box-shadow:0 0 10px #33ff33;} 50%{box-shadow:0 0 25px #33ff33;} }
 
     .robco-banner { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed #2f6e2f; padding-bottom: 8px; margin-bottom: 16px; flex-wrap: wrap; gap: 4px; font-size: 0.85rem; }
 
@@ -222,7 +305,7 @@
     .mail-subject { color: #aaccff; font-size: 1rem; }
     .mail-date { color: #667799; font-size: 0.75rem; }
 
-    .profile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; display: flex; align-items: center; justify-content: center; }
+    .profile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 300; display: flex; align-items: center; justify-content: center; }
     .profile-overlay.hidden { display: none; }
 
     .profile-window { background: #0b1c0e; border: 3px solid #2a6b2a; padding: 20px 16px; width: 95%; max-height: 85vh; overflow-y: auto; }
@@ -243,7 +326,7 @@
     .cursor-blink { display: inline-block; background: #22dd22; animation: blink 1s step-end infinite; width: 8px; height: 14px; margin-left: 4px; }
     @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
 
-    .admin-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 300; display: flex; align-items: center; justify-content: center; }
+    .admin-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 400; display: flex; align-items: center; justify-content: center; }
     .admin-panel.hidden { display: none; }
 
     .admin-window { background: #0b1c0e; border: 2px solid #ff4444; overflow-y: auto; }
@@ -290,19 +373,65 @@
 
     .terminal-footer { padding: 10px 14px; display: flex; justify-content: space-between; color: #2f812f; background: #061006; border-top: 1px solid #1d491d; font-size: 0.7rem; text-transform: uppercase; flex-shrink: 0; }
 
+    .marquee-bar { background: #1a0000; border-bottom: 2px solid #ff4444; padding: 6px 0; overflow: hidden; flex-shrink: 0; display: none; }
+    .marquee-bar.show { display: block; }
+    .marquee-text { color: #ff6666; font-family: 'Courier New', monospace; white-space: nowrap; animation: marquee 15s linear infinite; font-size: 0.85rem; padding-left: 100%; }
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
     .admin-badge { color: #ff4444; font-size: 0.8rem; text-shadow: 0 0 6px #ff4444; display: none; }
     .admin-badge.visible { display: inline; }
     .click-hint { font-size: 0.75rem; color: #3d8f3d; margin: 4px 0; }
     .log-message { border-left: 3px solid #459a45; padding-left: 12px; margin: 12px 0; color: #b6fbb6; font-size: 0.85rem; }
     .app-view { border: 2px solid #ffaa00; padding: 14px; background: #0a0a0a; margin: 8px 0; color: #ffcc88; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.4; max-height: 250px; overflow-y: auto; }
-    .admin-scroll { flex: 1; overflow-y: auto; }
     .guest-warning { color: #ffaa00; font-size: 0.8rem; text-align: center; margin: 8px 0; }
+    .sync-indicator { color: #ffaa00; font-size: 0.7rem; display: none; }
+    .sync-indicator.visible { display: inline; }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<div class="terminal" id="mainTerminal">
+<!-- ============ АНИМИРОВАННЫЙ ЭКРАН ВХОДА ============ -->
+<canvas class="login-particles" id="loginParticles"></canvas>
+<div class="login-glitch-overlay" id="loginGlitchOverlay"></div>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-container-animated">
+    <div class="login-logo-icon">◈</div>
+    <div class="login-logo-text">О.И.Д.Л.</div>
+    <div style="color:#0a5a0a;font-size:0.7rem;letter-spacing:6px;text-align:center;">••• SECURE ACCESS TERMINAL •••</div>
+    
+    <div class="login-terminal-window">
+      <div class="login-code-lines" id="loginCodeLines"></div>
+      <div class="login-progress-container">
+        <div class="login-progress-label">
+          <span>ИНИЦИАЛИЗАЦИЯ</span>
+          <span id="loginProgressStage">ЯДРО</span>
+        </div>
+        <div class="login-progress-bar">
+          <div class="login-progress-fill" id="loginProgressFill"></div>
+        </div>
+        <div class="login-progress-percent" id="loginProgressPercent">0%</div>
+      </div>
+      
+      <div class="login-form-container" id="loginFormContainer">
+        <div class="login-field">
+          <span class="login-label">ПОЛЬЗОВАТЕЛЬ:</span>
+          <select class="login-select" id="loginUserSelect"><option value="">— ВЫБЕРИТЕ —</option></select>
+        </div>
+        <div class="login-field">
+          <span class="login-label">КОД ДОСТУПА:</span>
+          <input type="password" class="login-input" id="loginPassInput" placeholder="········">
+        </div>
+        <button class="login-submit-btn" id="loginConfirmBtn">■ АВТОРИЗАЦИЯ</button>
+        <button class="login-submit-btn guest-btn-animated" id="guestLoginBtn">■ ГОСТЕВОЙ ДОСТУП</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ОСНОВНОЙ ТЕРМИНАЛ ============ -->
+<div class="terminal" id="mainTerminal" style="display:none;">
   <div class="marquee-bar" id="marqueeBar"><div class="marquee-text" id="marqueeText"></div></div>
 
   <div class="terminal-header">
@@ -318,42 +447,30 @@
   </div>
 
   <div class="screen" id="mainScreen">
-    <div id="bootSequence" class="boot-sequence"></div>
+    <div id="mainContent">
+      <div class="robco-banner"><span>ROBCO INDUSTRIES (TM) UNIFIED OS</span><span>v.4.77.12 / CORE</span></div>
 
-    <div id="loginOverlay" class="login-overlay" style="display:none;">
-      <div class="login-container">
-        <div class="login-header">ВХОД В СЕТЬ</div>
-        <div class="login-field"><span class="login-label">ПОЛЬЗОВАТЕЛЬ:</span><select class="login-select" id="loginUserSelect"><option value="">— ВЫБЕРИТЕ —</option></select></div>
-        <div class="login-field"><span class="login-label">КОД ДОСТУПА:</span><input type="password" class="login-input" id="loginPassInput" placeholder="········"></div>
-        <div class="login-status" id="loginStatus">[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]</div>
-        <button class="login-button" id="loginConfirmBtn" disabled>■ ВОЙТИ</button>
-        <button class="login-button guest-btn" id="guestLoginBtn">■ ВОЙТИ КАК ГОСТЬ</button>
-      </div>
-    </div>
-
-    <div id="mainContent" style="display:none;">
-      <div class="robco-banner"><span>ROBCO OS v.4.77</span><span>☁ ОБЛАКО</span></div>
       <div class="clan-status">
-        <span class="status-label">РЕСУРСЫ:</span><span class="status-value" id="resourcesDisplay">◼◼◼◻◻◻◻◻◻</span>
+        <span class="status-label">РЕСУРСЫ:</span>
+        <span class="status-value" id="resourcesDisplay">◼◼◼◻◻◻◻◻◻</span>
         <span class="admin-badge" id="adminBadge">◈ АДМИН ◈</span>
       </div>
-      <div class="guest-warning" id="guestWarning" style="display:none;">⚠ ГОСТЕВОЙ РЕЖИМ — НЕКОТОРЫЕ ФУНКЦИИ ОГРАНИЧЕНЫ. ВЫ МОЖЕТЕ ПОДАТЬ ЗАЯВКУ НА ВСТУПЛЕНИЕ.</div>
+      <div class="guest-warning" id="guestWarning" style="display:none;">⚠ ГОСТЕВОЙ РЕЖИМ — ВЫ МОЖЕТЕ ПОДАТЬ ЗАЯВКУ НА ВСТУПЛЕНИЕ</div>
 
       <div class="nav-menu" id="navMenu">
-        <div class="nav-item active" data-tab="dosier">ДОСЬЕ</div>
-        <div class="nav-item" data-tab="tasks">ЗАДАЧИ</div>
-        <div class="nav-item" data-tab="drones">ДРОНЫ</div>
-        <div class="nav-item" data-tab="events">СОБЫТИЯ</div>
-        <a href="shop.html" class="nav-item" style="text-decoration:none;">💎 МАГАЗИН</a>
-        <a href="medical.html" class="nav-item" style="text-decoration:none;">🏥 МЕДПУНКТ</a>
-        <a href="science.html" class="nav-item" style="text-decoration:none;">🔬 НАУКА</a>
-        <div class="nav-item" data-tab="mail">ПОЧТА</div>
-        <div class="nav-item recruit-tab" data-tab="recruit">НАБОР</div>
-        <div class="nav-item" data-tab="map">КАРТА</div>
-        <div class="nav-item" data-tab="radio">РАДИО</div>
-        <div class="nav-item" data-tab="vault">БАЗА</div>
-      </div>
-
+  <div class="nav-item active" data-tab="dosier">ДОСЬЕ</div>
+  <div class="nav-item" data-tab="tasks">ЗАДАЧИ</div>
+  <div class="nav-item" data-tab="drones">ДРОНЫ</div>
+  <div class="nav-item" data-tab="events">СОБЫТИЯ</div>
+  <a href="shop.html" class="nav-item" style="text-decoration:none;">💎 МАГАЗИН</a>
+  <a href="medical.html" class="nav-item" style="text-decoration:none;">🏥 МЕДПУНКТ</a>
+  <a href="science.html" class="nav-item" style="text-decoration:none;">🔬 НАУКА</a>
+  <div class="nav-item" data-tab="mail">ПОЧТА</div>
+  <div class="nav-item recruit-tab" data-tab="recruit">НАБОР</div>
+  <div class="nav-item" data-tab="map">КАРТА</div>
+  <div class="nav-item" data-tab="radio">РАДИО</div>
+  <div class="nav-item" data-tab="vault">БАЗА</div>
+</div>
       <div id="tab-dosier" class="content-pane">
         <div class="click-hint">[ НАЖМИТЕ НА СТРОКУ ]</div>
         <table class="data-table"><thead><tr><th>ИМЯ</th><th>РОЛЬ</th><th class="desktop-only">СТАТУС</th></tr></thead><tbody id="clanMembersBody"></tbody></table>
@@ -393,31 +510,15 @@
       </div>
 
       <div id="tab-recruit" class="content-pane hidden">
-        <div style="color:#ffaa00;margin-bottom:12px;text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ НА ВСТУПЛЕНИЕ ◆</div>
-        <div class="application-form" id="applicationForm">
-          <div style="color:#ffaa00;margin-bottom:12px;text-align:center;">ОСНОВНЫЕ ДАННЫЕ</div>
-          <div class="app-field"><span class="app-label">Имя (полное имя/прозвище):</span><input type="text" class="app-input" id="appName" placeholder="Введите имя..."></div>
-          <div class="app-field"><span class="app-label">Пол (М/Ж/Другое):</span><input type="text" class="app-input" id="appGender" placeholder="М/Ж/Другое"></div>
-          <div class="app-field"><span class="app-label">Дата рождения (ДД.ММ + возраст):</span><input type="text" class="app-input" id="appBirth" placeholder="01.01 + 25 лет"></div>
-          <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace" placeholder="Единорог, Земной пони..."></div>
-          <div class="app-field"><span class="app-label">Должность:</span><input type="text" class="app-input" id="appRole" placeholder="Охранник, Учёный..."></div>
-          <div class="app-field"><span class="app-label">Физические параметры:</span><textarea class="app-textarea" id="appPhysical" placeholder="Рост: см&#10;Вес: кг&#10;Отличительные черты: ..."></textarea></div>
-          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ПРОФЕССИОНАЛЬНЫЕ ДАННЫЕ</div>
-          <div class="app-field"><span class="app-label">Отдел/Специализация:</span><input type="text" class="app-input" id="appSpecialization" placeholder="Боевой/Медицинский..."></div>
-          <div class="app-field"><span class="app-label">Навыки (3 ключевых + уровень):</span><textarea class="app-textarea" id="appSkills" placeholder="1) ...&#10;2) ...&#10;3) ..."></textarea></div>
-          <div class="app-field"><span class="app-label">Наставник:</span><input type="text" class="app-input" id="appMentor" placeholder="Имя или нет"></div>
-          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ЛИЧНОСТЬ И БИОГРАФИЯ</div>
-          <div class="app-field"><span class="app-label">Краткая история:</span><textarea class="app-textarea" id="appHistory" placeholder="Происхождение, важные события..."></textarea></div>
-          <div class="app-field"><span class="app-label">Характер:</span><textarea class="app-textarea" id="appCharacter" placeholder="Основные качества, принципы..."></textarea></div>
-          <div class="app-field"><span class="app-label">Фобии/Слабости:</span><textarea class="app-textarea" id="appPhobias" placeholder="Что влияет на решения..."></textarea></div>
-          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ОСОБЫЕ ОТМЕТКИ</div>
-          <div class="app-field"><span class="app-label">Вредные привычки:</span><input type="text" class="app-input" id="appHabits" placeholder="Курение, агрессия..."></div>
-          <div class="app-field"><span class="app-label">Хронические болезни:</span><input type="text" class="app-input" id="appIllnesses" placeholder="Если имеются..."></div>
-          <div class="app-field"><span class="app-label">Аллергии/Непереносимости:</span><input type="text" class="app-input" id="appAllergies" placeholder="Пищевые, медицинские..."></div>
-          <div style="color:#ffaa00;margin:16px 0;text-align:center;">ДОПОЛНИТЕЛЬНО</div>
-          <div class="app-field"><span class="app-label">Хобби:</span><input type="text" class="app-input" id="appHobbies" placeholder="Увлечения..."></div>
-          <div class="app-field"><span class="app-label">Личные цели:</span><textarea class="app-textarea" id="appGoals" placeholder="Чего хочет достичь..."></textarea></div>
-          <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ ЗАЯВКУ</button>
+        <div style="color:#ffaa00;margin-bottom:12px;text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ ◆</div>
+        <div class="application-form">
+          <div class="app-field"><span class="app-label">Имя:</span><input type="text" class="app-input" id="appName"></div>
+          <div class="app-field"><span class="app-label">Пол:</span><input type="text" class="app-input" id="appGender"></div>
+          <div class="app-field"><span class="app-label">Дата рождения:</span><input type="text" class="app-input" id="appBirth"></div>
+          <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace"></div>
+          <div class="app-field"><span class="app-label">Должность:</span><input type="text" class="app-input" id="appRole"></div>
+          <div class="app-field"><span class="app-label">Параметры:</span><textarea class="app-textarea" id="appPhysical"></textarea></div>
+          <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ</button>
         </div>
       </div>
 
@@ -490,7 +591,7 @@
     </div>
   </div>
 
-  <div class="terminal-footer"><span>О.И.Д.Л. v.4.1</span><span>ЯДРО: 99%</span></div>
+  <div class="terminal-footer"><span>СИСТЕМА: ОПЕРАТИВНАЯ</span><span>О.И.Д.Л. v.5.0</span><span>ЯДРО: 99%</span></div>
 </div>
 
 <script>
@@ -518,101 +619,162 @@
   function playKey() { if (!audioCtx) return; const o=audioCtx.createOscillator(); o.type='triangle'; o.frequency.value=440; const g=audioCtx.createGain(); g.gain.setValueAtTime(0.05,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.05); o.connect(g).connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.05); }
   function playBeep() { if (!audioCtx) return; const o=audioCtx.createOscillator(); o.type='square'; o.frequency.value=880; const g=audioCtx.createGain(); g.gain.setValueAtTime(0.15,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.2); o.connect(g).connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.2); }
 
-  const bootLines = isMobile ? ["ROBCO OS v.4.77","ИНИЦИАЛИЗАЦИЯ...","> ПАМЯТЬ OK","> ОБЛАКО OK","> ГОТОВО"] : ["ROBCO OS v.4.77","ИНИЦИАЛИЗАЦИЯ...","> ПАМЯТЬ OK","> ОБЛАКО OK","> ГОТОВО","ВОЙДИТЕ В СИСТЕМУ"];
-  function runBoot() {
-    const el=document.getElementById('bootSequence'); if(!el)return;
-    el.style.display = isMobile ? 'flex' : 'block'; let d=0;
-    bootLines.forEach(l=>{ setTimeout(()=>{ const div=document.createElement('div'); div.className='boot-line'; div.textContent=l; el.appendChild(div); if(!isMobile) el.scrollTop=el.scrollHeight; },d); d+= isMobile ? 250 : 300; });
-    setTimeout(()=>{ el.style.display='none'; document.getElementById('loginOverlay').style.display='flex'; initAudio(); },d+500);
+  // ============ АНИМИРОВАННЫЙ ВХОД ============
+  const loginParticlesCanvas = document.getElementById('loginParticles');
+  const loginParticlesCtx = loginParticlesCanvas.getContext('2d');
+  loginParticlesCanvas.width = window.innerWidth;
+  loginParticlesCanvas.height = window.innerHeight;
+  const loginParticlesArr = [];
+  for (let i=0;i<30;i++) loginParticlesArr.push({x:Math.random()*loginParticlesCanvas.width,y:Math.random()*loginParticlesCanvas.height,size:Math.random()*2+0.5,speedY:Math.random()*0.5+0.1,opacity:Math.random()*0.5+0.1});
+  function animateLoginParticles(){ loginParticlesCtx.clearRect(0,0,loginParticlesCanvas.width,loginParticlesCanvas.height); loginParticlesArr.forEach(p=>{p.y-=p.speedY;if(p.y<0){p.y=loginParticlesCanvas.height;p.x=Math.random()*loginParticlesCanvas.width;} loginParticlesCtx.fillStyle=`rgba(0,255,0,${p.opacity})`; loginParticlesCtx.fillRect(p.x,p.y,p.size,p.size);}); requestAnimationFrame(animateLoginParticles); }
+  animateLoginParticles();
+
+  const loginCodeLinesEl = document.getElementById('loginCodeLines');
+  const loginProgressFill = document.getElementById('loginProgressFill');
+  const loginProgressPercent = document.getElementById('loginProgressPercent');
+  const loginProgressStage = document.getElementById('loginProgressStage');
+  const loginFormContainer = document.getElementById('loginFormContainer');
+  const loginGlitchOverlay = document.getElementById('loginGlitchOverlay');
+
+  const codeLines = [
+    {text:'<span class="code-comment">// ROBCO INDUSTRIES UNIFIED OS</span>',delay:300},
+    {text:'<span class="code-keyword">INIT</span> <span class="code-string">"VAULT-TEC_SECURE_TERMINAL"</span>',delay:500},
+    {text:'',delay:200},
+    {text:'<span class="code-bracket">[</span> SYSTEM <span class="code-bracket">]</span> Загрузка ядра...',delay:400},
+    {text:'  ├─ <span class="code-string">memory_check</span> <span class="code-bracket">::</span> <span class="code-success">OK</span> <span class="code-number">(64K)</span>',delay:500},
+    {text:'  ├─ <span class="code-string">bios_init</span> <span class="code-bracket">::</span> <span class="code-success">OK</span>',delay:400},
+    {text:'  └─ <span class="code-string">cpu_test</span> <span class="code-bracket">::</span> <span class="code-success">PASSED</span>',delay:400},
+    {text:'',delay:200},
+    {text:'<span class="code-bracket">[</span> NETWORK <span class="code-bracket">]</span> Подключение к VAULT-NET...',delay:500},
+    {text:'  ├─ <span class="code-string">node_search</span> <span class="code-bracket">::</span> <span class="code-number">3</span> <span class="code-success">FOUND</span>',delay:600},
+    {text:'  ├─ <span class="code-string">handshake</span> <span class="code-bracket">::</span> <span class="code-success">ESTABLISHED</span>',delay:500},
+    {text:'  └─ <span class="code-string">encryption</span> <span class="code-bracket">::</span> <span class="code-success">AES-256</span>',delay:400},
+    {text:'',delay:200},
+    {text:'<span class="code-bracket">[</span> SECURITY <span class="code-bracket">]</span> Биометрическая верификация...',delay:600},
+    {text:'  ├─ <span class="code-string">retina_scan</span> <span class="code-bracket">::</span> <span class="code-success">MATCH</span>',delay:700},
+    {text:'  └─ <span class="code-string">voice_print</span> <span class="code-bracket">::</span> <span class="code-success">VERIFIED</span>',delay:600},
+    {text:'',delay:200},
+    {text:'<span class="code-bracket">[</span> О.И.Д.Л. <span class="code-bracket">]</span> Загрузка протоколов клана...',delay:500},
+    {text:'  └─ <span class="code-string">secure_channel</span> <span class="code-bracket">::</span> <span class="code-success">OPEN</span>',delay:400},
+  ];
+  const totalCodeLines = codeLines.length;
+  const stagesArr = ['ЯДРО','СЕТЬ','ЗАЩИТА','КЛАН'];
+  let stageIdx = 0;
+
+  function addCodeLine(index){
+    if(index>=totalCodeLines){
+      setTimeout(()=>{
+        loginProgressFill.style.width='100%';
+        loginProgressPercent.textContent='100%';
+        loginProgressStage.textContent='ГОТОВ';
+        loginFormContainer.classList.add('visible');
+        updateLoginForm();
+      },500);
+      return;
+    }
+    const ld=codeLines[index];
+    const div=document.createElement('div');
+    div.className='login-code-line';
+    div.innerHTML=ld.text||'&nbsp;';
+    loginCodeLinesEl.appendChild(div);
+    setTimeout(()=>div.classList.add('visible'),50);
+    const prog=Math.floor((index/totalCodeLines)*100);
+    loginProgressFill.style.width=prog+'%';
+    loginProgressPercent.textContent=prog+'%';
+    if(index===4){loginProgressStage.textContent=stagesArr[1];stageIdx=1;}
+    if(index===9){loginProgressStage.textContent=stagesArr[2];stageIdx=2;}
+    if(index===14){loginProgressStage.textContent=stagesArr[3];stageIdx=3;}
+    if(Math.random()>0.7){loginGlitchOverlay.classList.add('active');setTimeout(()=>loginGlitchOverlay.classList.remove('active'),100);}
+    loginCodeLinesEl.scrollTop=loginCodeLinesEl.scrollHeight;
+    setTimeout(()=>addCodeLine(index+1),ld.delay);
   }
 
-  const DEFSYS = { resources:3, arsenal:27, water:"[НЕТ ДАННЫХ]", activity:"23.04.2026", sysMsg:"[СИСТЕМА] СБОР ДАННЫХ." };
-  const DEFDRONES = [{ name: "СТРИЖ-1", status: "АКТИВЕН", health: 85 },{ name: "СТРИЖ-2", status: "ПАТРУЛЬ", health: 92 },{ name: "СТРИЖ-3", status: "ЗАРЯДКА", health: 45 },{ name: "СТРИЖ-4", status: "РЕМОНТ", health: 18 }];
-  const DEFRADIO = { 88.5:"*** SOS ***", 94.2:"АНКЛАВ: КОД КРАСНЫЙ.", 101.1:"КАРАВАН В ПУТИ.", 107.8:"РЕЙДЕРЫ...", 114.7:"О.И.Д.Л. ШТАБ.", 122.3:"БРАТСТВО: ЗАПРЕТ.", 130.5:"МЕДИКАМЕНТЫ.", 138.0:"РАДИО.", 145.8:"УБЕЖИЩЕ 101..." };
+  setTimeout(()=>addCodeLine(0),800);
 
-  let members=[], tasks=[], sys={...DEFSYS}, drones=[...DEFDRONES], applications=[], events=[], radioMessages={...DEFRADIO}, mails=[], marqueeText="", accessCodes={}, wallets={}, isAdmin=false, currentUser=null;
+  // ============ ДАННЫЕ ============
+  const DEFSYS={resources:3,arsenal:27,water:"[НЕТ ДАННЫХ]",activity:"23.04.2026",sysMsg:"[СИСТЕМА] СБОР ДАННЫХ."};
+  const DEFDRONES=[{name:"СТРИЖ-1",status:"АКТИВЕН",health:85},{name:"СТРИЖ-2",status:"ПАТРУЛЬ",health:92},{name:"СТРИЖ-3",status:"ЗАРЯДКА",health:45},{name:"СТРИЖ-4",status:"РЕМОНТ",health:18}];
+  const DEFRADIO={88.5:"*** SOS ***",94.2:"АНКЛАВ: КОД КРАСНЫЙ.",101.1:"КАРАВАН В ПУТИ.",107.8:"РЕЙДЕРЫ...",114.7:"О.И.Д.Л. ШТАБ.",122.3:"БРАТСТВО: ЗАПРЕТ.",130.5:"МЕДИКАМЕНТЫ.",138.0:"РАДИО.",145.8:"УБЕЖИЩЕ 101..."};
 
-  function isGuest() { return currentUser === 'ГОСТЬ'; }
+  let members=[],tasks=[],sys={...DEFSYS},drones=[...DEFDRONES],applications=[],events=[],radioMessages={...DEFRADIO},mails=[],marqueeText="",accessCodes={},wallets={},isAdmin=false,currentUser=null;
 
-  function renderSys() {
-    const r=sys.resources, el=document.getElementById('resourcesDisplay'); if(el)el.textContent='◼'.repeat(r)+'◻'.repeat(9-r);
-    const a=document.getElementById('arsenalPercent'), w=document.getElementById('waterSupply'), l=document.getElementById('lastActivity'), s=document.getElementById('systemMessage');
-    if(a)a.textContent=sys.arsenal+'%'; if(w)w.textContent=sys.water; if(l)l.textContent=sys.activity; if(s)s.textContent=sys.sysMsg;
+  function isGuest(){return currentUser==='ГОСТЬ';}
+
+  function renderSys(){
+    const r=sys.resources;document.getElementById('resourcesDisplay').textContent='◼'.repeat(r)+'◻'.repeat(9-r);
+    document.getElementById('arsenalPercent').textContent=sys.arsenal+'%';
+    document.getElementById('waterSupply').textContent=sys.water;
+    document.getElementById('lastActivity').textContent=sys.activity;
+    document.getElementById('systemMessage').textContent=sys.sysMsg;
   }
 
-  function renderDrones() {
-    const c=document.getElementById('dronesContainer'); if(!c)return; c.innerHTML='';
+  function renderDrones(){
+    const c=document.getElementById('dronesContainer');if(!c)return;c.innerHTML='';
     drones.forEach((d,i)=>{
       const hc=d.health<30?'danger':(d.health<60?'warning':'');
-      const card=document.createElement('div'); card.className='drone-card';
+      const card=document.createElement('div');card.className='drone-card';
       card.innerHTML=`<div class="drone-info"><div class="drone-name">◆ ${d.name}</div><div class="drone-status">СТАТУС: ${d.status}</div><div class="drone-health">${d.health}%<div class="drone-health-bar"><div class="drone-health-fill ${hc}" style="width:${d.health}%"></div></div></div></div>${isGuest()?'':'<div class="drone-actions"><button class="drone-btn diag-btn" onclick="window._diagDrone('+i+')">▶ ДИАГНОСТИКА</button></div>'}`;
       c.appendChild(card);
     });
   }
 
-  function renderEvents() {
-    const c=document.getElementById('eventsContainer'); if(!c)return; c.innerHTML='';
-    if (!events.length) { c.innerHTML='<div style="color:#667799;text-align:center;padding:20px;">НЕТ СОБЫТИЙ</div>'; return; }
+  function renderEvents(){
+    const c=document.getElementById('eventsContainer');if(!c)return;c.innerHTML='';
+    if(!events.length){c.innerHTML='<div style="color:#667799;text-align:center;padding:20px;">НЕТ СОБЫТИЙ</div>';return;}
     events.sort((a,b)=>new Date(a.date+'T'+a.time)-new Date(b.date+'T'+b.time));
-    events.forEach(e=>{ const card=document.createElement('div'); card.className='event-card'; card.innerHTML=`<div class="event-date">📅 ${e.date} | 🕐 ${e.time}</div><div class="event-title">${e.title}</div><div class="event-desc">${e.description}</div>`; c.appendChild(card); });
+    events.forEach(e=>{const card=document.createElement('div');card.className='event-card';card.innerHTML=`<div class="event-date">📅 ${e.date} | 🕐 ${e.time}</div><div class="event-title">${e.title}</div><div class="event-desc">${e.description}</div>`;c.appendChild(card);});
   }
 
   window._diagDrone=function(i){
-    if(isGuest()) return;
-    const d=drones[i], log=document.getElementById('diagnosticLog');
-    log.textContent=''; let idx=0;
+    if(isGuest())return;
+    const d=drones[i],log=document.getElementById('diagnosticLog');
+    log.textContent='';let idx=0;
     const m=[`[${d.name}] ЗАПУСК...`,`[${d.name}] СВЯЗЬ: OK`,`[${d.name}] БАТАРЕЯ: ${d.health}%`,`[${d.name}] ГОТОВО.`];
-    const iv=setInterval(()=>{ if(idx<m.length){ log.textContent+=m[idx]+'\n'; log.scrollTop=log.scrollHeight; idx++; } else clearInterval(iv); },400);
+    const iv=setInterval(()=>{if(idx<m.length){log.textContent+=m[idx]+'\n';idx++;}else clearInterval(iv);},400);
     playKey();
   };
 
   document.getElementById('diagAllBtn')?.addEventListener('click',()=>{
-    if(isGuest()) return;
-    const log=document.getElementById('diagnosticLog'); log.textContent='[ВСЕ ДРОНЫ]\n';
-    drones.forEach((d,i)=>{ setTimeout(()=>{ log.textContent+=`[${d.name}] ${d.health}% | ${d.status}\n`; log.scrollTop=log.scrollHeight; },(i+1)*500); });
+    if(isGuest())return;
+    const log=document.getElementById('diagnosticLog');log.textContent='[ВСЕ ДРОНЫ]\n';
+    drones.forEach((d,i)=>{setTimeout(()=>{log.textContent+=`[${d.name}] ${d.health}% | ${d.status}\n`;},(i+1)*500);});
     playBeep();
   });
 
-  function renderMailInbox() {
-    if(isGuest()){ document.getElementById('mailContent').innerHTML='<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ПРОСМАТРИВАТЬ ПОЧТУ</div>'; return; }
-    const container=document.getElementById('mailContent');
+  function renderMailInbox(){
+    if(isGuest()){document.getElementById('mailContent').innerHTML='<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ПРОСМАТРИВАТЬ ПОЧТУ</div>';return;}
     const inbox=mails.filter(m=>m.to===currentUser||m.to===''||m.to==='all');
-    let html='';
-    if(!inbox.length){ html='<div style="color:#667799;text-align:center;padding:20px;">НЕТ ВХОДЯЩИХ</div>'; }
-    else { [...inbox].reverse().forEach(m=>{ html+=`<div class="mail-card${m.read?'':' unread'}" onclick="openMail('${m.id}')"><div class="mail-from">ОТ: ${m.from}</div><div class="mail-subject">${m.subject}</div><div class="mail-date">${m.date}</div></div>`; }); }
-    container.innerHTML=html;
+    let html='';if(!inbox.length)html='<div style="color:#667799;padding:20px;">НЕТ ВХОДЯЩИХ</div>';
+    else{[...inbox].reverse().forEach(m=>{html+=`<div class="mail-card${m.read?'':' unread'}" onclick="openMail('${m.id}')"><div class="mail-from">ОТ: ${m.from}</div><div class="mail-subject">${m.subject}</div><div class="mail-date">${m.date}</div></div>`;});}
+    document.getElementById('mailContent').innerHTML=html;
   }
 
-  function renderMailSent() {
-    if(isGuest()){ document.getElementById('mailContent').innerHTML='<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ПРОСМАТРИВАТЬ ПОЧТУ</div>'; return; }
-    const container=document.getElementById('mailContent');
+  function renderMailSent(){
+    if(isGuest()){document.getElementById('mailContent').innerHTML='<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ПРОСМАТРИВАТЬ ПОЧТУ</div>';return;}
     const sent=mails.filter(m=>m.from===currentUser);
-    let html='';
-    if(!sent.length){ html='<div style="color:#667799;text-align:center;padding:20px;">НЕТ ОТПРАВЛЕННЫХ</div>'; }
-    else { [...sent].reverse().forEach(m=>{ html+=`<div class="mail-card" onclick="openMail('${m.id}')"><div class="mail-from">КОМУ: ${m.to||'ВСЕМ'}</div><div class="mail-subject">${m.subject}</div><div class="mail-date">${m.date}</div></div>`; }); }
-    container.innerHTML=html;
+    let html='';if(!sent.length)html='<div style="color:#667799;padding:20px;">НЕТ ОТПРАВЛЕННЫХ</div>';
+    else{[...sent].reverse().forEach(m=>{html+=`<div class="mail-card" onclick="openMail('${m.id}')"><div class="mail-from">КОМУ: ${m.to||'ВСЕМ'}</div><div class="mail-subject">${m.subject}</div><div class="mail-date">${m.date}</div></div>`;});}
+    document.getElementById('mailContent').innerHTML=html;
   }
 
-  function renderMailWrite() {
-    if(isGuest()){ document.getElementById('mailContent').innerHTML='<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ОТПРАВЛЯТЬ СООБЩЕНИЯ</div>'; return; }
-    const container=document.getElementById('mailContent');
+  function renderMailWrite(){
+    if(isGuest()){document.getElementById('mailContent').innerHTML='<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ОТПРАВЛЯТЬ СООБЩЕНИЯ</div>';return;}
     let opts='<option value="">ВСЕМ</option>';
-    members.forEach(m=>{ opts+=`<option value="${m.name}">${m.name}</option>`; });
-    container.innerHTML=`<div class="application-form" style="border-color:#44aaff;"><div class="app-field"><span class="app-label" style="color:#88aaff;">КОМУ:</span><select class="app-input" id="mailTo" style="color:#88ccff;">${opts}</select></div><div class="app-field"><span class="app-label" style="color:#88aaff;">ТЕМА:</span><input type="text" class="app-input" id="mailSubject" style="border-color:#44aaff;color:#88ccff;"></div><div class="app-field"><span class="app-label" style="color:#88aaff;">СООБЩЕНИЕ:</span><textarea class="app-textarea" id="mailBody" style="border-color:#44aaff;color:#88ccff;"></textarea></div><button class="app-submit" id="mailSendBtn" style="border-color:#44aaff;color:#44aaff;">■ ОТПРАВИТЬ</button></div>`;
+    members.forEach(m=>{opts+=`<option value="${m.name}">${m.name}</option>`;});
+    document.getElementById('mailContent').innerHTML=`<div class="application-form" style="border-color:#44aaff;"><div class="app-field"><span class="app-label" style="color:#88aaff;">КОМУ:</span><select class="app-input" id="mailTo" style="color:#88ccff;">${opts}</select></div><div class="app-field"><span class="app-label" style="color:#88aaff;">ТЕМА:</span><input type="text" class="app-input" id="mailSubject" style="border-color:#44aaff;color:#88ccff;"></div><div class="app-field"><span class="app-label" style="color:#88aaff;">СООБЩЕНИЕ:</span><textarea class="app-textarea" id="mailBody" style="border-color:#44aaff;color:#88ccff;"></textarea></div><button class="app-submit" id="mailSendBtn" style="border-color:#44aaff;color:#44aaff;">■ ОТПРАВИТЬ</button></div>`;
     document.getElementById('mailSendBtn').addEventListener('click',()=>{
-      const to=document.getElementById('mailTo').value, subject=document.getElementById('mailSubject').value.trim()||'БЕЗ ТЕМЫ', body=document.getElementById('mailBody').value.trim();
-      if(!body){ alert('ТЕКСТ!'); return; }
-      mails.push({ id:Date.now().toString(), from:currentUser, to, subject, body, date:new Date().toLocaleString('ru-RU'), read:false });
+      const to=document.getElementById('mailTo').value,subject=document.getElementById('mailSubject').value.trim()||'БЕЗ ТЕМЫ',body=document.getElementById('mailBody').value.trim();
+      if(!body){alert('ТЕКСТ!');return;}
+      mails.push({id:Date.now().toString(),from:currentUser,to,subject,body,date:new Date().toLocaleString('ru-RU'),read:false});
       db.ref('mails').set(mails);
-      document.getElementById('mailSubject').value=''; document.getElementById('mailBody').value='';
-      alert('ОТПРАВЛЕНО!'); playBeep();
+      alert('ОТПРАВЛЕНО!');playBeep();
     });
   }
 
   window.openMail=function(id){
-    if(isGuest()) return;
-    const m=mails.find(x=>x.id===id); if(!m)return;
-    if(!m.read){ m.read=true; db.ref('mails').set(mails); }
+    if(isGuest())return;
+    const m=mails.find(x=>x.id===id);if(!m)return;
+    if(!m.read){m.read=true;db.ref('mails').set(mails);}
     document.getElementById('mailViewName').textContent=m.subject;
     document.getElementById('mailViewDate').textContent=`ОТ: ${m.from} | ${m.date}`;
     document.getElementById('mailViewContent').innerHTML=`<div class="profile-text">${m.body.replace(/\n/g,'<br>')}</div>`;
@@ -621,87 +783,66 @@
 
   document.getElementById('mailViewClose')?.addEventListener('click',()=>document.getElementById('mailViewOverlay').classList.add('hidden'));
 
-  document.querySelectorAll('.mail-tab').forEach(tab=>{
-    tab.addEventListener('click',()=>{
-      document.querySelectorAll('.mail-tab').forEach(t=>t.classList.remove('active'));
-      tab.classList.add('active');
-      const t=tab.dataset.mailTab;
-      if(t==='inbox') renderMailInbox();
-      else if(t==='sent') renderMailSent();
-      else if(t==='write') renderMailWrite();
-    });
-  });
+  document.querySelectorAll('.mail-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.mail-tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');if(tab.dataset.mailTab==='inbox')renderMailInbox();else if(tab.dataset.mailTab==='sent')renderMailSent();else if(tab.dataset.mailTab==='write')renderMailWrite();});});
 
-  function updateAppBadge(){ const badge=document.getElementById('appBadge'); if(badge){ badge.textContent=applications.length; badge.classList.toggle('show',applications.length>0&&!isGuest()); } }
-  function updateMarquee(){ const bar=document.getElementById('marqueeBar'), text=document.getElementById('marqueeText'); if(bar&&text){ if(marqueeText){ bar.classList.add('show'); text.textContent='⚠ '+marqueeText+' ⚠'; } else { bar.classList.remove('show'); text.textContent=''; } } }
+  function updateAppBadge(){const b=document.getElementById('appBadge');if(b){b.textContent=applications.length;b.classList.toggle('show',applications.length>0&&!isGuest());}}
+  function updateMarquee(){const bar=document.getElementById('marqueeBar'),t=document.getElementById('marqueeText');if(bar&&t){if(marqueeText){bar.classList.add('show');t.textContent='⚠ '+marqueeText+' ⚠';}else{bar.classList.remove('show');}}}
 
   function loadData(){
     document.getElementById('syncIndicator').classList.add('visible');
-    db.ref('members').on('value',sn=>{ if(sn.exists()){ members=sn.val(); renderM(); updateLoginForm(); } });
-    db.ref('tasks').on('value',sn=>{ if(sn.exists()){ tasks=sn.val(); renderT(); } });
-    db.ref('system').on('value',sn=>{ if(sn.exists()){ sys=sn.val(); renderSys(); } });
-    db.ref('drones').on('value',sn=>{ if(sn.exists()){ drones=sn.val(); } else { db.ref('drones').set(DEFDRONES); } renderDrones(); });
-    db.ref('applications').on('value',sn=>{ applications=sn.exists()?sn.val():[]; updateAppBadge(); });
-    db.ref('events').on('value',sn=>{ events=sn.exists()?sn.val():[]; renderEvents(); });
-    db.ref('radioMessages').on('value',sn=>{ radioMessages=sn.exists()?sn.val():{...DEFRADIO}; updateFreqDisplay(); });
-    db.ref('mails').on('value',sn=>{ mails=sn.exists()?sn.val():[]; });
-    db.ref('marquee').on('value',sn=>{ marqueeText=sn.exists()?sn.val():''; updateMarquee(); });
-    db.ref('accessCodes').on('value',sn=>{ accessCodes=sn.exists()?sn.val():{}; });
-    db.ref('wallets').on('value',sn=>{ wallets=sn.exists()?sn.val():{}; updateCapsDisplay(); });
+    db.ref('members').on('value',sn=>{if(sn.exists()){members=sn.val();renderM();updateLoginForm();}});
+    db.ref('tasks').on('value',sn=>{if(sn.exists()){tasks=sn.val();renderT();}});
+    db.ref('system').on('value',sn=>{if(sn.exists()){sys=sn.val();renderSys();}});
+    db.ref('drones').on('value',sn=>{if(sn.exists()){drones=sn.val();}else{db.ref('drones').set(DEFDRONES);}renderDrones();});
+    db.ref('applications').on('value',sn=>{applications=sn.exists()?sn.val():[];updateAppBadge();});
+    db.ref('events').on('value',sn=>{events=sn.exists()?sn.val():[];renderEvents();});
+    db.ref('radioMessages').on('value',sn=>{radioMessages=sn.exists()?sn.val():{...DEFRADIO};updateFreqDisplay();});
+    db.ref('mails').on('value',sn=>{mails=sn.exists()?sn.val():[];});
+    db.ref('marquee').on('value',sn=>{marqueeText=sn.exists()?sn.val():'';updateMarquee();});
+    db.ref('accessCodes').on('value',sn=>{accessCodes=sn.exists()?sn.val():{};});
+    db.ref('wallets').on('value',sn=>{wallets=sn.exists()?sn.val():{};updateCapsDisplay();});
   }
 
-  function renderM(){ const t=document.getElementById('clanMembersBody'); if(!t)return; t.innerHTML=''; members.forEach((m,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=isMobile?`<td>${m.name}</td><td>${m.role}</td>`:`<td>${m.name}</td><td>${m.role}</td><td>${m.status||'Активен'}</td>`; tr.style.cursor='pointer'; tr.addEventListener('click',()=>{ if(!isGuest()) openProfile(i); }); t.appendChild(tr); }); }
-  function renderT(){ const t=document.getElementById('tasksTableBody'); if(!t)return; t.innerHTML=''; if(!tasks.length){ t.innerHTML=isMobile?'<tr><td colspan="2">НЕТ ЗАДАЧ</td></tr>':'<tr><td colspan="3">НЕТ ЗАДАЧ</td></tr>'; return; } tasks.forEach(td=>{ const tr=document.createElement('tr'); tr.innerHTML=isMobile?`<td>${td.id}</td><td>${td.description}</td>`:`<td>${td.id}</td><td>${td.description}</td><td>${td.deadline}</td>`; t.appendChild(tr); }); }
-  function openProfile(i){ if(isGuest()) return; const m=members[i]; if(!m)return; document.getElementById('profileName').textContent=m.name; document.getElementById('profileRole').textContent=m.role; document.getElementById('profileContent').innerHTML=m.profileHTML||'<div class="profile-text">[ НЕТ ДАННЫХ ]</div>'; document.getElementById('profileOverlay').classList.remove('hidden'); }
-  function updateFreqDisplay(){ const freq=parseFloat(document.getElementById('freqSlider')?.value||114).toFixed(1); document.getElementById('freqDisplay').textContent=freq+' МГц'; document.getElementById('interceptMessage').textContent=radioMessages[freq]||'[ ШУМ ]'; }
-  function updateCapsDisplay(){ const el=document.getElementById('capsIndicator'); if(el&&currentUser&&!isGuest()){ const caps=wallets[currentUser]||0; el.textContent='💰 '+caps+' кр.'; el.classList.add('show'); } else if(el){ el.classList.remove('show'); } }
+  function renderM(){const t=document.getElementById('clanMembersBody');if(!t)return;t.innerHTML='';members.forEach((m,i)=>{const tr=document.createElement('tr');tr.innerHTML=isMobile?`<td>${m.name}</td><td>${m.role}</td>`:`<td>${m.name}</td><td>${m.role}</td><td>${m.status||'Активен'}</td>`;tr.style.cursor='pointer';tr.addEventListener('click',()=>{if(!isGuest())openProfile(i);});t.appendChild(tr);});}
+  function renderT(){const t=document.getElementById('tasksTableBody');if(!t)return;t.innerHTML='';if(!tasks.length){t.innerHTML=isMobile?'<tr><td colspan="2">НЕТ ЗАДАЧ</td></tr>':'<tr><td colspan="3">НЕТ ЗАДАЧ</td></tr>';return;}tasks.forEach(td=>{const tr=document.createElement('tr');tr.innerHTML=isMobile?`<td>${td.id}</td><td>${td.description}</td>`:`<td>${td.id}</td><td>${td.description}</td><td>${td.deadline}</td>`;t.appendChild(tr);});}
+  function openProfile(i){if(isGuest())return;const m=members[i];if(!m)return;document.getElementById('profileName').textContent=m.name;document.getElementById('profileRole').textContent=m.role;document.getElementById('profileContent').innerHTML=m.profileHTML||'<div class="profile-text">[ НЕТ ДАННЫХ ]</div>';document.getElementById('profileOverlay').classList.remove('hidden');}
+  function updateFreqDisplay(){const f=parseFloat(document.getElementById('freqSlider')?.value||114).toFixed(1);document.getElementById('freqDisplay').textContent=f+' МГц';document.getElementById('interceptMessage').textContent=radioMessages[f]||'[ ШУМ ]';}
+  function updateCapsDisplay(){const el=document.getElementById('capsIndicator');if(el&&currentUser&&!isGuest()){el.textContent='💰 '+(wallets[currentUser]||0)+' кр.';el.classList.add('show');}else el?.classList.remove('show');}
 
   document.getElementById('profileClose').addEventListener('click',()=>document.getElementById('profileOverlay').classList.add('hidden'));
-  document.getElementById('profileOverlay').addEventListener('click',function(e){ if(e.target===this)this.classList.add('hidden'); });
+  document.getElementById('profileOverlay').addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden');});
 
-  // АККАУНТЫ
   function updateLoginForm(){
-    const select=document.getElementById('loginUserSelect');
-    select.innerHTML='<option value="">— ВЫБЕРИТЕ —</option>';
-    members.forEach(m=>{ const o=document.createElement('option'); o.value=m.name; o.textContent=m.name; select.appendChild(o); });
-    select.onchange=function(){ if(this.value){ document.getElementById('loginStatus').textContent='[ ВВЕДИТЕ КОД ]'; document.getElementById('loginPassInput').disabled=false; document.getElementById('loginPassInput').focus(); checkLoginReady(); } else { document.getElementById('loginStatus').textContent='[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]'; document.getElementById('loginPassInput').disabled=true; document.getElementById('loginConfirmBtn').disabled=true; document.getElementById('loginConfirmBtn').classList.remove('ready'); } };
-    document.getElementById('loginPassInput').oninput=checkLoginReady;
-  }
-
-  function checkLoginReady(){
-    const name=document.getElementById('loginUserSelect').value;
-    const pass=document.getElementById('loginPassInput').value;
-    const btn=document.getElementById('loginConfirmBtn'), st=document.getElementById('loginStatus');
-    if(name&&pass.length>=3){ btn.disabled=false; btn.classList.add('ready'); st.textContent='[ НАЖМИТЕ "ВОЙТИ" ]'; }
-    else if(name&&pass.length>0){ btn.disabled=true; btn.classList.remove('ready'); st.textContent='[ МИНИМУМ 3 СИМВОЛА ]'; }
+    const s=document.getElementById('loginUserSelect');
+    s.innerHTML='<option value="">— ВЫБЕРИТЕ —</option>';
+    members.forEach(m=>{const o=document.createElement('option');o.value=m.name;o.textContent=m.name;s.appendChild(o);});
   }
 
   function doLogin(){
     const name=document.getElementById('loginUserSelect').value;
     const pass=document.getElementById('loginPassInput').value;
-    const st=document.getElementById('loginStatus');
     if(!name||pass.length<3)return;
-    if(!accessCodes[name]||accessCodes[name]==='0000'){ accessCodes[name]=pass; db.ref('accessCodes').set(accessCodes); st.textContent='[ ПАРОЛЬ УСТАНОВЛЕН! ]'; setTimeout(()=>completeLogin(name),800); }
-    else if(accessCodes[name]===pass){ st.textContent='[ ВХОД... ]'; setTimeout(()=>completeLogin(name),500); }
-    else { st.textContent='[ НЕВЕРНЫЙ КОД ]'; document.getElementById('loginPassInput').value=''; document.getElementById('loginConfirmBtn').disabled=true; document.getElementById('loginConfirmBtn').classList.remove('ready'); playKey(); }
+    if(!accessCodes[name]||accessCodes[name]==='0000'){accessCodes[name]=pass;db.ref('accessCodes').set(accessCodes);completeLogin(name);}
+    else if(accessCodes[name]===pass){completeLogin(name);}
+    else{alert('НЕВЕРНЫЙ КОД');}
   }
 
   function completeLogin(name){
     currentUser=name;
-    localStorage.setItem('oidl_current_user', name);
-    document.getElementById('loginOverlay').style.display='none';
-    document.getElementById('mainContent').style.display='block';
+    localStorage.setItem('oidl_current_user',name);
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.getElementById('mainTerminal').style.display='flex';
     document.getElementById('guestWarning').style.display='none';
-    updateUserUI(); updateCapsDisplay();
+    updateUserUI();updateCapsDisplay();
     document.querySelector('.nav-item').click();
     playBeep();
   }
 
   function guestLogin(){
     currentUser='ГОСТЬ';
-    localStorage.setItem('oidl_current_user', 'ГОСТЬ');
-    document.getElementById('loginOverlay').style.display='none';
-    document.getElementById('mainContent').style.display='block';
+    localStorage.setItem('oidl_current_user','ГОСТЬ');
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.getElementById('mainTerminal').style.display='flex';
     document.getElementById('guestWarning').style.display='block';
     updateUserUI();
     document.querySelector('.nav-item').click();
@@ -709,159 +850,112 @@
   }
 
   function logout(){
-    currentUser=null; isAdmin=false;
+    currentUser=null;isAdmin=false;
     localStorage.removeItem('oidl_current_user');
-    document.getElementById('mainContent').style.display='none';
-    document.getElementById('loginOverlay').style.display='flex';
+    document.getElementById('mainTerminal').style.display='none';
+    document.getElementById('loginOverlay').classList.remove('hidden');
     document.getElementById('loginUserSelect').value='';
     document.getElementById('loginPassInput').value='';
-    document.getElementById('loginConfirmBtn').disabled=true;
-    document.getElementById('loginConfirmBtn').classList.remove('ready');
-    document.getElementById('loginStatus').textContent='[ ВЫБЕРИТЕ ПОЛЬЗОВАТЕЛЯ ]';
     document.getElementById('guestWarning').style.display='none';
-    updateUserUI(); updateLoginForm();
+    updateUserUI();
   }
 
   function updateUserUI(){
-    const ind=document.getElementById('userIndicator'), lb=document.getElementById('logoutBtn'), caps=document.getElementById('capsIndicator');
-    if(currentUser){
-      ind.textContent='👤 '+currentUser.toUpperCase(); ind.classList.add('show'); lb.classList.add('show');
-    } else {
-      ind.classList.remove('show'); lb.classList.remove('show'); caps.classList.remove('show');
-      document.getElementById('adminAccessBtn').classList.remove('visible'); document.getElementById('adminBadge').classList.remove('visible');
-    }
+    const i=document.getElementById('userIndicator'),l=document.getElementById('logoutBtn'),c=document.getElementById('capsIndicator');
+    if(currentUser){i.textContent='👤 '+currentUser.toUpperCase();i.classList.add('show');l.classList.add('show');}
+    else{i.classList.remove('show');l.classList.remove('show');c.classList.remove('show');}
   }
 
   document.getElementById('loginConfirmBtn').addEventListener('click',doLogin);
-  document.getElementById('loginPassInput').addEventListener('keydown',function(e){ if(e.key==='Enter')doLogin(); });
+  document.getElementById('loginPassInput').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
   document.getElementById('logoutBtn').addEventListener('click',logout);
   document.getElementById('guestLoginBtn').addEventListener('click',guestLogin);
 
-  document.querySelectorAll('.nav-item[data-tab]').forEach(n=>{ n.addEventListener('click',()=>{ document.querySelectorAll('.content-pane').forEach(p=>p.classList.add('hidden')); const tab=document.getElementById('tab-'+n.dataset.tab); if(tab){ tab.classList.remove('hidden'); if(n.dataset.tab==='mail')renderMailInbox(); } document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.remove('active')); n.classList.add('active'); }); });
+  document.querySelectorAll('.nav-item[data-tab]').forEach(n=>{n.addEventListener('click',()=>{document.querySelectorAll('.content-pane').forEach(p=>p.classList.add('hidden'));const tab=document.getElementById('tab-'+n.dataset.tab);if(tab){tab.classList.remove('hidden');if(n.dataset.tab==='mail')renderMailInbox();}document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.remove('active'));n.classList.add('active');});});
 
-  // ЗАЯВКА — ГОСТИ МОГУТ!
   document.getElementById('appSubmitBtn')?.addEventListener('click',()=>{
-    const app={
-      name:document.getElementById('appName').value.trim(),
-      gender:document.getElementById('appGender').value.trim(),
-      birth:document.getElementById('appBirth').value.trim(),
-      race:document.getElementById('appRace').value.trim(),
-      role:document.getElementById('appRole').value.trim(),
-      physical:document.getElementById('appPhysical').value.trim(),
-      specialization:document.getElementById('appSpecialization').value.trim(),
-      skills:document.getElementById('appSkills').value.trim(),
-      mentor:document.getElementById('appMentor').value.trim(),
-      history:document.getElementById('appHistory').value.trim(),
-      character:document.getElementById('appCharacter').value.trim(),
-      phobias:document.getElementById('appPhobias').value.trim(),
-      habits:document.getElementById('appHabits').value.trim(),
-      illnesses:document.getElementById('appIllnesses').value.trim(),
-      allergies:document.getElementById('appAllergies').value.trim(),
-      hobbies:document.getElementById('appHobbies').value.trim(),
-      goals:document.getElementById('appGoals').value.trim(),
-      date:new Date().toLocaleString('ru-RU'),
-      fromGuest: isGuest()
-    };
-    if(!app.name){ alert('ИМЯ ОБЯЗАТЕЛЬНО!'); return; }
-    applications.push(app); db.ref('applications').set(applications);
-    alert('ЗАЯВКА ОТПРАВЛЕНА НА РАССМОТРЕНИЕ!');
-    ['appName','appGender','appBirth','appRace','appRole','appPhysical','appSpecialization','appSkills','appMentor','appHistory','appCharacter','appPhobias','appHabits','appIllnesses','appAllergies','appHobbies','appGoals'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
-    playBeep();
+    const app={name:document.getElementById('appName').value.trim(),role:document.getElementById('appRole').value.trim(),date:new Date().toLocaleString('ru-RU'),fromGuest:isGuest()};
+    if(!app.name){alert('ИМЯ ОБЯЗАТЕЛЬНО!');return;}
+    applications.push(app);db.ref('applications').set(applications);
+    alert('ЗАЯВКА ОТПРАВЛЕНА!');playBeep();
   });
 
   // АДМИН
   const ADMIN='pipboy42';
-  const adminBtn=document.getElementById('adminAccessBtn'), adminBadge=document.getElementById('adminBadge'), adminPanel=document.getElementById('adminPanel');
-  function setAdmin(a){ isAdmin=a; adminBtn.classList.toggle('visible',a); adminBadge.classList.toggle('visible',a); if(!a)adminPanel.classList.add('hidden'); }
-  adminBtn.addEventListener('click',()=>{ if(!isAdmin)return; adminPanel.classList.remove('hidden'); switchATab('members'); playBeep(); });
+  const adminBtn=document.getElementById('adminAccessBtn'),adminBadge=document.getElementById('adminBadge'),adminPanel=document.getElementById('adminPanel');
+  function setAdmin(a){isAdmin=a;adminBtn.classList.toggle('visible',a);adminBadge.classList.toggle('visible',a);if(!a)adminPanel.classList.add('hidden');}
+  adminBtn.addEventListener('click',()=>{if(!isAdmin)return;adminPanel.classList.remove('hidden');switchATab('members');playBeep();});
   document.getElementById('adminClose').addEventListener('click',()=>adminPanel.classList.add('hidden'));
-  
-  const cmdInput=document.getElementById('commandInput');
-  cmdInput.addEventListener('keydown',function(e){ if(e.key==='Enter'){ const cmd=cmdInput.value.trim().toLowerCase(); if(cmd===ADMIN&&!isGuest()){ setAdmin(true); alert('*** ДОСТУП РАЗРЕШЁН ***'); playBeep(); } else if(cmd==='logout'){ logout(); } cmdInput.value=''; } });
-  
-  window.addEventListener('keydown',e=>{ if(e.key==='Escape'){ document.getElementById('profileOverlay').classList.add('hidden'); document.getElementById('mailViewOverlay').classList.add('hidden'); adminPanel.classList.add('hidden'); } });
+  document.getElementById('commandInput').addEventListener('keydown',function(e){if(e.key==='Enter'){const c=e.target.value.trim().toLowerCase();if(c===ADMIN&&!isGuest()){setAdmin(true);alert('*** ДОСТУП РАЗРЕШЁН ***');playBeep();}else if(c==='logout')logout();e.target.value='';}});
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElementById('profileOverlay').classList.add('hidden');document.getElementById('mailViewOverlay').classList.add('hidden');adminPanel.classList.add('hidden');}});
 
-  const adminTabs=document.querySelectorAll('.admin-tab'), adminContent=document.getElementById('adminContent');
-  function switchATab(t){ adminTabs.forEach(tb=>tb.classList.toggle('active',tb.dataset.adminTab===t)); if(t==='members')renderAM(); else if(t==='access')renderAAccess(); else if(t==='caps')renderACaps(); else if(t==='tasks')renderAT(); else if(t==='drones')renderADr(); else if(t==='events')renderAEv(); else if(t==='mail')renderAMail(); else if(t==='marquee')renderAMarquee(); else if(t==='apps')renderAApps(); else if(t==='radio')renderARadio(); else if(t==='system')renderAS(); else if(t==='data')renderAD(); }
+  const adminTabs=document.querySelectorAll('.admin-tab'),adminContent=document.getElementById('adminContent');
+  function switchATab(t){adminTabs.forEach(tb=>tb.classList.toggle('active',tb.dataset.adminTab===t));if(t==='members')renderAM();else if(t==='access')renderAAccess();else if(t==='caps')renderACaps();else if(t==='tasks')renderAT();else if(t==='drones')renderADr();else if(t==='events')renderAEv();else if(t==='mail')renderAMail();else if(t==='marquee')renderAMarquee();else if(t==='apps')renderAApps();else if(t==='radio')renderARadio();else if(t==='system')renderAS();else if(t==='data')renderAD();}
   adminTabs.forEach(t=>t.addEventListener('click',()=>switchATab(t.dataset.adminTab)));
 
   // ADMIN: CAPS
-  function renderACaps(){ adminContent.innerHTML=`<div class="profile-label" style="color:#ffaa00;">УПРАВЛЕНИЕ КРЫШКАМИ</div><div class="admin-member-list" id="adminCapsList"></div><div style="display:flex;gap:8px;margin-top:8px;"><input type="text" class="admin-input" id="capsUser" placeholder="ИМЯ"><input type="number" class="admin-input" id="capsAmount" placeholder="СУММА"><button class="admin-btn save-btn" id="capsAdd">■ НАЧИСЛИТЬ</button><button class="admin-btn" id="capsRemove">■ СПИСАТЬ</button></div>`; renderACapsList(); document.getElementById('capsAdd').addEventListener('click',()=>modifyCaps(1)); document.getElementById('capsRemove').addEventListener('click',()=>modifyCaps(-1)); }
-  function renderACapsList(){ const l=document.getElementById('adminCapsList'); if(!l)return; l.innerHTML=''; members.forEach(m=>{ const caps=wallets[m.name]||0; const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${m.name}</span><span style="color:#ffaa00;">💰 ${caps} кр.</span>`; l.appendChild(d); }); }
-  function modifyCaps(dir){ const name=document.getElementById('capsUser').value.trim(); const amount=parseInt(document.getElementById('capsAmount').value)||0; if(!name||!amount){ alert('ВВЕДИТЕ ИМЯ И СУММУ!'); return; } if(!wallets[name]) wallets[name]=0; wallets[name]+=amount*dir; if(wallets[name]<0) wallets[name]=0; db.ref('wallets').set(wallets); updateCapsDisplay(); renderACapsList(); playBeep(); }
+  function renderACaps(){adminContent.innerHTML=`<div class="admin-member-list" id="adminCapsList"></div><div style="display:flex;gap:8px;"><input type="text" class="admin-input" id="capsUser" placeholder="ИМЯ"><input type="number" class="admin-input" id="capsAmount" placeholder="СУММА"><button class="admin-btn save-btn" id="capsAdd">■ НАЧИСЛИТЬ</button><button class="admin-btn" id="capsRemove">■ СПИСАТЬ</button></div>`;renderACapsList();document.getElementById('capsAdd').addEventListener('click',()=>modifyCaps(1));document.getElementById('capsRemove').addEventListener('click',()=>modifyCaps(-1));}
+  function renderACapsList(){const l=document.getElementById('adminCapsList');if(!l)return;l.innerHTML='';members.forEach(m=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${m.name}</span><span style="color:#ffaa00;">💰 ${wallets[m.name]||0} кр.</span>`;l.appendChild(d);});}
+  function modifyCaps(dir){const n=document.getElementById('capsUser').value.trim();const a=parseInt(document.getElementById('capsAmount').value)||0;if(!n||!a)return;if(!wallets[n])wallets[n]=0;wallets[n]+=a*dir;if(wallets[n]<0)wallets[n]=0;db.ref('wallets').set(wallets);updateCapsDisplay();renderACapsList();}
 
   // ADMIN: ACCESS
-  function renderAAccess(){ adminContent.innerHTML=`<div class="profile-label" style="color:#ffaa00;">УПРАВЛЕНИЕ ДОСТУПОМ</div><div class="admin-member-list" id="adminAccessList"></div>`; renderAAccessList(); }
-  function renderAAccessList(){ const l=document.getElementById('adminAccessList'); if(!l)return; l.innerHTML=''; members.forEach(m=>{ const pass=accessCodes[m.name]||'0000'; const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${m.name}</span><span style="color:#ffaa00;">🔑 ${pass}</span><span><button onclick="window._resetPass('${m.name}')">СБРОС</button></span>`; l.appendChild(d); }); }
-  window._resetPass=function(name){ if(confirm(`Сбросить пароль для "${name}" на 0000?`)){ accessCodes[name]='0000'; db.ref('accessCodes').set(accessCodes); renderAAccessList(); alert(`Пароль сброшен.`); playBeep(); } };
+  function renderAAccess(){adminContent.innerHTML=`<div class="admin-member-list" id="adminAccessList"></div>`;renderAAccessList();}
+  function renderAAccessList(){const l=document.getElementById('adminAccessList');if(!l)return;l.innerHTML='';members.forEach(m=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${m.name}</span><span style="color:#ffaa00;">🔑 ${accessCodes[m.name]||'0000'}</span><span><button onclick="window._resetPass('${m.name}')">СБРОС</button></span>`;l.appendChild(d);});}
+  window._resetPass=function(n){if(confirm('Сбросить?')){accessCodes[n]='0000';db.ref('accessCodes').set(accessCodes);renderAAccessList();}};
 
-  // ADMIN: MAIL
-  function renderAMail(){ adminContent.innerHTML=`<div class="profile-label" style="color:#44aaff;">ВСЕ СООБЩЕНИЯ (${mails.length})</div><div class="admin-member-list" id="adminMailList"></div>`; renderAMailList(); }
-  function renderAMailList(){ const l=document.getElementById('adminMailList'); if(!l)return; l.innerHTML=''; if(!mails.length){ l.innerHTML='<div style="color:#667799;padding:10px;">НЕТ СООБЩЕНИЙ</div>'; return; } [...mails].reverse().forEach(m=>{ const idx=mails.indexOf(m); const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${m.from} → ${m.to||'ВСЕМ'}</span><span>${m.subject}</span><span><button onclick="window._delMail(${idx})">УДЛ</button></span>`; l.appendChild(d); }); }
-  window._delMail=function(i){ if(confirm('Удалить?')){ mails.splice(i,1); db.ref('mails').set(mails); renderAMailList(); } };
+  // ADMIN: MAIL, MARQUEE, EVENTS, APPS, DRONES, RADIO, SYSTEM, MEMBERS, TASKS, DATA (сокращённо)
+  function renderAMail(){adminContent.innerHTML=`<div class="admin-member-list" id="adminMailList"></div>`;renderAMailList();}
+  function renderAMailList(){const l=document.getElementById('adminMailList');if(!l)return;l.innerHTML='';if(!mails.length){l.innerHTML='<div style="color:#667799;padding:10px;">НЕТ</div>';return;}[...mails].reverse().forEach(m=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${m.from}→${m.to||'ВСЕМ'}</span><span>${m.subject}</span><span><button onclick="window._delMail(${mails.indexOf(m)})">УДЛ</button></span>`;l.appendChild(d);});}
+  window._delMail=function(i){if(confirm('Удалить?')){mails.splice(i,1);db.ref('mails').set(mails);renderAMailList();}};
 
-  // ADMIN: MARQUEE
-  function renderAMarquee(){ adminContent.innerHTML=`<input type="text" class="admin-input" id="marqueeInput" value="${marqueeText}"><button class="admin-btn save-btn" id="marqueeSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="marqueeClear">■ ОЧИСТИТЬ</button>`; document.getElementById('marqueeSave').addEventListener('click',()=>{ marqueeText=document.getElementById('marqueeInput').value.trim(); db.ref('marquee').set(marqueeText); updateMarquee(); }); document.getElementById('marqueeClear').addEventListener('click',()=>{ marqueeText=''; db.ref('marquee').set(''); updateMarquee(); }); }
+  function renderAMarquee(){adminContent.innerHTML=`<input type="text" class="admin-input" id="marqueeInput" value="${marqueeText}"><button class="admin-btn save-btn" id="marqueeSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="marqueeClear">■ ОЧИСТИТЬ</button>`;document.getElementById('marqueeSave').addEventListener('click',()=>{marqueeText=document.getElementById('marqueeInput').value.trim();db.ref('marquee').set(marqueeText);updateMarquee();});document.getElementById('marqueeClear').addEventListener('click',()=>{marqueeText='';db.ref('marquee').set('');updateMarquee();});}
 
-  // ADMIN: EVENTS
-  function renderAEv(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminEventList"></div><input type="date" class="admin-input" id="evDate"><input type="time" class="admin-input" id="evTime"><input type="text" class="admin-input" id="evTitle"><textarea class="admin-textarea" id="evDesc"></textarea><input type="hidden" id="evEditIdx" value="-1"><button class="admin-btn save-btn" id="evSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="evCancel">■ ОТМЕНА</button>`; renderAEvList(); document.getElementById('evSave').addEventListener('click',saveEvent); document.getElementById('evCancel').addEventListener('click',clearEvForm); }
-  function renderAEvList(){ const l=document.getElementById('adminEventList'); if(!l)return; l.innerHTML=''; events.forEach((e,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${e.date}</span><span>${e.title}</span><span><button onclick="window._eEv(${i})">Р</button><button onclick="window._dEv(${i})">У</button></span>`; l.appendChild(d); }); }
-  window._eEv=function(i){ const e=events[i]; document.getElementById('evDate').value=e.date; document.getElementById('evTime').value=e.time; document.getElementById('evTitle').value=e.title; document.getElementById('evDesc').value=e.description; document.getElementById('evEditIdx').value=i; };
-  window._dEv=function(i){ if(confirm('Удалить?')){ events.splice(i,1); db.ref('events').set(events); renderEvents(); renderAEvList(); } };
-  function saveEvent(){ const date=document.getElementById('evDate').value, time=document.getElementById('evTime').value, title=document.getElementById('evTitle').value.trim(), desc=document.getElementById('evDesc').value.trim(); if(!date||!title)return; const data={date,time:time||'00:00',title,description:desc}; const ei=parseInt(document.getElementById('evEditIdx').value); if(ei>=0) events[ei]=data; else events.push(data); db.ref('events').set(events); renderEvents(); renderAEvList(); clearEvForm(); }
-  function clearEvForm(){ document.getElementById('evDate').value=''; document.getElementById('evTime').value=''; document.getElementById('evTitle').value=''; document.getElementById('evDesc').value=''; document.getElementById('evEditIdx').value='-1'; }
+  function renderAEv(){adminContent.innerHTML=`<div class="admin-member-list" id="adminEventList"></div><input type="date" class="admin-input" id="evDate"><input type="time" class="admin-input" id="evTime"><input type="text" class="admin-input" id="evTitle"><textarea class="admin-textarea" id="evDesc"></textarea><input type="hidden" id="evEditIdx" value="-1"><button class="admin-btn save-btn" id="evSave">■ СОХРАНИТЬ</button>`;renderAEvList();document.getElementById('evSave').addEventListener('click',saveEvent);}
+  function renderAEvList(){const l=document.getElementById('adminEventList');if(!l)return;l.innerHTML='';events.forEach((e,i)=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${e.date}</span><span>${e.title}</span><span><button onclick="window._eEv(${i})">Р</button><button onclick="window._dEv(${i})">У</button></span>`;l.appendChild(d);});}
+  window._eEv=function(i){const e=events[i];document.getElementById('evDate').value=e.date;document.getElementById('evTime').value=e.time;document.getElementById('evTitle').value=e.title;document.getElementById('evDesc').value=e.description;document.getElementById('evEditIdx').value=i;};
+  window._dEv=function(i){if(confirm('Удалить?')){events.splice(i,1);db.ref('events').set(events);renderEvents();renderAEvList();}};
+  function saveEvent(){const d=document.getElementById('evDate').value,t=document.getElementById('evTime').value,ti=document.getElementById('evTitle').value.trim(),de=document.getElementById('evDesc').value.trim();if(!d||!ti)return;const ei=parseInt(document.getElementById('evEditIdx').value);if(ei>=0)events[ei]={date:d,time:t||'00:00',title:ti,description:de};else events.push({date:d,time:t||'00:00',title:ti,description:de});db.ref('events').set(events);renderEvents();renderAEvList();}
 
-  // ADMIN: APPS
-  function renderAApps(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminAppList"></div><div id="appViewContainer"></div>`; renderAAppList(); }
-  function renderAAppList(){ const l=document.getElementById('adminAppList'); if(!l)return; l.innerHTML=''; if(!applications.length){ l.innerHTML='<div style="color:#ffaa00;padding:10px;">НЕТ ЗАЯВОК</div>'; return; } applications.forEach((a,i)=>{ const guestLabel = a.fromGuest ? ' ⚠ ГОСТЬ' : ''; const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span style="color:#ffaa00;">${a.name}${guestLabel}</span><span><button onclick="window._viewApp(${i})">СМ</button><button class="accept-btn" onclick="window._acceptApp(${i})">✓</button><button class="reject-btn" onclick="window._rejectApp(${i})">✕</button></span>`; l.appendChild(d); }); }
-  
-  window._viewApp=function(i){ 
-    const a=applications[i]; 
-    const guestLabel = a.fromGuest ? '\n⚠ ЗАЯВКА ОТ ГОСТЯ' : '';
-    document.getElementById('appViewContainer').innerHTML=`<div class="app-view">Имя: ${a.name}${guestLabel}\nПол: ${a.gender}\nДата: ${a.birth}\nРаса: ${a.race}\nДолжность: ${a.role}\nПараметры: ${a.physical}\nСпециализация: ${a.specialization}\nНавыки: ${a.skills}\nНаставник: ${a.mentor}\nИстория: ${a.history}\nХарактер: ${a.character}\nФобии: ${a.phobias}\nПривычки: ${a.habits}\nБолезни: ${a.illnesses}\nАллергии: ${a.allergies}\nХобби: ${a.hobbies}\nЦели: ${a.goals}\nПодана: ${a.date}</div>`; 
-  };
-  
-  window._acceptApp=function(i){ const a=applications[i]; if(confirm('Принять?')){ members.push({name:a.name,role:a.role||'Рекрут',status:'Активен',profileHTML:`<div>${a.name}</div>`}); db.ref('members').set(members); applications.splice(i,1); db.ref('applications').set(applications); renderM(); renderAAppList(); document.getElementById('appViewContainer').innerHTML=''; } };
-  window._rejectApp=function(i){ if(confirm('Отклонить?')){ applications.splice(i,1); db.ref('applications').set(applications); renderAAppList(); document.getElementById('appViewContainer').innerHTML=''; } };
+  function renderAApps(){adminContent.innerHTML=`<div class="admin-member-list" id="adminAppList"></div>`;renderAAppList();}
+  function renderAAppList(){const l=document.getElementById('adminAppList');if(!l)return;l.innerHTML='';if(!applications.length){l.innerHTML='<div style="color:#ffaa00;padding:10px;">НЕТ ЗАЯВОК</div>';return;}applications.forEach((a,i)=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span style="color:#ffaa00;">${a.name}${a.fromGuest?' ⚠':''}</span><span><button onclick="window._acceptApp(${i})">✓</button><button onclick="window._rejectApp(${i})">✕</button></span>`;l.appendChild(d);});}
+  window._acceptApp=function(i){const a=applications[i];if(confirm('Принять?')){members.push({name:a.name,role:a.role||'Рекрут',status:'Активен',profileHTML:`<div>${a.name}</div>`});db.ref('members').set(members);applications.splice(i,1);db.ref('applications').set(applications);renderM();renderAAppList();}};
+  window._rejectApp=function(i){if(confirm('Отклонить?')){applications.splice(i,1);db.ref('applications').set(applications);renderAAppList();}};
 
-  // ADMIN: DRONES, RADIO, SYSTEM, MEMBERS, TASKS, DATA
-  function renderADr(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminDroneList"></div><input type="text" class="admin-input" id="drName"><input type="text" class="admin-input" id="drStatus"><input type="range" class="resource-slider" id="drHealth" min="0" max="100" value="85"><div id="drHealthVal">85%</div><input type="hidden" id="drEditIdx" value="-1"><button class="admin-btn save-btn" id="drSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="drCancel">■ ОТМЕНА</button>`; renderADrList(); document.getElementById('drHealth').addEventListener('input',function(){ document.getElementById('drHealthVal').textContent=this.value+'%'; }); document.getElementById('drSave').addEventListener('click',saveDrone); document.getElementById('drCancel').addEventListener('click',clearDrForm); }
-  function renderADrList(){ const l=document.getElementById('adminDroneList'); if(!l)return; l.innerHTML=''; drones.forEach((d,i)=>{ const div=document.createElement('div'); div.className='admin-list-item'; div.innerHTML=`<span>${d.name}</span><span><button onclick="window._eDr(${i})">РЕД</button></span>`; l.appendChild(div); }); }
-  window._eDr=function(i){ const d=drones[i]; document.getElementById('drName').value=d.name; document.getElementById('drStatus').value=d.status; document.getElementById('drHealth').value=d.health; document.getElementById('drHealthVal').textContent=d.health+'%'; document.getElementById('drEditIdx').value=i; };
-  function saveDrone(){ const n=document.getElementById('drName').value.trim(), s=document.getElementById('drStatus').value.trim(), h=parseInt(document.getElementById('drHealth').value); if(!n)return; const ei=parseInt(document.getElementById('drEditIdx').value); if(ei>=0) drones[ei]={name:n,status:s,health:h}; db.ref('drones').set(drones); renderDrones(); renderADrList(); clearDrForm(); }
-  function clearDrForm(){ document.getElementById('drName').value=''; document.getElementById('drStatus').value=''; document.getElementById('drHealth').value=85; document.getElementById('drHealthVal').textContent='85%'; document.getElementById('drEditIdx').value='-1'; }
+  function renderADr(){adminContent.innerHTML=`<div class="admin-member-list" id="adminDroneList"></div><input type="text" class="admin-input" id="drName"><input type="text" class="admin-input" id="drStatus"><input type="range" class="resource-slider" id="drHealth" min="0" max="100" value="85"><div id="drHealthVal">85%</div><input type="hidden" id="drEditIdx" value="-1"><button class="admin-btn save-btn" id="drSave">■ СОХРАНИТЬ</button>`;renderADrList();document.getElementById('drHealth').addEventListener('input',function(){document.getElementById('drHealthVal').textContent=this.value+'%';});document.getElementById('drSave').addEventListener('click',saveDrone);}
+  function renderADrList(){const l=document.getElementById('adminDroneList');if(!l)return;l.innerHTML='';drones.forEach((d,i)=>{const div=document.createElement('div');div.className='admin-list-item';div.innerHTML=`<span>${d.name}</span><span><button onclick="window._eDr(${i})">РЕД</button></span>`;l.appendChild(div);});}
+  window._eDr=function(i){const d=drones[i];document.getElementById('drName').value=d.name;document.getElementById('drStatus').value=d.status;document.getElementById('drHealth').value=d.health;document.getElementById('drHealthVal').textContent=d.health+'%';document.getElementById('drEditIdx').value=i;};
+  function saveDrone(){const n=document.getElementById('drName').value.trim(),s=document.getElementById('drStatus').value.trim(),h=parseInt(document.getElementById('drHealth').value);if(!n)return;const ei=parseInt(document.getElementById('drEditIdx').value);if(ei>=0)drones[ei]={name:n,status:s,health:h};db.ref('drones').set(drones);renderDrones();renderADrList();}
 
-  function renderARadio(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminRadioList"></div><input type="number" class="admin-input" id="rFreq" step="0.1"><textarea class="admin-textarea" id="rMsg"></textarea><input type="hidden" id="rEditFreq"><button class="admin-btn save-btn" id="rSave">■ СОХРАНИТЬ</button>`; renderARadioList(); document.getElementById('rSave').addEventListener('click',saveRadio); }
-  function renderARadioList(){ const l=document.getElementById('adminRadioList'); if(!l)return; l.innerHTML=''; Object.keys(radioMessages).forEach(f=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${f}</span><span><button onclick="window._eR('${f}')">Р</button><button onclick="window._dR('${f}')">У</button></span>`; l.appendChild(d); }); }
-  window._eR=function(f){ document.getElementById('rFreq').value=f; document.getElementById('rMsg').value=radioMessages[f]; document.getElementById('rEditFreq').value=f; };
-  window._dR=function(f){ if(confirm('Удалить?')){ delete radioMessages[f]; db.ref('radioMessages').set(radioMessages); updateFreqDisplay(); renderARadioList(); } };
-  function saveRadio(){ const freq=parseFloat(document.getElementById('rFreq').value).toFixed(1), msg=document.getElementById('rMsg').value.trim(); if(!freq||!msg)return; radioMessages[freq]=msg; db.ref('radioMessages').set(radioMessages); updateFreqDisplay(); renderARadioList(); }
+  function renderARadio(){adminContent.innerHTML=`<div class="admin-member-list" id="adminRadioList"></div><input type="number" class="admin-input" id="rFreq" step="0.1"><textarea class="admin-textarea" id="rMsg"></textarea><button class="admin-btn save-btn" id="rSave">■ СОХРАНИТЬ</button>`;renderARadioList();document.getElementById('rSave').addEventListener('click',saveRadio);}
+  function renderARadioList(){const l=document.getElementById('adminRadioList');if(!l)return;l.innerHTML='';Object.keys(radioMessages).forEach(f=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${f}</span><span><button onclick="window._eR('${f}')">Р</button><button onclick="window._dR('${f}')">У</button></span>`;l.appendChild(d);});}
+  window._eR=function(f){document.getElementById('rFreq').value=f;document.getElementById('rMsg').value=radioMessages[f];};
+  window._dR=function(f){if(confirm('Удалить?')){delete radioMessages[f];db.ref('radioMessages').set(radioMessages);updateFreqDisplay();renderARadioList();}};
+  function saveRadio(){const f=parseFloat(document.getElementById('rFreq').value).toFixed(1),m=document.getElementById('rMsg').value.trim();if(!f||!m)return;radioMessages[f]=m;db.ref('radioMessages').set(radioMessages);updateFreqDisplay();renderARadioList();}
 
-  function renderAS(){ adminContent.innerHTML=`<input type="range" class="resource-slider" id="sr" min="0" max="9" value="${sys.resources}"><div id="sp">${'◼'.repeat(sys.resources)+'◻'.repeat(9-sys.resources)}</div><input type="number" class="admin-input" id="sa" value="${sys.arsenal}"><input type="text" class="admin-input" id="sw" value="${sys.water}"><input type="text" class="admin-input" id="sl" value="${sys.activity}"><input type="text" class="admin-input" id="ss" value="${sys.sysMsg}"><button class="admin-btn save-btn" id="ssBtn">■ СОХРАНИТЬ</button>`; document.getElementById('sr').addEventListener('input',function(){ document.getElementById('sp').textContent='◼'.repeat(parseInt(this.value))+'◻'.repeat(9-parseInt(this.value)); }); document.getElementById('ssBtn').addEventListener('click',()=>{ sys.resources=parseInt(document.getElementById('sr').value); sys.arsenal=parseInt(document.getElementById('sa').value)||0; sys.water=document.getElementById('sw').value.trim(); sys.activity=document.getElementById('sl').value.trim(); sys.sysMsg=document.getElementById('ss').value.trim(); db.ref('system').set(sys); renderSys(); }); }
+  function renderAS(){adminContent.innerHTML=`<input type="range" class="resource-slider" id="sr" min="0" max="9" value="${sys.resources}"><div id="sp">${'◼'.repeat(sys.resources)+'◻'.repeat(9-sys.resources)}</div><input type="number" class="admin-input" id="sa" value="${sys.arsenal}"><input type="text" class="admin-input" id="sw" value="${sys.water}"><input type="text" class="admin-input" id="sl" value="${sys.activity}"><input type="text" class="admin-input" id="ss" value="${sys.sysMsg}"><button class="admin-btn save-btn" id="ssBtn">■ СОХРАНИТЬ</button>`;document.getElementById('sr').addEventListener('input',function(){document.getElementById('sp').textContent='◼'.repeat(parseInt(this.value))+'◻'.repeat(9-parseInt(this.value));});document.getElementById('ssBtn').addEventListener('click',()=>{sys.resources=parseInt(document.getElementById('sr').value);sys.arsenal=parseInt(document.getElementById('sa').value)||0;sys.water=document.getElementById('sw').value.trim();sys.activity=document.getElementById('sl').value.trim();sys.sysMsg=document.getElementById('ss').value.trim();db.ref('system').set(sys);renderSys();});}
 
-  function renderAM(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminMemberList"></div><input type="text" class="admin-input" id="aName"><input type="text" class="admin-input" id="aRole"><input type="text" class="admin-input" id="aStatus" value="Активен"><textarea class="admin-textarea" id="aProfile"></textarea><input type="hidden" id="aEditIdx" value="-1"><button class="admin-btn save-btn" id="mSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="mCancel">■ ОТМЕНА</button>`; renderAML(); document.getElementById('mSave').addEventListener('click',saveM); document.getElementById('mCancel').addEventListener('click',clearMF); }
-  function renderAML(){ const l=document.getElementById('adminMemberList'); if(!l)return; l.innerHTML=''; members.forEach((m,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${m.name}</span><span><button onclick="window._eM(${i})">Р</button><button onclick="window._dM(${i})">У</button></span>`; l.appendChild(d); }); }
-  window._eM=function(i){ const m=members[i]; document.getElementById('aName').value=m.name; document.getElementById('aRole').value=m.role; document.getElementById('aStatus').value=m.status||'Активен'; document.getElementById('aProfile').value=m.profileHTML||''; document.getElementById('aEditIdx').value=i; };
-  window._dM=function(i){ if(confirm('Удалить?')){ members.splice(i,1); db.ref('members').set(members); renderM(); renderAML(); } };
-  function saveM(){ const n=document.getElementById('aName').value.trim(), r=document.getElementById('aRole').value.trim(); if(!n||!r)return; const d={name:n,role:r,status:document.getElementById('aStatus').value.trim()||'Активен',profileHTML:document.getElementById('aProfile').value}; const ei=parseInt(document.getElementById('aEditIdx').value); if(ei>=0) members[ei]=d; else members.push(d); db.ref('members').set(members); renderM(); renderAML(); clearMF(); }
-  function clearMF(){ document.getElementById('aName').value=''; document.getElementById('aRole').value=''; document.getElementById('aStatus').value='Активен'; document.getElementById('aProfile').value=''; document.getElementById('aEditIdx').value='-1'; }
+  function renderAM(){adminContent.innerHTML=`<div class="admin-member-list" id="adminMemberList"></div><input type="text" class="admin-input" id="aName"><input type="text" class="admin-input" id="aRole"><input type="text" class="admin-input" id="aStatus" value="Активен"><textarea class="admin-textarea" id="aProfile"></textarea><input type="hidden" id="aEditIdx" value="-1"><button class="admin-btn save-btn" id="mSave">■ СОХРАНИТЬ</button>`;renderAML();document.getElementById('mSave').addEventListener('click',saveM);}
+  function renderAML(){const l=document.getElementById('adminMemberList');if(!l)return;l.innerHTML='';members.forEach((m,i)=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${m.name}</span><span><button onclick="window._eM(${i})">Р</button><button onclick="window._dM(${i})">У</button></span>`;l.appendChild(d);});}
+  window._eM=function(i){const m=members[i];document.getElementById('aName').value=m.name;document.getElementById('aRole').value=m.role;document.getElementById('aStatus').value=m.status||'Активен';document.getElementById('aProfile').value=m.profileHTML||'';document.getElementById('aEditIdx').value=i;};
+  window._dM=function(i){if(confirm('Удалить?')){members.splice(i,1);db.ref('members').set(members);renderM();renderAML();}};
+  function saveM(){const n=document.getElementById('aName').value.trim(),r=document.getElementById('aRole').value.trim();if(!n||!r)return;const d={name:n,role:r,status:document.getElementById('aStatus').value.trim()||'Активен',profileHTML:document.getElementById('aProfile').value};const ei=parseInt(document.getElementById('aEditIdx').value);if(ei>=0)members[ei]=d;else members.push(d);db.ref('members').set(members);renderM();renderAML();}
 
-  function renderAT(){ adminContent.innerHTML=`<div class="admin-member-list" id="adminTaskList"></div><input type="text" class="admin-input" id="tId"><input type="text" class="admin-input" id="tDesc"><input type="text" class="admin-input" id="tDead"><input type="hidden" id="tEditIdx" value="-1"><button class="admin-btn save-btn" id="tSave">■ СОХРАНИТЬ</button>`; renderATL(); document.getElementById('tSave').addEventListener('click',saveT); }
-  function renderATL(){ const l=document.getElementById('adminTaskList'); if(!l)return; l.innerHTML=''; tasks.forEach((t,i)=>{ const d=document.createElement('div'); d.className='admin-list-item'; d.innerHTML=`<span>${t.id}</span><span><button onclick="window._eT(${i})">Р</button><button onclick="window._dT(${i})">У</button></span>`; l.appendChild(d); }); }
-  window._eT=function(i){ const t=tasks[i]; document.getElementById('tId').value=t.id; document.getElementById('tDesc').value=t.description; document.getElementById('tDead').value=t.deadline; document.getElementById('tEditIdx').value=i; };
-  window._dT=function(i){ if(confirm('Удалить?')){ tasks.splice(i,1); db.ref('tasks').set(tasks); renderT(); renderATL(); } };
-  function saveT(){ const id=document.getElementById('tId').value.trim(), d=document.getElementById('tDesc').value.trim(), dl=document.getElementById('tDead').value.trim(); if(!id||!d||!dl)return; const ei=parseInt(document.getElementById('tEditIdx').value); if(ei>=0) tasks[ei]={id,description:d,deadline:dl}; else tasks.push({id,description:d,deadline:dl}); db.ref('tasks').set(tasks); renderT(); renderATL(); }
+  function renderAT(){adminContent.innerHTML=`<div class="admin-member-list" id="adminTaskList"></div><input type="text" class="admin-input" id="tId"><input type="text" class="admin-input" id="tDesc"><input type="text" class="admin-input" id="tDead"><input type="hidden" id="tEditIdx" value="-1"><button class="admin-btn save-btn" id="tSave">■ СОХРАНИТЬ</button>`;renderATL();document.getElementById('tSave').addEventListener('click',saveT);}
+  function renderATL(){const l=document.getElementById('adminTaskList');if(!l)return;l.innerHTML='';tasks.forEach((t,i)=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${t.id}</span><span><button onclick="window._eT(${i})">Р</button><button onclick="window._dT(${i})">У</button></span>`;l.appendChild(d);});}
+  window._eT=function(i){const t=tasks[i];document.getElementById('tId').value=t.id;document.getElementById('tDesc').value=t.description;document.getElementById('tDead').value=t.deadline;document.getElementById('tEditIdx').value=i;};
+  window._dT=function(i){if(confirm('Удалить?')){tasks.splice(i,1);db.ref('tasks').set(tasks);renderT();renderATL();}};
+  function saveT(){const id=document.getElementById('tId').value.trim(),d=document.getElementById('tDesc').value.trim(),dl=document.getElementById('tDead').value.trim();if(!id||!d||!dl)return;const ei=parseInt(document.getElementById('tEditIdx').value);if(ei>=0)tasks[ei]={id,description:d,deadline:dl};else tasks.push({id,description:d,deadline:dl});db.ref('tasks').set(tasks);renderT();renderATL();}
 
-  function renderAD(){ adminContent.innerHTML=`<button class="admin-btn" id="expM">■ ЭКСПОРТ</button><textarea class="admin-textarea" id="impM"></textarea><button class="admin-btn" id="impMBtn">■ ИМПОРТ</button>`; document.getElementById('expM').addEventListener('click',()=>{ navigator.clipboard.writeText(JSON.stringify(members,null,2)); }); document.getElementById('impMBtn').addEventListener('click',()=>{ try{ const d=JSON.parse(document.getElementById('impM').value); if(Array.isArray(d)){ members=d; db.ref('members').set(members); renderM(); } }catch(e){} }); }
+  function renderAD(){adminContent.innerHTML=`<button class="admin-btn" id="expM">■ ЭКСПОРТ</button><textarea class="admin-textarea" id="impM"></textarea><button class="admin-btn" id="impMBtn">■ ИМПОРТ</button>`;document.getElementById('expM').addEventListener('click',()=>{navigator.clipboard.writeText(JSON.stringify(members,null,2));});document.getElementById('impMBtn').addEventListener('click',()=>{try{const d=JSON.parse(document.getElementById('impM').value);if(Array.isArray(d)){members=d;db.ref('members').set(members);renderM();}}catch(e){}});}
 
   // RADIO, VAULT
-  document.getElementById('freqSlider')?.addEventListener('input', updateFreqDisplay);
-  document.getElementById('scanBtn')?.addEventListener('click',()=>{ let f=88; const iv=setInterval(()=>{ const s=document.getElementById('freqSlider'); s.value=f; updateFreqDisplay(); f+=0.5; if(f>150)clearInterval(iv); },60); });
+  document.getElementById('freqSlider')?.addEventListener('input',updateFreqDisplay);
+  document.getElementById('scanBtn')?.addEventListener('click',()=>{let f=88;const iv=setInterval(()=>{const s=document.getElementById('freqSlider');s.value=f;updateFreqDisplay();f+=0.5;if(f>150)clearInterval(iv);},60);});
+  document.querySelectorAll('.vault-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.vault-btn').forEach(x=>x.classList.remove('active-floor'));b.classList.add('active-floor');const img=document.getElementById('vaultImage');if(img)img.src=`vault_floor_${parseInt(b.dataset.floor)+1}.png`;});});
 
-  document.querySelectorAll('.vault-btn').forEach(b=>{ b.addEventListener('click',()=>{ document.querySelectorAll('.vault-btn').forEach(x=>x.classList.remove('active-floor')); b.classList.add('active-floor'); const img=document.getElementById('vaultImage'); if(img)img.src=`vault_floor_${parseInt(b.dataset.floor)+1}.png`; }); });
+  window.addEventListener('resize',()=>{loginParticlesCanvas.width=window.innerWidth;loginParticlesCanvas.height=window.innerHeight;});
 
   loadData();
-  runBoot();
   setAdmin(false);
 })();
 </script>
