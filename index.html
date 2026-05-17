@@ -1,393 +1,416 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>ТЕРМИНАЛ УБЕЖИЩА · О.И.Д.Л.</title>
-  
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  
-  <style>
-    :root {
-      --bg: #020503; --green: #11dd33; --green-light: #33ff33;
-      --green-dark: #0a2a0a; --glow: #00ff41; --red: #ff4444;
-      --orange: #ffaa00; --blue: #4488ff;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ТЕРМИНАЛ УБЕЖИЩА · О.И.Д.Л.</title>
 
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-    body {
-      background: #020503; min-height: 100vh; min-height: 100dvh;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Courier New', 'VT323', monospace;
-      position: relative; overflow-x: hidden;
-      user-select: none; -webkit-user-select: none;
-    }
+    <style>
+        :root {
+            --bg: #020503; --green: #11dd33; --green-light: #33ff33;
+            --green-dark: #0a2a0a; --glow: #00ff41; --red: #ff4444;
+            --orange: #ffaa00; --blue: #4488ff;
+        }
 
-    body::before {
-      content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: repeating-linear-gradient(0deg,
-          rgba(0,0,0,0.5) 0px, rgba(0,20,0,0.2) 3px,
-          rgba(0,255,0,0.02) 4px, transparent 5px);
-      pointer-events: none; z-index: 100; animation: scan 10s linear infinite; opacity: 0.7;
-    }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-    body.desktop { padding: 16px; }
-    body.desktop::after {
-      content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle at center, transparent 30%, rgba(0,30,0,0.25) 100%);
-      pointer-events: none; z-index: 99;
-    }
-    body.mobile { padding: 0; }
+        body {
+            background: #020503; min-height: 100vh; min-height: 100dvh;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Courier New', 'VT323', monospace;
+            position: relative; overflow-x: hidden;
+            user-select: none; -webkit-user-select: none;
+        }
 
-    @keyframes scan { 0% { background-position: 0 0; } 100% { background-position: 0 20px; } }
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg,
+                    rgba(0,0,0,0.5) 0px, rgba(0,20,0,0.2) 3px,
+                    rgba(0,255,0,0.02) 4px, transparent 5px);
+            pointer-events: none; z-index: 100; animation: scan 10s linear infinite; opacity: 0.7;
+        }
 
-    /* ============ АНИМИРОВАННЫЙ ЭКРАН ВХОДА ============ */
-    .login-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #020503; z-index: 200;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-    }
-    .login-overlay.hidden { display: none; }
+        body.desktop { padding: 16px; }
+        body.desktop::after {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 30%, rgba(0,30,0,0.25) 100%);
+            pointer-events: none; z-index: 99;
+        }
+        body.mobile { padding: 0; }
 
-    .login-particles {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: 199;
-    }
+        @keyframes scan { 0% { background-position: 0 0; } 100% { background-position: 0 20px; } }
 
-    .login-container-animated {
-      position: relative; z-index: 201;
-      width: 650px; max-width: 90%;
-      display: flex; flex-direction: column; align-items: center; gap: 25px;
-    }
+        /* ============ АНИМИРОВАННЫЙ ЭКРАН ВХОДА ============ */
+        .login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #020503; z-index: 200;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .login-overlay.hidden { display: none; }
 
-    .login-logo-icon {
-      font-size: 4rem; color: var(--green);
-      text-shadow: 0 0 40px var(--glow), 0 0 80px var(--glow);
-      animation: logoGlow 2s ease-in-out infinite, logoFloat 3s ease-in-out infinite;
-    }
-    @keyframes logoGlow {
-      0%,100%{text-shadow:0 0 40px var(--glow),0 0 80px var(--glow);}
-      50%{text-shadow:0 0 80px var(--glow),0 0 150px var(--glow);}
-    }
-    @keyframes logoFloat {
-      0%,100%{transform:translateY(0);}
-      50%{transform:translateY(-8px);}
-    }
+        .login-particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 199;
+        }
 
-    .login-logo-text {
-      font-size: 2.5rem; font-weight: bold; letter-spacing: 15px;
-      color: var(--green); text-shadow: 0 0 20px var(--glow);
-      animation: textFlicker 3s infinite;
-    }
-    @keyframes textFlicker {
-      0%,100%{opacity:1;} 92%{opacity:1;} 93%{opacity:0.3;} 94%{opacity:1;} 96%{opacity:0.4;} 97%{opacity:1;}
-    }
+        .login-container-animated {
+            position: relative; z-index: 201;
+            width: 650px; max-width: 90%;
+            display: flex; flex-direction: column; align-items: center; gap: 25px;
+        }
 
-    .login-terminal-window {
-      width: 100%; background: rgba(0,20,0,0.3);
-      border: 2px solid rgba(0,255,0,0.3); border-radius: 8px;
-      box-shadow: 0 0 30px rgba(0,255,0,0.15), inset 0 0 30px rgba(0,0,0,0.5);
-      padding: 20px; position: relative; overflow: hidden;
-    }
+        .login-logo-icon {
+            font-size: 4rem; color: var(--green);
+            text-shadow: 0 0 40px var(--glow), 0 0 80px var(--glow);
+            animation: logoGlow 2s ease-in-out infinite, logoFloat 3s ease-in-out infinite;
+        }
+        @keyframes logoGlow {
+            0%,100%{text-shadow:0 0 40px var(--glow),0 0 80px var(--glow);}
+            50%{text-shadow:0 0 80px var(--glow),0 0 150px var(--glow);}
+        }
+        @keyframes logoFloat {
+            0%,100%{transform:translateY(0);}
+            50%{transform:translateY(-8px);}
+        }
 
-    .login-code-lines {
-      min-height: 140px; color: var(--green); font-size: 0.8rem;
-      line-height: 1.6; margin-bottom: 15px; max-height: 200px; overflow-y: auto;
-    }
+        .login-logo-text {
+            font-size: 2.5rem; font-weight: bold; letter-spacing: 15px;
+            color: var(--green); text-shadow: 0 0 20px var(--glow);
+            animation: textFlicker 3s infinite;
+        }
+        @keyframes textFlicker {
+            0%,100%{opacity:1;} 92%{opacity:1;} 93%{opacity:0.3;} 94%{opacity:1;} 96%{opacity:0.4;} 97%{opacity:1;}
+        }
 
-    .login-code-line {
-      opacity: 0; transform: translateY(10px); transition: all 0.3s ease;
-    }
-    .login-code-line.visible { opacity: 1; transform: translateY(0); }
+        .login-terminal-window {
+            width: 100%; background: rgba(0,20,0,0.3);
+            border: 2px solid rgba(0,255,0,0.3); border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0,255,0,0.15), inset 0 0 30px rgba(0,0,0,0.5);
+            padding: 20px; position: relative; overflow: hidden;
+        }
 
-    .code-bracket { color: #ffaa00; }
-    .code-string { color: #66ccff; }
-    .code-number { color: #ff6644; }
-    .code-keyword { color: #ff44ff; }
-    .code-comment { color: #336633; }
-    .code-success { color: #44ff44; }
+        .login-code-lines {
+            min-height: 140px; color: var(--green); font-size: 0.8rem;
+            line-height: 1.6; margin-bottom: 15px; max-height: 200px; overflow-y: auto;
+        }
 
-    .login-progress-container { margin: 15px 0; }
-    .login-progress-label {
-      display: flex; justify-content: space-between; color: #0a5a0a;
-      font-size: 0.65rem; margin-bottom: 4px; letter-spacing: 3px;
-    }
-    .login-progress-bar {
-      height: 4px; background: #0a1a0a; border-radius: 2px; overflow: hidden;
-    }
-    .login-progress-fill {
-      height: 100%; background: var(--green); box-shadow: 0 0 15px var(--glow);
-      width: 0%; transition: width 0.1s linear;
-    }
-    .login-progress-percent {
-      text-align: right; color: var(--green); font-size: 0.7rem; margin-top: 2px;
-    }
+        .login-code-line {
+            opacity: 0; transform: translateY(10px); transition: all 0.3s ease;
+        }
+        .login-code-line.visible { opacity: 1; transform: translateY(0); }
 
-    .login-form-container {
-      display: none; margin-top: 15px;
-    }
-    .login-form-container.visible { display: block; animation: fadeIn 0.5s ease; }
+        .code-bracket { color: #ffaa00; }
+        .code-string { color: #66ccff; }
+        .code-number { color: #ff6644; }
+        .code-keyword { color: #ff44ff; }
+        .code-comment { color: #336633; }
+        .code-success { color: #44ff44; }
 
-    @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+        .login-progress-container { margin: 15px 0; }
+        .login-progress-label {
+            display: flex; justify-content: space-between; color: #0a5a0a;
+            font-size: 0.65rem; margin-bottom: 4px; letter-spacing: 3px;
+        }
+        .login-progress-bar {
+            height: 4px; background: #0a1a0a; border-radius: 2px; overflow: hidden;
+        }
+        .login-progress-fill {
+            height: 100%; background: var(--green); box-shadow: 0 0 15px var(--glow);
+            width: 0%; transition: width 0.1s linear;
+        }
+        .login-progress-percent {
+            text-align: right; color: var(--green); font-size: 0.7rem; margin-top: 2px;
+        }
 
-    .login-field { margin-bottom: 15px; }
-    .login-label { color: #4fa84f; display: block; margin-bottom: 4px; font-size: 0.8rem; }
-    .login-select, .login-input {
-      width: 100%; background: #0a1a0a; border: 2px solid #1a4a1a;
-      color: #88cc88; padding: 12px; font-family: 'Courier New', monospace;
-      font-size: 1rem; outline: none;
-    }
-    .login-select option { background: #0a1a0a; color: #88cc88; }
+        .login-form-container {
+            display: none; margin-top: 15px;
+        }
+        .login-form-container.visible { display: block; animation: fadeIn 0.5s ease; }
 
-    .login-submit-btn {
-      width: 100%; padding: 14px; background: rgba(0,40,0,0.5);
-      border: 2px solid var(--green); color: var(--green);
-      font-family: 'Courier New', monospace; font-size: 1rem;
-      letter-spacing: 4px; cursor: pointer; text-transform: uppercase;
-      text-shadow: 0 0 10px var(--glow);
-      transition: all 0.3s ease;
-    }
-    .login-submit-btn:hover {
-      background: rgba(0,60,0,0.7); box-shadow: 0 0 40px var(--glow);
-    }
-    .guest-btn-animated {
-      background: rgba(20,20,0,0.5); border-color: #aaaa44; color: #cccc44;
-      margin-top: 8px;
-    }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
 
-    .login-glitch-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: 202; opacity: 0;
-      background: rgba(0,255,0,0.05); transition: opacity 0.1s ease;
-    }
-    .login-glitch-overlay.active { opacity: 1; }
+        .login-field { margin-bottom: 15px; }
+        .login-label { color: #4fa84f; display: block; margin-bottom: 4px; font-size: 0.8rem; }
+        .login-select, .login-input {
+            width: 100%; background: #0a1a0a; border: 2px solid #1a4a1a;
+            color: #88cc88; padding: 12px; font-family: 'Courier New', monospace;
+            font-size: 1rem; outline: none;
+        }
+        .login-select option { background: #0a1a0a; color: #88cc88; }
 
-    /* ============ ОСНОВНОЙ САЙТ (ВСЁ ОСТАЛЬНОЕ) ============ */
-    .terminal {
-      background-color: #0b1c0e; display: flex; flex-direction: column;
-      position: relative; z-index: 20;
-    }
-    body.desktop .terminal {
-      max-width: 1100px; width: 100%; border: 4px solid #1a3a1e;
-      box-shadow: 0 0 0 2px #0d2b10, 0 0 20px #00aa33 inset, 0 0 30px rgba(0,255,80,0.3);
-      border-radius: 12px 12px 20px 20px; padding: 0 0 6px 0;
-    }
-    body.mobile .terminal { width: 100%; min-height: 100vh; border: none; }
+        .login-submit-btn {
+            width: 100%; padding: 14px; background: rgba(0,40,0,0.5);
+            border: 2px solid var(--green); color: var(--green);
+            font-family: 'Courier New', monospace; font-size: 1rem;
+            letter-spacing: 4px; cursor: pointer; text-transform: uppercase;
+            text-shadow: 0 0 10px var(--glow);
+            transition: all 0.3s ease;
+        }
+        .login-submit-btn:hover {
+            background: rgba(0,60,0,0.7); box-shadow: 0 0 40px var(--glow);
+        }
+        .guest-btn-animated {
+            background: rgba(20,20,0,0.5); border-color: #aaaa44; color: #cccc44;
+            margin-top: 8px;
+        }
 
-    .terminal-header {
-      background: #0a170a; border-bottom: 2px solid #1a4c1a;
-      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-    }
-    body.desktop .terminal-header { padding: 8px 16px 4px 16px; border-radius: 8px 8px 0 0; }
-    body.mobile .terminal-header { padding: 14px 16px; }
+        .login-glitch-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 202; opacity: 0;
+            background: rgba(0,255,0,0.05); transition: opacity 0.1s ease;
+        }
+        .login-glitch-overlay.active { opacity: 1; }
 
-    .terminal-header-left { display: flex; gap: 8px; }
-    body.desktop .terminal-header-left { gap: 12px; }
-    .led { border-radius: 50%; background: #1d3b1d; box-shadow: 0 0 5px #00aa00; border: 1px solid #2f6b2f; }
-    body.desktop .led { width: 14px; height: 14px; }
-    body.mobile .led { width: 10px; height: 10px; }
-    .led.active { background: #33ff33; box-shadow: 0 0 12px #33ff66; animation: pulseLed 2s infinite; }
-    @keyframes pulseLed { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+        /* ============ ОСНОВНОЙ САЙТ ============ */
+        .terminal {
+            background-color: #0b1c0e; display: flex; flex-direction: column;
+            position: relative; z-index: 20;
+        }
+        body.desktop .terminal {
+            max-width: 1100px; width: 100%; border: 4px solid #1a3a1e;
+            box-shadow: 0 0 0 2px #0d2b10, 0 0 20px #00aa33 inset, 0 0 30px rgba(0,255,80,0.3);
+            border-radius: 12px 12px 20px 20px; padding: 0 0 6px 0;
+        }
+        body.mobile .terminal { width: 100%; min-height: 100vh; border: none; }
 
-    .terminal-header-center {
-      font-weight: bold; letter-spacing: 5px; color: #1f8a1f;
-      text-shadow: 0 0 8px #4aff4a; font-family: 'VT323', monospace;
-    }
-    body.desktop .terminal-header-center { font-size: 1.6rem; letter-spacing: 8px; padding: 0 24px; border-left: 2px solid #1f4f1f; border-right: 2px solid #1f4f1f; }
-    body.mobile .terminal-header-center { font-size: 1.2rem; }
+        .terminal-header {
+            background: #0a170a; border-bottom: 2px solid #1a4c1a;
+            display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+        }
+        body.desktop .terminal-header { padding: 8px 16px 4px 16px; border-radius: 8px 8px 0 0; }
+        body.mobile .terminal-header { padding: 14px 16px; }
 
-    .terminal-header-right { display: flex; align-items: center; gap: 8px; }
+        .terminal-header-left { display: flex; gap: 8px; }
+        body.desktop .terminal-header-left { gap: 12px; }
+        .led { border-radius: 50%; background: #1d3b1d; box-shadow: 0 0 5px #00aa00; border: 1px solid #2f6b2f; }
+        body.desktop .led { width: 14px; height: 14px; }
+        body.mobile .led { width: 10px; height: 10px; }
+        .led.active { background: #33ff33; box-shadow: 0 0 12px #33ff66; animation: pulseLed 2s infinite; }
+        @keyframes pulseLed { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
 
-    .user-indicator {
-      color: #ffaa00; font-size: 0.8rem; border: 1px solid #ffaa00;
-      padding: 3px 8px; display: none;
-    }
-    .user-indicator.show { display: inline-block; }
-    .caps-indicator {
-      color: #ffaa00; font-size: 0.8rem; border: 1px solid #ffaa00;
-      padding: 3px 8px; display: none;
-    }
-    .caps-indicator.show { display: inline-block; }
+        .terminal-header-center {
+            font-weight: bold; letter-spacing: 5px; color: #1f8a1f;
+            text-shadow: 0 0 8px #4aff4a; font-family: 'VT323', monospace;
+        }
+        body.desktop .terminal-header-center { font-size: 1.6rem; letter-spacing: 8px; padding: 0 24px; border-left: 2px solid #1f4f1f; border-right: 2px solid #1f4f1f; }
+        body.mobile .terminal-header-center { font-size: 1.2rem; }
 
-    .admin-access-btn {
-      background: #1a0000; border: 2px solid #ff4444; color: #ff4444;
-      font-family: 'Courier New', monospace; cursor: pointer; position: relative;
-      animation: pulseRed 2s infinite; display: none; text-transform: uppercase;
-    }
-    .admin-access-btn.visible { display: inline-block; }
-    body.desktop .admin-access-btn { font-size: 0.9rem; padding: 5px 10px; }
-    body.mobile .admin-access-btn { font-size: 0.8rem; padding: 8px 12px; }
-    @keyframes pulseRed { 0%,100%{box-shadow:0 0 4px #ff4444;} 50%{box-shadow:0 0 12px #ff4444;} }
+        .terminal-header-right { display: flex; align-items: center; gap: 8px; }
 
-    .app-badge {
-      position: absolute; top: -8px; right: -8px;
-      background: #ff4444; color: #fff; font-size: 0.6rem;
-      width: 16px; height: 16px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; font-weight: bold; display: none;
-    }
-    .app-badge.show { display: flex; }
+        .user-indicator {
+            color: #ffaa00; font-size: 0.8rem; border: 1px solid #ffaa00;
+            padding: 3px 8px; display: none;
+        }
+        .user-indicator.show { display: inline-block; }
+        .caps-indicator {
+            color: #ffaa00; font-size: 0.8rem; border: 1px solid #ffaa00;
+            padding: 3px 8px; display: none;
+        }
+        .caps-indicator.show { display: inline-block; }
 
-    .logout-btn {
-      background: #1a0000; border: 1px solid #ffaa00; color: #ffaa00;
-      font-family: 'Courier New', monospace; font-size: 0.75rem;
-      padding: 3px 8px; cursor: pointer; display: none;
-    }
-    .logout-btn.show { display: inline-block; }
+        .admin-access-btn {
+            background: #1a0000; border: 2px solid #ff4444; color: #ff4444;
+            font-family: 'Courier New', monospace; cursor: pointer; position: relative;
+            animation: pulseRed 2s infinite; display: none; text-transform: uppercase;
+        }
+        .admin-access-btn.visible { display: inline-block; }
+        body.desktop .admin-access-btn { font-size: 0.9rem; padding: 5px 10px; }
+        body.mobile .admin-access-btn { font-size: 0.8rem; padding: 8px 12px; }
+        @keyframes pulseRed { 0%,100%{box-shadow:0 0 4px #ff4444;} 50%{box-shadow:0 0 12px #ff4444;} }
 
-    .screen {
-      color: #11dd33; text-shadow: 0 0 6px #19f019; background: #0a130a;
-      font-size: 1rem; line-height: 1.4; position: relative; flex: 1;
-      overflow-y: auto; -webkit-overflow-scrolling: touch;
-    }
-    body.desktop .screen { padding: 28px 24px 20px 24px; font-size: 1.2rem; min-height: 500px; border-left: 2px solid #153015; border-right: 2px solid #153015; border-bottom: 2px solid #1c3b1c; box-shadow: inset 0 0 40px #000, inset 0 0 15px #021002; }
-    body.mobile .screen { padding: 20px 14px; box-shadow: inset 0 0 30px #000; }
+        .app-badge {
+            position: absolute; top: -8px; right: -8px;
+            background: #ff4444; color: #fff; font-size: 0.6rem;
+            width: 16px; height: 16px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: bold; display: none;
+        }
+        .app-badge.show { display: flex; }
 
-    .robco-banner { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed #2f6e2f; padding-bottom: 8px; margin-bottom: 16px; flex-wrap: wrap; gap: 4px; font-size: 0.85rem; }
+        .logout-btn {
+            background: #1a0000; border: 1px solid #ffaa00; color: #ffaa00;
+            font-family: 'Courier New', monospace; font-size: 0.75rem;
+            padding: 3px 8px; cursor: pointer; display: none;
+        }
+        .logout-btn.show { display: inline-block; }
 
-    .clan-status { display: flex; gap: 10px; margin-bottom: 20px; background: #041204; padding: 10px; border: 1px solid #1a551a; flex-wrap: wrap; align-items: center; }
-    body.desktop .clan-status { font-size: 1.1rem; gap: 18px; padding: 8px 14px; margin-bottom: 28px; }
+        .screen {
+            color: #11dd33; text-shadow: 0 0 6px #19f019; background: #0a130a;
+            font-size: 1rem; line-height: 1.4; position: relative; flex: 1;
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
+        }
+        body.desktop .screen { padding: 28px 24px 20px 24px; font-size: 1.2rem; min-height: 500px; border-left: 2px solid #153015; border-right: 2px solid #153015; border-bottom: 2px solid #1c3b1c; box-shadow: inset 0 0 40px #000, inset 0 0 15px #021002; }
+        body.mobile .screen { padding: 20px 14px; box-shadow: inset 0 0 30px #000; }
 
-    .status-item { display: flex; align-items: center; gap: 6px; }
-    .status-label { color: #70db70; }
-    .status-value { color: #9eff9e; font-weight: bold; }
+        .robco-banner { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed #2f6e2f; padding-bottom: 8px; margin-bottom: 16px; flex-wrap: wrap; gap: 4px; font-size: 0.85rem; }
 
-    .nav-menu { display: flex; flex-wrap: wrap; border: 1px solid #286828; background: #051005; margin-bottom: 20px; }
-    .nav-item { text-align: center; color: #3db83d; text-transform: uppercase; border: 1px solid #1b411b; cursor: pointer; font-weight: bold; letter-spacing: 1px; background: #081708; text-decoration: none; }
-    body.desktop .nav-item { flex: 1; padding: 12px 4px; font-size: 0.75rem; }
-    body.mobile .nav-item { flex: 1 1 25%; padding: 12px 4px; font-size: 0.65rem; }
-    .nav-item:hover { background: #143314; color: #a0ffa0; }
-    .nav-item.active { background: #1f461f; color: #c6ffc6; border-bottom: 3px solid #33bb33; }
+        .clan-status { display: flex; gap: 10px; margin-bottom: 20px; background: #041204; padding: 10px; border: 1px solid #1a551a; flex-wrap: wrap; align-items: center; }
+        body.desktop .clan-status { font-size: 1.1rem; gap: 18px; padding: 8px 14px; margin-bottom: 28px; }
 
-    .content-pane.hidden { display: none; }
+        .status-item { display: flex; align-items: center; gap: 6px; }
+        .status-label { color: #70db70; }
+        .status-value { color: #9eff9e; font-weight: bold; }
 
-    .data-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
-    .data-table th { text-align: left; padding: 8px 4px; color: #56d656; border-bottom: 1px solid #216321; font-size: 0.75rem; }
-    .data-table td { padding: 8px 4px; border-bottom: 1px dotted #1c541c; color: #b2f5b2; }
-    body.mobile .data-table td { padding: 12px 6px; }
-    .data-table tbody tr { cursor: pointer; }
-    .data-table tbody tr:active { background: #1a3a1a; }
+        .nav-menu { display: flex; flex-wrap: wrap; border: 1px solid #286828; background: #051005; margin-bottom: 20px; }
+        .nav-item { text-align: center; color: #3db83d; text-transform: uppercase; border: 1px solid #1b411b; cursor: pointer; font-weight: bold; letter-spacing: 1px; background: #081708; text-decoration: none; }
+        body.desktop .nav-item { flex: 1; padding: 12px 4px; font-size: 0.7rem; }
+        body.mobile .nav-item { flex: 1 1 22%; padding: 10px 2px; font-size: 0.6rem; }
+        .nav-item:hover { background: #143314; color: #a0ffa0; }
+        .nav-item.active { background: #1f461f; color: #c6ffc6; border-bottom: 3px solid #33bb33; }
 
-    .drone-card { border: 2px solid #2a6b2a; background: #0a1a0a; padding: 14px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 0 15px #000; flex-wrap: wrap; gap: 10px; }
-    body.mobile .drone-card { flex-direction: column; align-items: flex-start; }
-    .drone-info { flex: 1; }
-    .drone-name { color: #5fff5f; font-family: 'VT323', monospace; letter-spacing: 2px; font-size: 1.1rem; }
-    .drone-status { color: #8dc98d; font-size: 0.85rem; margin-top: 3px; }
-    .drone-health { margin-top: 5px; }
-    .drone-health-bar { height: 8px; background: #1a3a1a; border: 1px solid #2a5a2a; margin-top: 3px; width: 100%; }
-    .drone-health-fill { height: 100%; background: #33ff33; }
-    .drone-health-fill.warning { background: #ffaa00; }
-    .drone-health-fill.danger { background: #ff4444; }
-    .drone-btn { background: #0a1d0a; border: 1px solid #278027; color: #66dd66; padding: 8px 12px; font-family: inherit; font-size: 0.85rem; text-transform: uppercase; cursor: pointer; }
-    .drone-btn.diag-btn { border-color: #44aaff; color: #44aaff; }
-    .diagnostic-log { border: 1px solid #33bb33; background: #051005; padding: 12px; margin-top: 16px; min-height: 80px; color: #b6fbb6; font-size: 0.85rem; white-space: pre-wrap; }
+        .content-pane.hidden { display: none; }
 
-    .application-form { border: 2px solid #ffaa00; padding: 16px; background: #0a1a0a; margin: 12px 0; }
-    .app-field { margin-bottom: 10px; }
-    .app-label { color: #ffcc66; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 2px; display: block; }
-    .app-input, .app-textarea { width: 100%; background: #0b1f0b; border: 2px solid #ffaa00; color: #ffcc88; padding: 8px 10px; font-family: 'Courier New', monospace; font-size: 0.9rem; outline: none; }
-    .app-textarea { resize: vertical; min-height: 60px; }
-    .app-submit { background: #1a0a00; border: 2px solid #ffaa00; color: #ffaa00; padding: 12px 24px; font-family: inherit; font-size: 1rem; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 8px; }
+        .data-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+        .data-table th { text-align: left; padding: 8px 4px; color: #56d656; border-bottom: 1px solid #216321; font-size: 0.75rem; }
+        .data-table td { padding: 8px 4px; border-bottom: 1px dotted #1c541c; color: #b2f5b2; }
+        body.mobile .data-table td { padding: 12px 6px; }
+        .data-table tbody tr { cursor: pointer; }
+        .data-table tbody tr:active { background: #1a3a1a; }
 
-    .event-card { border: 2px solid #4488ff; background: #0a1a2a; padding: 12px; margin: 8px 0; }
-    .event-date { color: #88aaff; font-size: 0.85rem; }
-    .event-title { color: #aaccff; font-size: 1.1rem; font-family: 'VT323', monospace; }
-    .event-desc { color: #8899cc; font-size: 0.85rem; margin-top: 4px; }
+        .drone-card { border: 2px solid #2a6b2a; background: #0a1a0a; padding: 14px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 0 15px #000; flex-wrap: wrap; gap: 10px; }
+        body.mobile .drone-card { flex-direction: column; align-items: flex-start; }
+        .drone-info { flex: 1; }
+        .drone-name { color: #5fff5f; font-family: 'VT323', monospace; letter-spacing: 2px; font-size: 1.1rem; }
+        .drone-status { color: #8dc98d; font-size: 0.85rem; margin-top: 3px; }
+        .drone-health { margin-top: 5px; }
+        .drone-health-bar { height: 8px; background: #1a3a1a; border: 1px solid #2a5a2a; margin-top: 3px; width: 100%; }
+        .drone-health-fill { height: 100%; background: #33ff33; }
+        .drone-health-fill.warning { background: #ffaa00; }
+        .drone-health-fill.danger { background: #ff4444; }
+        .drone-btn { background: #0a1d0a; border: 1px solid #278027; color: #66dd66; padding: 8px 12px; font-family: inherit; font-size: 0.85rem; text-transform: uppercase; cursor: pointer; }
+        .drone-btn.diag-btn { border-color: #44aaff; color: #44aaff; }
+        .diagnostic-log { border: 1px solid #33bb33; background: #051005; padding: 12px; margin-top: 16px; min-height: 80px; color: #b6fbb6; font-size: 0.85rem; white-space: pre-wrap; }
 
-    .mail-tabs { display: flex; gap: 4px; margin-bottom: 12px; }
-    .mail-tab { background: #0a1a2a; border: 1px solid #44aaff; color: #88aaff; padding: 8px 14px; cursor: pointer; font-family: inherit; font-size: 0.8rem; text-transform: uppercase; }
-    .mail-tab.active { background: #1a3a5a; color: #44aaff; border-bottom: 3px solid #44aaff; }
+        .application-form { border: 2px solid #ffaa00; padding: 16px; background: #0a1a0a; margin: 12px 0; }
+        .app-field { margin-bottom: 10px; }
+        .app-label { color: #ffcc66; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 2px; display: block; }
+        .app-input, .app-textarea { width: 100%; background: #0b1f0b; border: 2px solid #ffaa00; color: #ffcc88; padding: 8px 10px; font-family: 'Courier New', monospace; font-size: 0.9rem; outline: none; }
+        .app-textarea { resize: vertical; min-height: 60px; }
+        .app-submit { background: #1a0a00; border: 2px solid #ffaa00; color: #ffaa00; padding: 12px 24px; font-family: inherit; font-size: 1rem; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 8px; }
 
-    .mail-card { border: 2px solid #44aaff; background: #0a1a2a; padding: 12px; margin: 8px 0; cursor: pointer; }
-    .mail-card.unread { border-color: #88ccff; box-shadow: 0 0 8px rgba(68,170,255,0.3); }
-    .mail-from { color: #88aaff; font-size: 0.8rem; }
-    .mail-subject { color: #aaccff; font-size: 1rem; }
-    .mail-date { color: #667799; font-size: 0.75rem; }
+        .event-card { border: 2px solid #4488ff; background: #0a1a2a; padding: 12px; margin: 8px 0; }
+        .event-date { color: #88aaff; font-size: 0.85rem; }
+        .event-title { color: #aaccff; font-size: 1.1rem; font-family: 'VT323', monospace; }
+        .event-desc { color: #8899cc; font-size: 0.85rem; margin-top: 4px; }
 
-    .profile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 300; display: flex; align-items: center; justify-content: center; }
-    .profile-overlay.hidden { display: none; }
+        .mail-tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+        .mail-tab { background: #0a1a2a; border: 1px solid #44aaff; color: #88aaff; padding: 8px 14px; cursor: pointer; font-family: inherit; font-size: 0.8rem; text-transform: uppercase; }
+        .mail-tab.active { background: #1a3a5a; color: #44aaff; border-bottom: 3px solid #44aaff; }
 
-    .profile-window { background: #0b1c0e; border: 3px solid #2a6b2a; padding: 20px 16px; width: 95%; max-height: 85vh; overflow-y: auto; }
-    body.desktop .profile-window { max-width: 600px; }
-    .profile-header { border-bottom: 2px solid #1f5a1f; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-    .profile-name { font-size: 1.5rem; color: #5fff5f; text-transform: uppercase; letter-spacing: 2px; font-family: 'VT323', monospace; }
-    .profile-role { color: #8dc98d; font-size: 1rem; }
-    .profile-close { background: none; border: 2px solid #33aa33; color: #33ff33; font-size: 1.5rem; width: 44px; height: 44px; cursor: pointer; text-align: center; line-height: 40px; }
+        .mail-card { border: 2px solid #44aaff; background: #0a1a2a; padding: 12px; margin: 8px 0; cursor: pointer; }
+        .mail-card.unread { border-color: #88ccff; box-shadow: 0 0 8px rgba(68,170,255,0.3); }
+        .mail-from { color: #88aaff; font-size: 0.8rem; }
+        .mail-subject { color: #aaccff; font-size: 1rem; }
+        .mail-date { color: #667799; font-size: 0.75rem; }
 
-    .profile-section { margin-bottom: 12px; border-left: 2px solid #2a5a2a; padding-left: 12px; }
-    .profile-label { color: #4fcb4f; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-    .profile-text { color: #b6fbb6; line-height: 1.5; font-size: 0.9rem; white-space: pre-wrap; }
-    .profile-divider { border: none; border-top: 1px dashed #1f4f1f; margin: 10px 0; }
+        .chat-msg {
+            margin: 6px 0; padding: 6px 10px; border-radius: 4px;
+            max-width: 85%; word-wrap: break-word;
+        }
+        .chat-msg.mine {
+            background: #0a2a0a; border-left: 3px solid #44ff44;
+            margin-left: auto; text-align: right; color: #88ff88;
+        }
+        .chat-msg.their {
+            background: #0a0a2a; border-left: 3px solid #4488ff;
+            margin-right: auto; text-align: left; color: #88aaff;
+        }
+        .chat-msg .msg-sender { font-size: 0.65rem; color: #666; margin-bottom: 2px; }
+        .chat-msg .msg-time { font-size: 0.6rem; color: #444; margin-top: 2px; }
+        .chat-msg .msg-text { font-size: 0.85rem; }
 
-    .command-line { display: flex; align-items: center; gap: 6px; margin-top: 16px; border-top: 1px solid #1d531d; padding-top: 12px; }
-    .command-input { background: transparent; border: none; color: #33ff33; font-family: 'Courier New', monospace; outline: none; flex: 1; font-size: 1rem; }
+        .profile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 300; display: flex; align-items: center; justify-content: center; }
+        .profile-overlay.hidden { display: none; }
 
-    .cursor-blink { display: inline-block; background: #22dd22; animation: blink 1s step-end infinite; width: 8px; height: 14px; margin-left: 4px; }
-    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+        .profile-window { background: #0b1c0e; border: 3px solid #2a6b2a; padding: 20px 16px; width: 95%; max-height: 85vh; overflow-y: auto; }
+        body.desktop .profile-window { max-width: 600px; }
+        .profile-header { border-bottom: 2px solid #1f5a1f; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .profile-name { font-size: 1.5rem; color: #5fff5f; text-transform: uppercase; letter-spacing: 2px; font-family: 'VT323', monospace; }
+        .profile-role { color: #8dc98d; font-size: 1rem; }
+        .profile-close { background: none; border: 2px solid #33aa33; color: #33ff33; font-size: 1.5rem; width: 44px; height: 44px; cursor: pointer; text-align: center; line-height: 40px; }
 
-    .admin-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 400; display: flex; align-items: center; justify-content: center; }
-    .admin-panel.hidden { display: none; }
+        .profile-section { margin-bottom: 12px; border-left: 2px solid #2a5a2a; padding-left: 12px; }
+        .profile-label { color: #4fcb4f; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .profile-text { color: #b6fbb6; line-height: 1.5; font-size: 0.9rem; white-space: pre-wrap; }
+        .profile-divider { border: none; border-top: 1px dashed #1f4f1f; margin: 10px 0; }
 
-    .admin-window { background: #0b1c0e; border: 2px solid #ff4444; overflow-y: auto; }
-    body.desktop .admin-window { max-width: 750px; width: 95%; max-height: 90vh; padding: 25px 30px; border-width: 3px; }
-    body.mobile .admin-window { width: 100%; height: 100%; padding: 20px 14px; }
+        .command-line { display: flex; align-items: center; gap: 6px; margin-top: 16px; border-top: 1px solid #1d531d; padding-top: 12px; }
+        .command-input { background: transparent; border: none; color: #33ff33; font-family: 'Courier New', monospace; outline: none; flex: 1; font-size: 1rem; }
 
-    .admin-header { border-bottom: 2px solid #ff4444; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-    .admin-title { font-size: 1.4rem; color: #ff4444; text-transform: uppercase; letter-spacing: 3px; font-family: 'VT323', monospace; }
-    .admin-close { background: none; border: 2px solid #ff4444; color: #ff4444; font-size: 1.5rem; width: 44px; height: 44px; cursor: pointer; text-align: center; line-height: 40px; }
+        .cursor-blink { display: inline-block; background: #22dd22; animation: blink 1s step-end infinite; width: 8px; height: 14px; margin-left: 4px; }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
 
-    .admin-input { width: 100%; background: #0b1f0b; border: 2px solid #ff4444; color: #ff8888; padding: 10px; font-family: 'Courier New', monospace; font-size: 0.95rem; outline: none; margin: 5px 0; }
-    .admin-textarea { width: 100%; background: #0b1f0b; border: 2px solid #ff4444; color: #ff8888; padding: 10px; font-family: 'Courier New', monospace; font-size: 0.9rem; outline: none; margin: 5px 0; resize: vertical; min-height: 80px; }
+        .admin-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 400; display: flex; align-items: center; justify-content: center; }
+        .admin-panel.hidden { display: none; }
 
-    .admin-btn { background: #1a0000; border: 2px solid #ff4444; color: #ff6666; padding: 10px 16px; font-family: inherit; font-size: 0.9rem; text-transform: uppercase; cursor: pointer; margin: 4px; }
-    .admin-btn.save-btn { border-color: #44ff44; color: #44ff44; background: #001a00; width: 100%; }
+        .admin-window { background: #0b1c0e; border: 2px solid #ff4444; overflow-y: auto; }
+        body.desktop .admin-window { max-width: 750px; width: 95%; max-height: 90vh; padding: 25px 30px; border-width: 3px; }
+        body.mobile .admin-window { width: 100%; height: 100%; padding: 20px 14px; }
 
-    .admin-member-list { max-height: 200px; overflow-y: auto; border: 1px solid #ff4444; padding: 8px; margin: 8px 0; }
-    .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 6px; border-bottom: 1px dotted #552222; color: #ffaaaa; font-size: 0.9rem; flex-wrap: wrap; gap: 4px; }
-    .admin-list-item button { background: #330000; border: 1px solid #ff4444; color: #ff4444; padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 0.8rem; margin-left: 3px; }
+        .admin-header { border-bottom: 2px solid #ff4444; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .admin-title { font-size: 1.4rem; color: #ff4444; text-transform: uppercase; letter-spacing: 3px; font-family: 'VT323', monospace; }
+        .admin-close { background: none; border: 2px solid #ff4444; color: #ff4444; font-size: 1.5rem; width: 44px; height: 44px; cursor: pointer; text-align: center; line-height: 40px; }
 
-    .admin-tabs { display: flex; gap: 3px; margin-bottom: 12px; flex-wrap: wrap; }
-    .admin-tab { background: #1a0000; border: 1px solid #ff4444; color: #ff8888; padding: 8px 10px; cursor: pointer; font-family: inherit; text-transform: uppercase; font-size: 0.7rem; }
-    .admin-tab.active { background: #330000; color: #ff4444; border-bottom: 3px solid #ff4444; }
+        .admin-input { width: 100%; background: #0b1f0b; border: 2px solid #ff4444; color: #ff8888; padding: 10px; font-family: 'Courier New', monospace; font-size: 0.95rem; outline: none; margin: 5px 0; }
+        .admin-textarea { width: 100%; background: #0b1f0b; border: 2px solid #ff4444; color: #ff8888; padding: 10px; font-family: 'Courier New', monospace; font-size: 0.9rem; outline: none; margin: 5px 0; resize: vertical; min-height: 80px; }
 
-    .resource-slider { width: 100%; margin: 8px 0; height: 20px; -webkit-appearance: none; background: #1a0000; border: 2px solid #ff4444; border-radius: 10px; }
-    .resource-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: #ff4444; border-radius: 50%; cursor: pointer; }
+        .admin-btn { background: #1a0000; border: 2px solid #ff4444; color: #ff6666; padding: 10px 16px; font-family: inherit; font-size: 0.9rem; text-transform: uppercase; cursor: pointer; margin: 4px; }
+        .admin-btn.save-btn { border-color: #44ff44; color: #44ff44; background: #001a00; width: 100%; }
 
-    .map-container { border: 2px solid #2a6b2a; padding: 8px; background: #0a1a0a; margin: 12px 0; text-align: center; }
-    .map-image { max-width: 100%; height: auto; border: 1px solid #1f4f1f; filter: sepia(1) hue-rotate(70deg) saturate(1.5) brightness(0.9); }
+        .admin-member-list { max-height: 200px; overflow-y: auto; border: 1px solid #ff4444; padding: 8px; margin: 8px 0; }
+        .admin-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 6px; border-bottom: 1px dotted #552222; color: #ffaaaa; font-size: 0.9rem; flex-wrap: wrap; gap: 4px; }
+        .admin-list-item button { background: #330000; border: 1px solid #ff4444; color: #ff4444; padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 0.8rem; margin-left: 3px; }
 
-    .vault-controls { display: flex; gap: 6px; margin: 12px 0; flex-wrap: wrap; }
-    .vault-btn { background: #0a1d0a; border: 1px solid #278027; color: #66dd66; padding: 10px 14px; font-family: inherit; font-size: 0.9rem; cursor: pointer; }
-    body.mobile .vault-btn { flex: 1; padding: 14px; font-size: 1rem; }
-    .vault-btn.active-floor { background: #1f461f; border-color: #33bb33; color: #c6ffc6; }
+        .admin-tabs { display: flex; gap: 3px; margin-bottom: 12px; flex-wrap: wrap; }
+        .admin-tab { background: #1a0000; border: 1px solid #ff4444; color: #ff8888; padding: 8px 10px; cursor: pointer; font-family: inherit; text-transform: uppercase; font-size: 0.7rem; }
+        .admin-tab.active { background: #330000; color: #ff4444; border-bottom: 3px solid #ff4444; }
 
-    .radio-tuner { border: 2px solid #2a6b2a; padding: 14px; background: #0a1a0a; margin: 12px 0; }
-    .freq-display { font-size: 1.6rem; color: #9eff9e; text-align: center; font-family: 'VT323', monospace; letter-spacing: 3px; margin: 8px 0; }
-    .freq-slider { width: 100%; margin: 10px 0; height: 16px; -webkit-appearance: none; background: #0a1a0a; border: 2px solid #278027; border-radius: 10px; }
-    .freq-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; background: #33ff33; border-radius: 50%; cursor: pointer; }
-    .intercept-message { background: #051005; padding: 12px; margin: 10px 0; border-left: 3px solid #33bb33; min-height: 50px; color: #b6fbb6; font-size: 0.9rem; }
+        .resource-slider { width: 100%; margin: 8px 0; height: 20px; -webkit-appearance: none; background: #1a0000; border: 2px solid #ff4444; border-radius: 10px; }
+        .resource-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: #ff4444; border-radius: 50%; cursor: pointer; }
 
-    .terminal-button { background: #0a1d0a; border: 1px solid #278027; color: #66dd66; padding: 10px 16px; font-family: inherit; font-size: 1rem; text-transform: uppercase; cursor: pointer; margin-top: 12px; }
-    body.mobile .terminal-button { width: 100%; padding: 14px; }
+        .map-container { border: 2px solid #2a6b2a; padding: 8px; background: #0a1a0a; margin: 12px 0; text-align: center; }
+        .map-image { max-width: 100%; height: auto; border: 1px solid #1f4f1f; filter: sepia(1) hue-rotate(70deg) saturate(1.5) brightness(0.9); }
 
-    .terminal-footer { padding: 10px 14px; display: flex; justify-content: space-between; color: #2f812f; background: #061006; border-top: 1px solid #1d491d; font-size: 0.7rem; text-transform: uppercase; flex-shrink: 0; }
+        .vault-controls { display: flex; gap: 6px; margin: 12px 0; flex-wrap: wrap; }
+        .vault-btn { background: #0a1d0a; border: 1px solid #278027; color: #66dd66; padding: 10px 14px; font-family: inherit; font-size: 0.9rem; cursor: pointer; }
+        body.mobile .vault-btn { flex: 1; padding: 14px; font-size: 1rem; }
+        .vault-btn.active-floor { background: #1f461f; border-color: #33bb33; color: #c6ffc6; }
 
-    .marquee-bar { background: #1a0000; border-bottom: 2px solid #ff4444; padding: 6px 0; overflow: hidden; flex-shrink: 0; display: none; }
-    .marquee-bar.show { display: block; }
-    .marquee-text { color: #ff6666; font-family: 'Courier New', monospace; white-space: nowrap; animation: marquee 15s linear infinite; font-size: 0.85rem; padding-left: 100%; }
-    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .radio-tuner { border: 2px solid #2a6b2a; padding: 14px; background: #0a1a0a; margin: 12px 0; }
+        .freq-display { font-size: 1.6rem; color: #9eff9e; text-align: center; font-family: 'VT323', monospace; letter-spacing: 3px; margin: 8px 0; }
+        .freq-slider { width: 100%; margin: 10px 0; height: 16px; -webkit-appearance: none; background: #0a1a0a; border: 2px solid #278027; border-radius: 10px; }
+        .freq-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; background: #33ff33; border-radius: 50%; cursor: pointer; }
+        .intercept-message { background: #051005; padding: 12px; margin: 10px 0; border-left: 3px solid #33bb33; min-height: 50px; color: #b6fbb6; font-size: 0.9rem; }
 
-    .admin-badge { color: #ff4444; font-size: 0.8rem; text-shadow: 0 0 6px #ff4444; display: none; }
-    .admin-badge.visible { display: inline; }
-    .click-hint { font-size: 0.75rem; color: #3d8f3d; margin: 4px 0; }
-    .log-message { border-left: 3px solid #459a45; padding-left: 12px; margin: 12px 0; color: #b6fbb6; font-size: 0.85rem; }
-    .app-view { border: 2px solid #ffaa00; padding: 14px; background: #0a0a0a; margin: 8px 0; color: #ffcc88; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.4; max-height: 250px; overflow-y: auto; }
-    .guest-warning { color: #ffaa00; font-size: 0.8rem; text-align: center; margin: 8px 0; }
-    .sync-indicator { color: #ffaa00; font-size: 0.7rem; display: none; }
-    .sync-indicator.visible { display: inline; }
-  </style>
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+        .terminal-button { background: #0a1d0a; border: 1px solid #278027; color: #66dd66; padding: 10px 16px; font-family: inherit; font-size: 1rem; text-transform: uppercase; cursor: pointer; margin-top: 12px; }
+        body.mobile .terminal-button { width: 100%; padding: 14px; }
+
+        .terminal-footer { padding: 10px 14px; display: flex; justify-content: space-between; color: #2f812f; background: #061006; border-top: 1px solid #1d491d; font-size: 0.7rem; text-transform: uppercase; flex-shrink: 0; }
+
+        .marquee-bar { background: #1a0000; border-bottom: 2px solid #ff4444; padding: 6px 0; overflow: hidden; flex-shrink: 0; display: none; }
+        .marquee-bar.show { display: block; }
+        .marquee-text { color: #ff6666; font-family: 'Courier New', monospace; white-space: nowrap; animation: marquee 15s linear infinite; font-size: 0.85rem; padding-left: 100%; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        .admin-badge { color: #ff4444; font-size: 0.8rem; text-shadow: 0 0 6px #ff4444; display: none; }
+        .admin-badge.visible { display: inline; }
+        .click-hint { font-size: 0.75rem; color: #3d8f3d; margin: 4px 0; }
+        .log-message { border-left: 3px solid #459a45; padding-left: 12px; margin: 12px 0; color: #b6fbb6; font-size: 0.85rem; }
+        .app-view { border: 2px solid #ffaa00; padding: 14px; background: #0a0a0a; margin: 8px 0; color: #ffcc88; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.4; max-height: 250px; overflow-y: auto; }
+        .guest-warning { color: #ffaa00; font-size: 0.8rem; text-align: center; margin: 8px 0; }
+        .sync-indicator { color: #ffaa00; font-size: 0.7rem; display: none; }
+        .sync-indicator.visible { display: inline; }
+
+        .chat-notification {
+            position: fixed; top: 10px; right: 10px; background: #0a2a0a;
+            border: 2px solid #ffaa00; color: #ffaa00; padding: 10px 16px;
+            z-index: 500; font-family: 'Courier New', monospace; font-size: 0.85rem;
+            cursor: pointer; animation: fadeIn 0.3s ease;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -396,202 +419,249 @@
 <div class="login-glitch-overlay" id="loginGlitchOverlay"></div>
 
 <div class="login-overlay" id="loginOverlay">
-  <div class="login-container-animated">
-    <div class="login-logo-icon">◈</div>
-    <div class="login-logo-text">О.И.Д.Л.</div>
-    <div style="color:#0a5a0a;font-size:0.7rem;letter-spacing:6px;text-align:center;">••• SECURE ACCESS TERMINAL •••</div>
-    
-    <div class="login-terminal-window">
-      <div class="login-code-lines" id="loginCodeLines"></div>
-      <div class="login-progress-container">
-        <div class="login-progress-label">
-          <span>ИНИЦИАЛИЗАЦИЯ</span>
-          <span id="loginProgressStage">ЯДРО</span>
+    <div class="login-container-animated">
+        <div class="login-logo-icon">◈</div>
+        <div class="login-logo-text">О.И.Д.Л.</div>
+        <div style="color:#0a5a0a;font-size:0.7rem;letter-spacing:6px;text-align:center;">••• SECURE ACCESS TERMINAL •••</div>
+
+        <div class="login-terminal-window">
+            <div class="login-code-lines" id="loginCodeLines"></div>
+            <div class="login-progress-container">
+                <div class="login-progress-label">
+                    <span>ИНИЦИАЛИЗАЦИЯ</span>
+                    <span id="loginProgressStage">ЯДРО</span>
+                </div>
+                <div class="login-progress-bar">
+                    <div class="login-progress-fill" id="loginProgressFill"></div>
+                </div>
+                <div class="login-progress-percent" id="loginProgressPercent">0%</div>
+            </div>
+
+            <div class="login-form-container" id="loginFormContainer">
+                <div class="login-field">
+                    <span class="login-label">ПОЛЬЗОВАТЕЛЬ:</span>
+                    <select class="login-select" id="loginUserSelect"><option value="">— ВЫБЕРИТЕ —</option></select>
+                </div>
+                <div class="login-field">
+                    <span class="login-label">КОД ДОСТУПА:</span>
+                    <input type="password" class="login-input" id="loginPassInput" placeholder="········">
+                </div>
+                <button class="login-submit-btn" id="loginConfirmBtn">■ АВТОРИЗАЦИЯ</button>
+                <button class="login-submit-btn guest-btn-animated" id="guestLoginBtn">■ ГОСТЕВОЙ ДОСТУП</button>
+            </div>
         </div>
-        <div class="login-progress-bar">
-          <div class="login-progress-fill" id="loginProgressFill"></div>
-        </div>
-        <div class="login-progress-percent" id="loginProgressPercent">0%</div>
-      </div>
-      
-      <div class="login-form-container" id="loginFormContainer">
-        <div class="login-field">
-          <span class="login-label">ПОЛЬЗОВАТЕЛЬ:</span>
-          <select class="login-select" id="loginUserSelect"><option value="">— ВЫБЕРИТЕ —</option></select>
-        </div>
-        <div class="login-field">
-          <span class="login-label">КОД ДОСТУПА:</span>
-          <input type="password" class="login-input" id="loginPassInput" placeholder="········">
-        </div>
-        <button class="login-submit-btn" id="loginConfirmBtn">■ АВТОРИЗАЦИЯ</button>
-        <button class="login-submit-btn guest-btn-animated" id="guestLoginBtn">■ ГОСТЕВОЙ ДОСТУП</button>
-      </div>
     </div>
-  </div>
 </div>
 
 <!-- ============ ОСНОВНОЙ ТЕРМИНАЛ ============ -->
 <div class="terminal" id="mainTerminal" style="display:none;">
-  <div class="marquee-bar" id="marqueeBar"><div class="marquee-text" id="marqueeText"></div></div>
+    <div class="marquee-bar" id="marqueeBar"><div class="marquee-text" id="marqueeText"></div></div>
 
-  <div class="terminal-header">
-    <div class="terminal-header-left"><div class="led active"></div><div class="led"></div><div class="led"></div></div>
-    <div class="terminal-header-center">Vault-Tec</div>
-    <div class="terminal-header-right">
-      <span class="user-indicator" id="userIndicator">👤 ГОСТЬ</span>
-      <span class="caps-indicator" id="capsIndicator">💰 0</span>
-      <button class="logout-btn" id="logoutBtn">ВЫХОД</button>
-      <button class="admin-access-btn" id="adminAccessBtn">◈ АДМИН ◈<span class="app-badge" id="appBadge">0</span></button>
-      <span class="sync-indicator" id="syncIndicator">◈ ОБЛАКО ◈</span>
-    </div>
-  </div>
-
-  <div class="screen" id="mainScreen">
-    <div id="mainContent">
-      <div class="robco-banner"><span>ROBCO INDUSTRIES (TM) UNIFIED OS</span><span>v.4.77.12 / CORE</span></div>
-
-      <div class="clan-status">
-        <span class="status-label">РЕСУРСЫ:</span>
-        <span class="status-value" id="resourcesDisplay">◼◼◼◻◻◻◻◻◻</span>
-        <span class="admin-badge" id="adminBadge">◈ АДМИН ◈</span>
-      </div>
-      <div class="guest-warning" id="guestWarning" style="display:none;">⚠ ГОСТЕВОЙ РЕЖИМ — ВЫ МОЖЕТЕ ПОДАТЬ ЗАЯВКУ НА ВСТУПЛЕНИЕ</div>
-
-      <div class="nav-menu" id="navMenu">
-  <div class="nav-item active" data-tab="dosier">ДОСЬЕ</div>
-  <div class="nav-item" data-tab="tasks">ЗАДАЧИ</div>
-  <div class="nav-item" data-tab="drones">ДРОНЫ</div>
-  <div class="nav-item" data-tab="events">СОБЫТИЯ</div>
-  <a href="shop.html" class="nav-item" style="text-decoration:none;">💎 МАГАЗИН</a>
-  <a href="medical.html" class="nav-item" style="text-decoration:none;">🏥 МЕДПУНКТ</a>
-  <a href="science.html" class="nav-item" style="text-decoration:none;">🔬 НАУКА</a>
-  <div class="nav-item" data-tab="mail">ПОЧТА</div>
-  <div class="nav-item recruit-tab" data-tab="recruit">НАБОР</div>
-  <div class="nav-item" data-tab="map">КАРТА</div>
-  <div class="nav-item" data-tab="radio">РАДИО</div>
-  <div class="nav-item" data-tab="vault">БАЗА</div>
-</div>
-      <div id="tab-dosier" class="content-pane">
-        <div class="click-hint">[ НАЖМИТЕ НА СТРОКУ ]</div>
-        <table class="data-table"><thead><tr><th>ИМЯ</th><th>РОЛЬ</th><th class="desktop-only">СТАТУС</th></tr></thead><tbody id="clanMembersBody"></tbody></table>
-        <div style="margin-top:14px; border-left:3px solid #248f24; padding-left:12px; font-size:0.85rem;">
-          <div>> АРСЕНАЛ: <span id="arsenalPercent">27%</span></div>
-          <div>> ВОДА: <span id="waterSupply">[НЕТ ДАННЫХ]</span></div>
-          <div>> АКТИВНОСТЬ: <span id="lastActivity">23.04.2026</span></div>
+    <div class="terminal-header">
+        <div class="terminal-header-left"><div class="led active"></div><div class="led"></div><div class="led"></div></div>
+        <div class="terminal-header-center">Vault-Tec</div>
+        <div class="terminal-header-right">
+            <span class="user-indicator" id="userIndicator">👤 ГОСТЬ</span>
+            <span class="caps-indicator" id="capsIndicator">💰 0</span>
+            <button class="logout-btn" id="logoutBtn">ВЫХОД</button>
+            <button class="admin-access-btn" id="adminAccessBtn">◈ АДМИН ◈<span class="app-badge" id="appBadge">0</span></button>
+            <span class="sync-indicator" id="syncIndicator">◈ ОБЛАКО ◈</span>
         </div>
-        <div class="log-message" id="systemMessage">[СИСТЕМА] СБОР ДАННЫХ.</div>
-      </div>
-
-      <div id="tab-tasks" class="content-pane hidden">
-        <div style="color:#bcffbc;">== ЗАДАЧИ ==</div>
-        <table class="data-table"><thead><tr><th>ID</th><th>ОПИСАНИЕ</th><th class="desktop-only">СРОК</th></tr></thead><tbody id="tasksTableBody"></tbody></table>
-      </div>
-
-      <div id="tab-drones" class="content-pane hidden">
-        <div style="color:#bcffbc;">◆ ДРОНЫ СВЯЗИ ◆</div>
-        <div id="dronesContainer"></div>
-        <div class="diagnostic-log" id="diagnosticLog">[ ДИАГНОСТИКА ] ОЖИДАНИЕ...</div>
-        <button class="terminal-button" id="diagAllBtn">■ ДИАГНОСТИКА ВСЕХ</button>
-      </div>
-
-      <div id="tab-events" class="content-pane hidden">
-        <div style="color:#88aaff;">◆ КАЛЕНДАРЬ СОБЫТИЙ ◆</div>
-        <div id="eventsContainer"></div>
-      </div>
-
-      <div id="tab-mail" class="content-pane hidden">
-        <div style="color:#44aaff;margin-bottom:8px;">◆ ВНУТРЕННЯЯ ПОЧТА ◆</div>
-        <div class="mail-tabs">
-          <button class="mail-tab active" data-mail-tab="inbox">ВХОДЯЩИЕ</button>
-          <button class="mail-tab" data-mail-tab="sent">ОТПРАВЛЕННЫЕ</button>
-          <button class="mail-tab" data-mail-tab="write">НАПИСАТЬ</button>
-        </div>
-        <div id="mailContent"></div>
-      </div>
-
-      <div id="tab-recruit" class="content-pane hidden">
-        <div style="color:#ffaa00;margin-bottom:12px;text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ ◆</div>
-        <div class="application-form">
-          <div class="app-field"><span class="app-label">Имя:</span><input type="text" class="app-input" id="appName"></div>
-          <div class="app-field"><span class="app-label">Пол:</span><input type="text" class="app-input" id="appGender"></div>
-          <div class="app-field"><span class="app-label">Дата рождения:</span><input type="text" class="app-input" id="appBirth"></div>
-          <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace"></div>
-          <div class="app-field"><span class="app-label">Должность:</span><input type="text" class="app-input" id="appRole"></div>
-          <div class="app-field"><span class="app-label">Параметры:</span><textarea class="app-textarea" id="appPhysical"></textarea></div>
-          <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ</button>
-        </div>
-      </div>
-
-      <div id="tab-map" class="content-pane hidden">
-        <div style="color:#bcffbc;">◆ КАРТА ◆</div>
-        <div class="map-container"><img src="map.png" alt="КАРТА" class="map-image" id="mapImage"></div>
-      </div>
-
-      <div id="tab-radio" class="content-pane hidden">
-        <div style="color:#bcffbc;">◆ РАДИО ◆</div>
-        <div class="radio-tuner">
-          <div class="freq-display" id="freqDisplay">114.7 МГц</div>
-          <input type="range" class="freq-slider" id="freqSlider" min="88" max="150" value="114" step="0.1">
-          <div class="intercept-message" id="interceptMessage">[ НАСТРОЙТЕ ЧАСТОТУ ]</div>
-          <button class="terminal-button" id="scanBtn">■ СКАНИРОВАТЬ</button>
-        </div>
-      </div>
-
-      <div id="tab-vault" class="content-pane hidden">
-        <div style="color:#bcffbc;">◆ УБЕЖИЩЕ 42 ◆</div>
-        <div class="vault-controls">
-          <button class="vault-btn active-floor" data-floor="0">ЭТАЖ 1</button>
-          <button class="vault-btn" data-floor="1">ЭТАЖ 2</button>
-          <button class="vault-btn" data-floor="2">ЭТАЖ 3</button>
-          <button class="vault-btn" data-floor="3">ЭТАЖ 4</button>
-        </div>
-        <div class="map-container"><img src="vault_floor_1.png" alt="ЭТАЖ" class="vault-image" id="vaultImage"></div>
-      </div>
-
-      <div class="command-line">
-        <span style="color:#2fa32f;">></span>
-        <input type="text" class="command-input" id="commandInput" placeholder="команда...">
-        <span class="cursor-blink"></span>
-      </div>
     </div>
-  </div>
 
-  <div id="profileOverlay" class="profile-overlay hidden">
-    <div class="profile-window">
-      <div class="profile-header"><div><div class="profile-name" id="profileName"></div><div class="profile-role" id="profileRole"></div></div><button class="profile-close" id="profileClose">✕</button></div>
-      <div id="profileContent"></div>
+    <div class="screen" id="mainScreen">
+        <div id="mainContent">
+            <div class="robco-banner"><span>ROBCO INDUSTRIES (TM) UNIFIED OS</span><span>v.4.77.12 / CORE</span></div>
+
+            <div class="clan-status">
+                <span class="status-label">РЕСУРСЫ:</span>
+                <span class="status-value" id="resourcesDisplay">◼◼◼◻◻◻◻◻◻</span>
+                <span class="admin-badge" id="adminBadge">◈ АДМИН ◈</span>
+            </div>
+            <div class="guest-warning" id="guestWarning" style="display:none;">⚠ ГОСТЕВОЙ РЕЖИМ — ВЫ МОЖЕТЕ ПОДАТЬ ЗАЯВКУ НА ВСТУПЛЕНИЕ</div>
+
+            <div class="nav-menu" id="navMenu">
+                <div class="nav-item active" data-tab="dosier">ДОСЬЕ</div>
+                <div class="nav-item" data-tab="tasks">ЗАДАЧИ</div>
+                <div class="nav-item" data-tab="drones">ДРОНЫ</div>
+                <div class="nav-item" data-tab="events">СОБЫТИЯ</div>
+                <div class="nav-item" data-tab="chat">💬 ЧАТ</div>
+                <a href="shop.html" class="nav-item" style="text-decoration:none;">💎 МАГАЗИН</a>
+                <a href="medical.html" class="nav-item" style="text-decoration:none;">🏥 МЕДПУНКТ</a>
+                <a href="science.html" class="nav-item" style="text-decoration:none;">🔬 НАУКА</a>
+                <div class="nav-item" data-tab="mail">ПОЧТА</div>
+                <div class="nav-item recruit-tab" data-tab="recruit">НАБОР</div>
+                <div class="nav-item" data-tab="map">КАРТА</div>
+                <div class="nav-item" data-tab="radio">РАДИО</div>
+                <div class="nav-item" data-tab="vault">БАЗА</div>
+            </div>
+
+            <!-- ДОСЬЕ -->
+            <div id="tab-dosier" class="content-pane">
+                <div class="click-hint">[ НАЖМИТЕ НА СТРОКУ ]</div>
+                <table class="data-table"><thead><tr><th>ИМЯ</th><th>РОЛЬ</th><th class="desktop-only">СТАТУС</th></tr></thead><tbody id="clanMembersBody"></tbody></table>
+                <div style="margin-top:14px; border-left:3px solid #248f24; padding-left:12px; font-size:0.85rem;">
+                    <div>> АРСЕНАЛ: <span id="arsenalPercent">27%</span></div>
+                    <div>> ВОДА: <span id="waterSupply">[НЕТ ДАННЫХ]</span></div>
+                    <div>> АКТИВНОСТЬ: <span id="lastActivity">23.04.2026</span></div>
+                </div>
+                <div class="log-message" id="systemMessage">[СИСТЕМА] СБОР ДАННЫХ.</div>
+            </div>
+
+            <!-- ЗАДАЧИ -->
+            <div id="tab-tasks" class="content-pane hidden">
+                <div style="color:#bcffbc;">== ЗАДАЧИ ==</div>
+                <table class="data-table"><thead><tr><th>ID</th><th>ОПИСАНИЕ</th><th class="desktop-only">СРОК</th></tr></thead><tbody id="tasksTableBody"></tbody></table>
+            </div>
+
+            <!-- ДРОНЫ -->
+            <div id="tab-drones" class="content-pane hidden">
+                <div style="color:#bcffbc;">◆ ДРОНЫ СВЯЗИ ◆</div>
+                <div id="dronesContainer"></div>
+                <div class="diagnostic-log" id="diagnosticLog">[ ДИАГНОСТИКА ] ОЖИДАНИЕ...</div>
+                <button class="terminal-button" id="diagAllBtn">■ ДИАГНОСТИКА ВСЕХ</button>
+            </div>
+
+            <!-- СОБЫТИЯ -->
+            <div id="tab-events" class="content-pane hidden">
+                <div style="color:#88aaff;">◆ КАЛЕНДАРЬ СОБЫТИЙ ◆</div>
+                <div id="eventsContainer"></div>
+            </div>
+
+            <!-- ЧАТ -->
+            <div id="tab-chat" class="content-pane hidden">
+                <div style="color:#ffaa00;margin-bottom:8px;">◆ ВНУТРЕННИЙ ЧАТ ◆ <span style="font-size:0.7rem;color:#886600;">(лимит: 16 сообщений | 400 символов)</span></div>
+                <div class="app-field" style="margin-bottom:12px;">
+                    <span class="app-label" style="color:#ffaa00;">СОБЕСЕДНИК:</span>
+                    <select class="app-input" id="chatWith" style="border-color:#ffaa00;color:#ffcc88;">
+                        <option value="">— ВЫБЕРИТЕ —</option>
+                    </select>
+                </div>
+                <div id="chatMessages" style="border:2px solid #ffaa00;background:#0a0a0a;padding:12px;min-height:300px;max-height:400px;overflow-y:auto;margin-bottom:12px;font-size:0.85rem;">
+                    <div style="color:#886600;text-align:center;padding:40px;">ВЫБЕРИТЕ СОБЕСЕДНИКА</div>
+                </div>
+                <div id="chatCounter" style="color:#886600;font-size:0.75rem;margin-bottom:8px;text-align:center;"></div>
+                <div style="display:flex;gap:8px;">
+                    <input type="text" class="app-input" id="chatInput" placeholder="СООБЩЕНИЕ (макс. 400 символов)..." 
+                           style="border-color:#ffaa00;color:#ffcc88;flex:1;" maxlength="400">
+                    <button class="terminal-button" id="chatSendBtn" style="margin-top:0;width:auto;padding:10px 20px;">▶ ОТПРАВИТЬ</button>
+                </div>
+                <button class="terminal-button" id="chatClearBtn" style="border-color:#ff4444;color:#ff4444;margin-top:8px;">🗑 ОЧИСТИТЬ ЧАТ</button>
+            </div>
+
+            <!-- ПОЧТА -->
+            <div id="tab-mail" class="content-pane hidden">
+                <div style="color:#44aaff;margin-bottom:8px;">◆ ВНУТРЕННЯЯ ПОЧТА ◆</div>
+                <div class="mail-tabs">
+                    <button class="mail-tab active" data-mail-tab="inbox">ВХОДЯЩИЕ</button>
+                    <button class="mail-tab" data-mail-tab="sent">ОТПРАВЛЕННЫЕ</button>
+                    <button class="mail-tab" data-mail-tab="write">НАПИСАТЬ</button>
+                </div>
+                <div id="mailContent"></div>
+            </div>
+
+            <!-- НАБОР -->
+            <div id="tab-recruit" class="content-pane hidden">
+                <div style="color:#ffaa00;text-align:center;font-size:1.1rem;letter-spacing:2px;font-family:'VT323',monospace;">◆ ПОДАТЬ ЗАЯВКУ ◆</div>
+                <div class="application-form">
+                    <div class="app-field"><span class="app-label">Имя (полное имя/прозвище):</span><input type="text" class="app-input" id="appName" placeholder="Введите имя..."></div>
+                    <div class="app-field"><span class="app-label">Пол (М/Ж/Другое):</span><input type="text" class="app-input" id="appGender" placeholder="М/Ж/Другое"></div>
+                    <div class="app-field"><span class="app-label">Дата рождения (ДД.ММ + возраст):</span><input type="text" class="app-input" id="appBirth" placeholder="01.01 + 25 лет"></div>
+                    <div class="app-field"><span class="app-label">Раса:</span><input type="text" class="app-input" id="appRace" placeholder="Единорог, Земной пони..."></div>
+                    <div class="app-field"><span class="app-label">Должность:</span><input type="text" class="app-input" id="appRole" placeholder="Охранник, Учёный..."></div>
+                    <div class="app-field"><span class="app-label">Физические параметры:</span><textarea class="app-textarea" id="appPhysical" placeholder="Рост: см&#10;Вес: кг&#10;Отличительные черты: ..."></textarea></div>
+                    <div style="color:#ffaa00;margin:16px 0;text-align:center;">ПРОФЕССИОНАЛЬНЫЕ ДАННЫЕ</div>
+                    <div class="app-field"><span class="app-label">Отдел/Специализация:</span><input type="text" class="app-input" id="appSpecialization" placeholder="Боевой/Медицинский..."></div>
+                    <div class="app-field"><span class="app-label">Навыки (3 ключевых + уровень):</span><textarea class="app-textarea" id="appSkills" placeholder="1) ...&#10;2) ...&#10;3) ..."></textarea></div>
+                    <div class="app-field"><span class="app-label">Наставник:</span><input type="text" class="app-input" id="appMentor" placeholder="Имя или нет"></div>
+                    <div style="color:#ffaa00;margin:16px 0;text-align:center;">ЛИЧНОСТЬ И БИОГРАФИЯ</div>
+                    <div class="app-field"><span class="app-label">Краткая история:</span><textarea class="app-textarea" id="appHistory" placeholder="Происхождение, важные события..."></textarea></div>
+                    <div class="app-field"><span class="app-label">Характер:</span><textarea class="app-textarea" id="appCharacter" placeholder="Основные качества, принципы..."></textarea></div>
+                    <div class="app-field"><span class="app-label">Фобии/Слабости:</span><textarea class="app-textarea" id="appPhobias" placeholder="Что влияет на решения..."></textarea></div>
+                    <div style="color:#ffaa00;margin:16px 0;text-align:center;">ОСОБЫЕ ОТМЕТКИ</div>
+                    <div class="app-field"><span class="app-label">Вредные привычки:</span><input type="text" class="app-input" id="appHabits" placeholder="Курение, агрессия..."></div>
+                    <div class="app-field"><span class="app-label">Хронические болезни:</span><input type="text" class="app-input" id="appIllnesses" placeholder="Если имеются..."></div>
+                    <div class="app-field"><span class="app-label">Аллергии/Непереносимости:</span><input type="text" class="app-input" id="appAllergies" placeholder="Пищевые, медицинские..."></div>
+                    <div style="color:#ffaa00;margin:16px 0;text-align:center;">ДОПОЛНИТЕЛЬНО</div>
+                    <div class="app-field"><span class="app-label">Хобби:</span><input type="text" class="app-input" id="appHobbies" placeholder="Увлечения..."></div>
+                    <div class="app-field"><span class="app-label">Личные цели:</span><textarea class="app-textarea" id="appGoals" placeholder="Чего хочет достичь..."></textarea></div>
+                    <button class="app-submit" id="appSubmitBtn">■ ОТПРАВИТЬ ЗАЯВКУ</button>
+                </div>
+            </div>
+
+            <!-- КАРТА -->
+            <div id="tab-map" class="content-pane hidden">
+                <div style="color:#bcffbc;">◆ КАРТА ◆</div>
+                <div class="map-container"><img src="map.png" alt="КАРТА" class="map-image" id="mapImage"></div>
+            </div>
+
+            <!-- РАДИО -->
+            <div id="tab-radio" class="content-pane hidden">
+                <div style="color:#bcffbc;">◆ РАДИО ◆</div>
+                <div class="radio-tuner">
+                    <div class="freq-display" id="freqDisplay">114.7 МГц</div>
+                    <input type="range" class="freq-slider" id="freqSlider" min="88" max="150" value="114" step="0.1">
+                    <div class="intercept-message" id="interceptMessage">[ НАСТРОЙТЕ ЧАСТОТУ ]</div>
+                    <button class="terminal-button" id="scanBtn">■ СКАНИРОВАТЬ</button>
+                </div>
+            </div>
+
+            <!-- БАЗА -->
+            <div id="tab-vault" class="content-pane hidden">
+                <div style="color:#bcffbc;">◆ УБЕЖИЩЕ 42 ◆</div>
+                <div class="vault-controls">
+                    <button class="vault-btn active-floor" data-floor="0">ЭТАЖ 1</button>
+                    <button class="vault-btn" data-floor="1">ЭТАЖ 2</button>
+                    <button class="vault-btn" data-floor="2">ЭТАЖ 3</button>
+                    <button class="vault-btn" data-floor="3">ЭТАЖ 4</button>
+                </div>
+                <div class="map-container"><img src="vault_floor_1.png" alt="ЭТАЖ" class="vault-image" id="vaultImage"></div>
+            </div>
+
+            <div class="command-line">
+                <span style="color:#2fa32f;">></span>
+                <input type="text" class="command-input" id="commandInput" placeholder="команда...">
+                <span class="cursor-blink"></span>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div id="mailViewOverlay" class="profile-overlay hidden">
-    <div class="profile-window" style="border-color:#44aaff;">
-      <div class="profile-header"><div><div class="profile-name" id="mailViewName"></div><div class="profile-role" id="mailViewDate"></div></div><button class="profile-close" id="mailViewClose">✕</button></div>
-      <div id="mailViewContent"></div>
+    <div id="profileOverlay" class="profile-overlay hidden">
+        <div class="profile-window">
+            <div class="profile-header"><div><div class="profile-name" id="profileName"></div><div class="profile-role" id="profileRole"></div></div><button class="profile-close" id="profileClose">✕</button></div>
+            <div id="profileContent"></div>
+        </div>
     </div>
-  </div>
 
-  <div id="adminPanel" class="admin-panel hidden">
-    <div class="admin-window">
-      <div class="admin-header"><div class="admin-title">АДМИН</div><button class="admin-close" id="adminClose">✕</button></div>
-      <div class="admin-tabs">
-        <button class="admin-tab active" data-admin-tab="members">СОСТАВ</button>
-        <button class="admin-tab" data-admin-tab="access">ДОСТУП</button>
-        <button class="admin-tab" data-admin-tab="caps">КРЫШКИ</button>
-        <button class="admin-tab" data-admin-tab="tasks">ЗАДАЧИ</button>
-        <button class="admin-tab" data-admin-tab="drones">ДРОНЫ</button>
-        <button class="admin-tab" data-admin-tab="events">СОБЫТИЯ</button>
-        <button class="admin-tab" data-admin-tab="mail">ПОЧТА</button>
-        <button class="admin-tab" data-admin-tab="marquee">СТРОКА</button>
-        <button class="admin-tab" data-admin-tab="apps">ЗАЯВКИ</button>
-        <button class="admin-tab" data-admin-tab="radio">РАДИО</button>
-        <button class="admin-tab" data-admin-tab="system">СИСТЕМА</button>
-        <button class="admin-tab" data-admin-tab="data">ДАННЫЕ</button>
-      </div>
-      <div id="adminContent"></div>
+    <div id="mailViewOverlay" class="profile-overlay hidden">
+        <div class="profile-window" style="border-color:#44aaff;">
+            <div class="profile-header"><div><div class="profile-name" id="mailViewName"></div><div class="profile-role" id="mailViewDate"></div></div><button class="profile-close" id="mailViewClose">✕</button></div>
+            <div id="mailViewContent"></div>
+        </div>
     </div>
-  </div>
 
-  <div class="terminal-footer"><span>СИСТЕМА: ОПЕРАТИВНАЯ</span><span>О.И.Д.Л. v.5.0</span><span>ЯДРО: 99%</span></div>
+    <div id="adminPanel" class="admin-panel hidden">
+        <div class="admin-window">
+            <div class="admin-header"><div class="admin-title">АДМИН</div><button class="admin-close" id="adminClose">✕</button></div>
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-admin-tab="members">СОСТАВ</button>
+                <button class="admin-tab" data-admin-tab="access">ДОСТУП</button>
+                <button class="admin-tab" data-admin-tab="caps">КРЫШКИ</button>
+                <button class="admin-tab" data-admin-tab="tasks">ЗАДАЧИ</button>
+                <button class="admin-tab" data-admin-tab="drones">ДРОНЫ</button>
+                <button class="admin-tab" data-admin-tab="events">СОБЫТИЯ</button>
+                <button class="admin-tab" data-admin-tab="mail">ПОЧТА</button>
+                <button class="admin-tab" data-admin-tab="marquee">СТРОКА</button>
+                <button class="admin-tab" data-admin-tab="apps">ЗАЯВКИ</button>
+                <button class="admin-tab" data-admin-tab="radio">РАДИО</button>
+                <button class="admin-tab" data-admin-tab="system">СИСТЕМА</button>
+                <button class="admin-tab" data-admin-tab="data">ДАННЫЕ</button>
+            </div>
+            <div id="adminContent"></div>
+        </div>
+    </div>
+
+    <div class="terminal-footer"><span>СИСТЕМА: ОПЕРАТИВНАЯ</span><span>О.И.Д.Л. v.5.0</span><span>ЯДРО: 99%</span></div>
 </div>
 
 <script>
@@ -613,11 +683,116 @@
   });
   const db = firebase.database();
 
+  // ==================== АУДИО СИСТЕМА ====================
   let audioCtx = null;
-  function initAudio() { if (!audioCtx) try { audioCtx = new (window.AudioContext||window.webkitAudioContext)(); startHum(); } catch(e) {} }
-  function startHum() { if (!audioCtx) return; const o=audioCtx.createOscillator(); o.type='sine'; o.frequency.value=25; const g=audioCtx.createGain(); g.gain.value=0.06; o.connect(g).connect(audioCtx.destination); o.start(); }
-  function playKey() { if (!audioCtx) return; const o=audioCtx.createOscillator(); o.type='triangle'; o.frequency.value=440; const g=audioCtx.createGain(); g.gain.setValueAtTime(0.05,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.05); o.connect(g).connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.05); }
-  function playBeep() { if (!audioCtx) return; const o=audioCtx.createOscillator(); o.type='square'; o.frequency.value=880; const g=audioCtx.createGain(); g.gain.setValueAtTime(0.15,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.2); o.connect(g).connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.2); }
+
+  function initAudio() {
+    if (!audioCtx) {
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        startBackgroundHum();
+      } catch(e) {
+        console.log('Web Audio API не поддерживается');
+      }
+    }
+  }
+
+  function startBackgroundHum() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = 25;
+    const gain = audioCtx.createGain();
+    gain.gain.value = 0.04;
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start();
+  }
+
+  function playTypingSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = 800 + Math.random() * 400;
+    gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.03);
+  }
+
+  function playClickSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = 1200;
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.05);
+  }
+
+  function playSuccessSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    [523, 659, 784].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.08, now + i * 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.15);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(now + i * 0.1);
+      osc.stop(now + i * 0.1 + 0.15);
+    });
+  }
+
+  function playErrorSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.value = 150;
+    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.3);
+  }
+
+  function playNotificationSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    [880, 1100].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.06, now + i * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.1);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(now + i * 0.08);
+      osc.stop(now + i * 0.08 + 0.1);
+    });
+  }
+
+  function playChatReceiveSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = 660;
+    gain.gain.setValueAtTime(0.06, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.12);
+  }
 
   // ============ АНИМИРОВАННЫЙ ВХОД ============
   const loginParticlesCanvas = document.getElementById('loginParticles');
@@ -625,8 +800,26 @@
   loginParticlesCanvas.width = window.innerWidth;
   loginParticlesCanvas.height = window.innerHeight;
   const loginParticlesArr = [];
-  for (let i=0;i<30;i++) loginParticlesArr.push({x:Math.random()*loginParticlesCanvas.width,y:Math.random()*loginParticlesCanvas.height,size:Math.random()*2+0.5,speedY:Math.random()*0.5+0.1,opacity:Math.random()*0.5+0.1});
-  function animateLoginParticles(){ loginParticlesCtx.clearRect(0,0,loginParticlesCanvas.width,loginParticlesCanvas.height); loginParticlesArr.forEach(p=>{p.y-=p.speedY;if(p.y<0){p.y=loginParticlesCanvas.height;p.x=Math.random()*loginParticlesCanvas.width;} loginParticlesCtx.fillStyle=`rgba(0,255,0,${p.opacity})`; loginParticlesCtx.fillRect(p.x,p.y,p.size,p.size);}); requestAnimationFrame(animateLoginParticles); }
+  for (let i = 0; i < 30; i++) {
+    loginParticlesArr.push({
+      x: Math.random() * loginParticlesCanvas.width,
+      y: Math.random() * loginParticlesCanvas.height,
+      size: Math.random() * 2 + 0.5,
+      speedY: Math.random() * 0.5 + 0.1,
+      opacity: Math.random() * 0.5 + 0.1
+    });
+  }
+
+  function animateLoginParticles() {
+    loginParticlesCtx.clearRect(0, 0, loginParticlesCanvas.width, loginParticlesCanvas.height);
+    loginParticlesArr.forEach(p => {
+      p.y -= p.speedY;
+      if (p.y < 0) { p.y = loginParticlesCanvas.height; p.x = Math.random() * loginParticlesCanvas.width; }
+      loginParticlesCtx.fillStyle = `rgba(0,255,0,${p.opacity})`;
+      loginParticlesCtx.fillRect(p.x, p.y, p.size, p.size);
+    });
+    requestAnimationFrame(animateLoginParticles);
+  }
   animateLoginParticles();
 
   const loginCodeLinesEl = document.getElementById('loginCodeLines');
@@ -661,299 +854,452 @@
   const stagesArr = ['ЯДРО','СЕТЬ','ЗАЩИТА','КЛАН'];
   let stageIdx = 0;
 
-  function addCodeLine(index){
-    if(index>=totalCodeLines){
-      setTimeout(()=>{
-        loginProgressFill.style.width='100%';
-        loginProgressPercent.textContent='100%';
-        loginProgressStage.textContent='ГОТОВ';
+  function addCodeLine(index) {
+    if (index >= totalCodeLines) {
+      setTimeout(() => {
+        loginProgressFill.style.width = '100%';
+        loginProgressPercent.textContent = '100%';
+        loginProgressStage.textContent = 'ГОТОВ';
         loginFormContainer.classList.add('visible');
         updateLoginForm();
-      },500);
+        playSuccessSound();
+      }, 500);
       return;
     }
-    const ld=codeLines[index];
-    const div=document.createElement('div');
-    div.className='login-code-line';
-    div.innerHTML=ld.text||'&nbsp;';
+    const ld = codeLines[index];
+    const div = document.createElement('div');
+    div.className = 'login-code-line';
+    div.innerHTML = ld.text || '&nbsp;';
     loginCodeLinesEl.appendChild(div);
-    setTimeout(()=>div.classList.add('visible'),50);
-    const prog=Math.floor((index/totalCodeLines)*100);
-    loginProgressFill.style.width=prog+'%';
-    loginProgressPercent.textContent=prog+'%';
-    if(index===4){loginProgressStage.textContent=stagesArr[1];stageIdx=1;}
-    if(index===9){loginProgressStage.textContent=stagesArr[2];stageIdx=2;}
-    if(index===14){loginProgressStage.textContent=stagesArr[3];stageIdx=3;}
-    if(Math.random()>0.7){loginGlitchOverlay.classList.add('active');setTimeout(()=>loginGlitchOverlay.classList.remove('active'),100);}
-    loginCodeLinesEl.scrollTop=loginCodeLinesEl.scrollHeight;
-    setTimeout(()=>addCodeLine(index+1),ld.delay);
+    setTimeout(() => div.classList.add('visible'), 50);
+    const prog = Math.floor((index / totalCodeLines) * 100);
+    loginProgressFill.style.width = prog + '%';
+    loginProgressPercent.textContent = prog + '%';
+    if (index === 4) { loginProgressStage.textContent = stagesArr[1]; stageIdx = 1; }
+    if (index === 9) { loginProgressStage.textContent = stagesArr[2]; stageIdx = 2; }
+    if (index === 14) { loginProgressStage.textContent = stagesArr[3]; stageIdx = 3; }
+    if (Math.random() > 0.7) {
+      loginGlitchOverlay.classList.add('active');
+      setTimeout(() => loginGlitchOverlay.classList.remove('active'), 100);
+    }
+    if (ld.text && !ld.text.includes('//')) playTypingSound();
+    loginCodeLinesEl.scrollTop = loginCodeLinesEl.scrollHeight;
+    setTimeout(() => addCodeLine(index + 1), ld.delay);
   }
 
-  setTimeout(()=>addCodeLine(0),800);
+  setTimeout(() => addCodeLine(0), 800);
 
   // ============ ДАННЫЕ ============
-  const DEFSYS={resources:3,arsenal:27,water:"[НЕТ ДАННЫХ]",activity:"23.04.2026",sysMsg:"[СИСТЕМА] СБОР ДАННЫХ."};
-  const DEFDRONES=[{name:"СТРИЖ-1",status:"АКТИВЕН",health:85},{name:"СТРИЖ-2",status:"ПАТРУЛЬ",health:92},{name:"СТРИЖ-3",status:"ЗАРЯДКА",health:45},{name:"СТРИЖ-4",status:"РЕМОНТ",health:18}];
-  const DEFRADIO={88.5:"*** SOS ***",94.2:"АНКЛАВ: КОД КРАСНЫЙ.",101.1:"КАРАВАН В ПУТИ.",107.8:"РЕЙДЕРЫ...",114.7:"О.И.Д.Л. ШТАБ.",122.3:"БРАТСТВО: ЗАПРЕТ.",130.5:"МЕДИКАМЕНТЫ.",138.0:"РАДИО.",145.8:"УБЕЖИЩЕ 101..."};
+  const DEFSYS = { resources:3, arsenal:27, water:"[НЕТ ДАННЫХ]", activity:"23.04.2026", sysMsg:"[СИСТЕМА] СБОР ДАННЫХ." };
+  const DEFDRONES = [
+    { name: "СТРИЖ-1", status: "АКТИВЕН", health: 85 },
+    { name: "СТРИЖ-2", status: "ПАТРУЛЬ", health: 92 },
+    { name: "СТРИЖ-3", status: "ЗАРЯДКА", health: 45 },
+    { name: "СТРИЖ-4", status: "РЕМОНТ", health: 18 }
+  ];
+  const DEFRADIO = {
+    88.5: "*** SOS ***", 94.2: "АНКЛАВ: КОД КРАСНЫЙ.", 101.1: "КАРАВАН В ПУТИ.",
+    107.8: "РЕЙДЕРЫ...", 114.7: "О.И.Д.Л. ШТАБ.", 122.3: "БРАТСТВО: ЗАПРЕТ.",
+    130.5: "МЕДИКАМЕНТЫ.", 138.0: "РАДИО.", 145.8: "УБЕЖИЩЕ 101..."
+  };
 
-  let members=[],tasks=[],sys={...DEFSYS},drones=[...DEFDRONES],applications=[],events=[],radioMessages={...DEFRADIO},mails=[],marqueeText="",accessCodes={},wallets={},isAdmin=false,currentUser=null;
+  let members = [], tasks = [], sys = {...DEFSYS}, drones = [...DEFDRONES],
+      applications = [], events = [], radioMessages = {...DEFRADIO},
+      mails = [], marqueeText = "", accessCodes = {}, wallets = {},
+      chatMessages = {}, isAdmin = false, currentUser = null;
 
-  function isGuest(){return currentUser==='ГОСТЬ';}
+  function isGuest() { return currentUser === 'ГОСТЬ'; }
 
-  function renderSys(){
-    const r=sys.resources;document.getElementById('resourcesDisplay').textContent='◼'.repeat(r)+'◻'.repeat(9-r);
-    document.getElementById('arsenalPercent').textContent=sys.arsenal+'%';
-    document.getElementById('waterSupply').textContent=sys.water;
-    document.getElementById('lastActivity').textContent=sys.activity;
-    document.getElementById('systemMessage').textContent=sys.sysMsg;
+  function renderSys() {
+    const r = sys.resources;
+    document.getElementById('resourcesDisplay').textContent = '◼'.repeat(r) + '◻'.repeat(9 - r);
+    document.getElementById('arsenalPercent').textContent = sys.arsenal + '%';
+    document.getElementById('waterSupply').textContent = sys.water;
+    document.getElementById('lastActivity').textContent = sys.activity;
+    document.getElementById('systemMessage').textContent = sys.sysMsg;
   }
 
-  function renderDrones(){
-    const c=document.getElementById('dronesContainer');if(!c)return;c.innerHTML='';
-    drones.forEach((d,i)=>{
-      const hc=d.health<30?'danger':(d.health<60?'warning':'');
-      const card=document.createElement('div');card.className='drone-card';
-      card.innerHTML=`<div class="drone-info"><div class="drone-name">◆ ${d.name}</div><div class="drone-status">СТАТУС: ${d.status}</div><div class="drone-health">${d.health}%<div class="drone-health-bar"><div class="drone-health-fill ${hc}" style="width:${d.health}%"></div></div></div></div>${isGuest()?'':'<div class="drone-actions"><button class="drone-btn diag-btn" onclick="window._diagDrone('+i+')">▶ ДИАГНОСТИКА</button></div>'}`;
+  function renderDrones() {
+    const c = document.getElementById('dronesContainer'); if (!c) return; c.innerHTML = '';
+    drones.forEach((d, i) => {
+      const hc = d.health < 30 ? 'danger' : (d.health < 60 ? 'warning' : '');
+      const card = document.createElement('div'); card.className = 'drone-card';
+      card.innerHTML = `<div class="drone-info"><div class="drone-name">◆ ${d.name}</div><div class="drone-status">СТАТУС: ${d.status}</div><div class="drone-health">${d.health}%<div class="drone-health-bar"><div class="drone-health-fill ${hc}" style="width:${d.health}%"></div></div></div></div>${isGuest() ? '' : '<div class="drone-actions"><button class="drone-btn diag-btn" onclick="window._diagDrone(' + i + ')">▶ ДИАГНОСТИКА</button></div>'}`;
       c.appendChild(card);
     });
   }
 
-  function renderEvents(){
-    const c=document.getElementById('eventsContainer');if(!c)return;c.innerHTML='';
-    if(!events.length){c.innerHTML='<div style="color:#667799;text-align:center;padding:20px;">НЕТ СОБЫТИЙ</div>';return;}
-    events.sort((a,b)=>new Date(a.date+'T'+a.time)-new Date(b.date+'T'+b.time));
-    events.forEach(e=>{const card=document.createElement('div');card.className='event-card';card.innerHTML=`<div class="event-date">📅 ${e.date} | 🕐 ${e.time}</div><div class="event-title">${e.title}</div><div class="event-desc">${e.description}</div>`;c.appendChild(card);});
+  function renderEvents() {
+    const c = document.getElementById('eventsContainer'); if (!c) return; c.innerHTML = '';
+    if (!events.length) { c.innerHTML = '<div style="color:#667799;text-align:center;padding:20px;">НЕТ СОБЫТИЙ</div>'; return; }
+    events.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+    events.forEach(e => { const card = document.createElement('div'); card.className = 'event-card'; card.innerHTML = `<div class="event-date">📅 ${e.date} | 🕐 ${e.time}</div><div class="event-title">${e.title}</div><div class="event-desc">${e.description}</div>`; c.appendChild(card); });
   }
 
-  window._diagDrone=function(i){
-    if(isGuest())return;
-    const d=drones[i],log=document.getElementById('diagnosticLog');
-    log.textContent='';let idx=0;
-    const m=[`[${d.name}] ЗАПУСК...`,`[${d.name}] СВЯЗЬ: OK`,`[${d.name}] БАТАРЕЯ: ${d.health}%`,`[${d.name}] ГОТОВО.`];
-    const iv=setInterval(()=>{if(idx<m.length){log.textContent+=m[idx]+'\n';idx++;}else clearInterval(iv);},400);
-    playKey();
+  window._diagDrone = function(i) {
+    if (isGuest()) return;
+    const d = drones[i], log = document.getElementById('diagnosticLog');
+    log.textContent = ''; let idx = 0;
+    const m = [`[${d.name}] ЗАПУСК...`, `[${d.name}] СВЯЗЬ: OK`, `[${d.name}] БАТАРЕЯ: ${d.health}%`, `[${d.name}] ГОТОВО.`];
+    const iv = setInterval(() => { if (idx < m.length) { log.textContent += m[idx] + '\n'; idx++; } else clearInterval(iv); }, 400);
+    playTypingSound();
   };
 
-  document.getElementById('diagAllBtn')?.addEventListener('click',()=>{
-    if(isGuest())return;
-    const log=document.getElementById('diagnosticLog');log.textContent='[ВСЕ ДРОНЫ]\n';
-    drones.forEach((d,i)=>{setTimeout(()=>{log.textContent+=`[${d.name}] ${d.health}% | ${d.status}\n`;},(i+1)*500);});
-    playBeep();
+  document.getElementById('diagAllBtn')?.addEventListener('click', () => {
+    if (isGuest()) return;
+    const log = document.getElementById('diagnosticLog'); log.textContent = '[ВСЕ ДРОНЫ]\n';
+    drones.forEach((d, i) => { setTimeout(() => { log.textContent += `[${d.name}] ${d.health}% | ${d.status}\n`; }, (i + 1) * 500); });
+    playClickSound();
   });
 
-  function renderMailInbox(){
-    if(isGuest()){document.getElementById('mailContent').innerHTML='<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ПРОСМАТРИВАТЬ ПОЧТУ</div>';return;}
-    const inbox=mails.filter(m=>m.to===currentUser||m.to===''||m.to==='all');
-    let html='';if(!inbox.length)html='<div style="color:#667799;padding:20px;">НЕТ ВХОДЯЩИХ</div>';
-    else{[...inbox].reverse().forEach(m=>{html+=`<div class="mail-card${m.read?'':' unread'}" onclick="openMail('${m.id}')"><div class="mail-from">ОТ: ${m.from}</div><div class="mail-subject">${m.subject}</div><div class="mail-date">${m.date}</div></div>`;});}
-    document.getElementById('mailContent').innerHTML=html;
-  }
-
-  function renderMailSent(){
-    if(isGuest()){document.getElementById('mailContent').innerHTML='<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ПРОСМАТРИВАТЬ ПОЧТУ</div>';return;}
-    const sent=mails.filter(m=>m.from===currentUser);
-    let html='';if(!sent.length)html='<div style="color:#667799;padding:20px;">НЕТ ОТПРАВЛЕННЫХ</div>';
-    else{[...sent].reverse().forEach(m=>{html+=`<div class="mail-card" onclick="openMail('${m.id}')"><div class="mail-from">КОМУ: ${m.to||'ВСЕМ'}</div><div class="mail-subject">${m.subject}</div><div class="mail-date">${m.date}</div></div>`;});}
-    document.getElementById('mailContent').innerHTML=html;
-  }
-
-  function renderMailWrite(){
-    if(isGuest()){document.getElementById('mailContent').innerHTML='<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ОТПРАВЛЯТЬ СООБЩЕНИЯ</div>';return;}
-    let opts='<option value="">ВСЕМ</option>';
-    members.forEach(m=>{opts+=`<option value="${m.name}">${m.name}</option>`;});
-    document.getElementById('mailContent').innerHTML=`<div class="application-form" style="border-color:#44aaff;"><div class="app-field"><span class="app-label" style="color:#88aaff;">КОМУ:</span><select class="app-input" id="mailTo" style="color:#88ccff;">${opts}</select></div><div class="app-field"><span class="app-label" style="color:#88aaff;">ТЕМА:</span><input type="text" class="app-input" id="mailSubject" style="border-color:#44aaff;color:#88ccff;"></div><div class="app-field"><span class="app-label" style="color:#88aaff;">СООБЩЕНИЕ:</span><textarea class="app-textarea" id="mailBody" style="border-color:#44aaff;color:#88ccff;"></textarea></div><button class="app-submit" id="mailSendBtn" style="border-color:#44aaff;color:#44aaff;">■ ОТПРАВИТЬ</button></div>`;
-    document.getElementById('mailSendBtn').addEventListener('click',()=>{
-      const to=document.getElementById('mailTo').value,subject=document.getElementById('mailSubject').value.trim()||'БЕЗ ТЕМЫ',body=document.getElementById('mailBody').value.trim();
-      if(!body){alert('ТЕКСТ!');return;}
-      mails.push({id:Date.now().toString(),from:currentUser,to,subject,body,date:new Date().toLocaleString('ru-RU'),read:false});
-      db.ref('mails').set(mails);
-      alert('ОТПРАВЛЕНО!');playBeep();
+  // ============ ЧАТ ============
+  function updateChatSelect() {
+    const select = document.getElementById('chatWith');
+    if (!select) return;
+    select.innerHTML = '<option value="">— ВЫБЕРИТЕ —</option>';
+    members.forEach(m => {
+      if (m.name !== currentUser) {
+        const opt = document.createElement('option');
+        opt.value = m.name;
+        opt.textContent = m.name;
+        select.appendChild(opt);
+      }
     });
   }
 
-  window.openMail=function(id){
-    if(isGuest())return;
-    const m=mails.find(x=>x.id===id);if(!m)return;
-    if(!m.read){m.read=true;db.ref('mails').set(mails);}
-    document.getElementById('mailViewName').textContent=m.subject;
-    document.getElementById('mailViewDate').textContent=`ОТ: ${m.from} | ${m.date}`;
-    document.getElementById('mailViewContent').innerHTML=`<div class="profile-text">${m.body.replace(/\n/g,'<br>')}</div>`;
+  function getChatKey(user1, user2) {
+    const sorted = [user1, user2].sort();
+    return sorted[0] + '_' + sorted[1];
+  }
+
+  function renderChat() {
+    const container = document.getElementById('chatMessages');
+    const counter = document.getElementById('chatCounter');
+    const chatWith = document.getElementById('chatWith').value;
+
+    if (!chatWith || isGuest()) {
+      container.innerHTML = '<div style="color:#886600;text-align:center;padding:40px;">ВЫБЕРИТЕ СОБЕСЕДНИКА</div>';
+      counter.textContent = '';
+      return;
+    }
+
+    const chatKey = getChatKey(currentUser, chatWith);
+    const messages = chatMessages[chatKey] || [];
+
+    counter.textContent = `СООБЩЕНИЙ: ${messages.length} / 16`;
+
+    if (!messages.length) {
+      container.innerHTML = '<div style="color:#886600;text-align:center;padding:40px;">НЕТ СООБЩЕНИЙ. НАЧНИТЕ ОБЩЕНИЕ.</div>';
+      return;
+    }
+
+    container.innerHTML = '';
+    messages.forEach(msg => {
+      const div = document.createElement('div');
+      div.className = 'chat-msg ' + (msg.from === currentUser ? 'mine' : 'their');
+      div.innerHTML = `<div class="msg-sender">${msg.from === currentUser ? 'ВЫ' : msg.from}</div><div class="msg-text">${msg.text}</div><div class="msg-time">${msg.time}</div>`;
+      container.appendChild(div);
+    });
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function sendChatMessage() {
+    if (isGuest()) { alert('ГОСТИ НЕ МОГУТ ОТПРАВЛЯТЬ СООБЩЕНИЯ!'); return; }
+    const chatWith = document.getElementById('chatWith').value;
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+
+    if (!chatWith) { alert('ВЫБЕРИТЕ СОБЕСЕДНИКА!'); return; }
+    if (!text) return;
+    if (text.length > 400) { alert('МАКСИМУМ 400 СИМВОЛОВ!'); return; }
+
+    const chatKey = getChatKey(currentUser, chatWith);
+    if (!chatMessages[chatKey]) chatMessages[chatKey] = [];
+
+    if (chatMessages[chatKey].length >= 16) {
+      alert('ДОСТИГНУТ ЛИМИТ В 16 СООБЩЕНИЙ! ОЧИСТИТЕ ЧАТ.');
+      return;
+    }
+
+    chatMessages[chatKey].push({
+      from: currentUser,
+      text: text,
+      time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+    });
+
+    db.ref('chatMessages').set(chatMessages);
+    input.value = '';
+    renderChat();
+    playTypingSound();
+  }
+
+  function clearCurrentChat() {
+    const chatWith = document.getElementById('chatWith').value;
+    if (!chatWith) { alert('ВЫБЕРИТЕ СОБЕСЕДНИКА!'); return; }
+    if (!confirm('ОЧИСТИТЬ ИСТОРИЮ ЧАТА?')) return;
+
+    const chatKey = getChatKey(currentUser, chatWith);
+    delete chatMessages[chatKey];
+    db.ref('chatMessages').set(chatMessages);
+    renderChat();
+    playClickSound();
+  }
+
+  document.getElementById('chatSendBtn')?.addEventListener('click', sendChatMessage);
+  document.getElementById('chatInput')?.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') sendChatMessage();
+  });
+  document.getElementById('chatClearBtn')?.addEventListener('click', clearCurrentChat);
+  document.getElementById('chatWith')?.addEventListener('change', renderChat);
+
+  // ============ ПОЧТА ============
+  function renderMailInbox() {
+    if (isGuest()) { document.getElementById('mailContent').innerHTML = '<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ПРОСМАТРИВАТЬ ПОЧТУ</div>'; return; }
+    const inbox = mails.filter(m => m.to === currentUser || m.to === '' || m.to === 'all');
+    let html = '';
+    if (!inbox.length) html = '<div style="color:#667799;padding:20px;">НЕТ ВХОДЯЩИХ</div>';
+    else { [...inbox].reverse().forEach(m => { html += `<div class="mail-card${m.read ? '' : ' unread'}" onclick="openMail('${m.id}')"><div class="mail-from">ОТ: ${m.from}</div><div class="mail-subject">${m.subject}</div><div class="mail-date">${m.date}</div></div>`; }); }
+    document.getElementById('mailContent').innerHTML = html;
+  }
+
+  function renderMailSent() {
+    if (isGuest()) { document.getElementById('mailContent').innerHTML = '<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ПРОСМАТРИВАТЬ ПОЧТУ</div>'; return; }
+    const sent = mails.filter(m => m.from === currentUser);
+    let html = '';
+    if (!sent.length) html = '<div style="color:#667799;padding:20px;">НЕТ ОТПРАВЛЕННЫХ</div>';
+    else { [...sent].reverse().forEach(m => { html += `<div class="mail-card" onclick="openMail('${m.id}')"><div class="mail-from">КОМУ: ${m.to || 'ВСЕМ'}</div><div class="mail-subject">${m.subject}</div><div class="mail-date">${m.date}</div></div>`; }); }
+    document.getElementById('mailContent').innerHTML = html;
+  }
+
+  function renderMailWrite() {
+    if (isGuest()) { document.getElementById('mailContent').innerHTML = '<div style="color:#667799;text-align:center;padding:20px;">⚠ ГОСТИ НЕ МОГУТ ОТПРАВЛЯТЬ СООБЩЕНИЯ</div>'; return; }
+    let opts = '<option value="">ВСЕМ</option>';
+    members.forEach(m => { opts += `<option value="${m.name}">${m.name}</option>`; });
+    document.getElementById('mailContent').innerHTML = `<div class="application-form" style="border-color:#44aaff;"><div class="app-field"><span class="app-label" style="color:#88aaff;">КОМУ:</span><select class="app-input" id="mailTo" style="color:#88ccff;">${opts}</select></div><div class="app-field"><span class="app-label" style="color:#88aaff;">ТЕМА:</span><input type="text" class="app-input" id="mailSubject" style="border-color:#44aaff;color:#88ccff;"></div><div class="app-field"><span class="app-label" style="color:#88aaff;">СООБЩЕНИЕ:</span><textarea class="app-textarea" id="mailBody" style="border-color:#44aaff;color:#88ccff;"></textarea></div><button class="app-submit" id="mailSendBtn" style="border-color:#44aaff;color:#44aaff;">■ ОТПРАВИТЬ</button></div>`;
+    document.getElementById('mailSendBtn').addEventListener('click', () => {
+      const to = document.getElementById('mailTo').value, subject = document.getElementById('mailSubject').value.trim() || 'БЕЗ ТЕМЫ', body = document.getElementById('mailBody').value.trim();
+      if (!body) { alert('ТЕКСТ!'); return; }
+      mails.push({ id: Date.now().toString(), from: currentUser, to, subject, body, date: new Date().toLocaleString('ru-RU'), read: false });
+      db.ref('mails').set(mails);
+      alert('ОТПРАВЛЕНО!'); playSuccessSound();
+    });
+  }
+
+  window.openMail = function(id) {
+    if (isGuest()) return;
+    const m = mails.find(x => x.id === id); if (!m) return;
+    if (!m.read) { m.read = true; db.ref('mails').set(mails); }
+    document.getElementById('mailViewName').textContent = m.subject;
+    document.getElementById('mailViewDate').textContent = `ОТ: ${m.from} | ${m.date}`;
+    document.getElementById('mailViewContent').innerHTML = `<div class="profile-text">${m.body.replace(/\n/g, '<br>')}</div>`;
     document.getElementById('mailViewOverlay').classList.remove('hidden');
   };
 
-  document.getElementById('mailViewClose')?.addEventListener('click',()=>document.getElementById('mailViewOverlay').classList.add('hidden'));
+  document.getElementById('mailViewClose')?.addEventListener('click', () => document.getElementById('mailViewOverlay').classList.add('hidden'));
+  document.querySelectorAll('.mail-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('.mail-tab').forEach(t => t.classList.remove('active')); tab.classList.add('active'); if (tab.dataset.mailTab === 'inbox') renderMailInbox(); else if (tab.dataset.mailTab === 'sent') renderMailSent(); else if (tab.dataset.mailTab === 'write') renderMailWrite(); }); });
 
-  document.querySelectorAll('.mail-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.mail-tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');if(tab.dataset.mailTab==='inbox')renderMailInbox();else if(tab.dataset.mailTab==='sent')renderMailSent();else if(tab.dataset.mailTab==='write')renderMailWrite();});});
+  function updateAppBadge() { const b = document.getElementById('appBadge'); if (b) { b.textContent = applications.length; b.classList.toggle('show', applications.length > 0 && !isGuest()); } }
+  function updateMarquee() { const bar = document.getElementById('marqueeBar'), t = document.getElementById('marqueeText'); if (bar && t) { if (marqueeText) { bar.classList.add('show'); t.textContent = '⚠ ' + marqueeText + ' ⚠'; } else { bar.classList.remove('show'); } } }
 
-  function updateAppBadge(){const b=document.getElementById('appBadge');if(b){b.textContent=applications.length;b.classList.toggle('show',applications.length>0&&!isGuest());}}
-  function updateMarquee(){const bar=document.getElementById('marqueeBar'),t=document.getElementById('marqueeText');if(bar&&t){if(marqueeText){bar.classList.add('show');t.textContent='⚠ '+marqueeText+' ⚠';}else{bar.classList.remove('show');}}}
-
-  function loadData(){
+  function loadData() {
     document.getElementById('syncIndicator').classList.add('visible');
-    db.ref('members').on('value',sn=>{if(sn.exists()){members=sn.val();renderM();updateLoginForm();}});
-    db.ref('tasks').on('value',sn=>{if(sn.exists()){tasks=sn.val();renderT();}});
-    db.ref('system').on('value',sn=>{if(sn.exists()){sys=sn.val();renderSys();}});
-    db.ref('drones').on('value',sn=>{if(sn.exists()){drones=sn.val();}else{db.ref('drones').set(DEFDRONES);}renderDrones();});
-    db.ref('applications').on('value',sn=>{applications=sn.exists()?sn.val():[];updateAppBadge();});
-    db.ref('events').on('value',sn=>{events=sn.exists()?sn.val():[];renderEvents();});
-    db.ref('radioMessages').on('value',sn=>{radioMessages=sn.exists()?sn.val():{...DEFRADIO};updateFreqDisplay();});
-    db.ref('mails').on('value',sn=>{mails=sn.exists()?sn.val():[];});
-    db.ref('marquee').on('value',sn=>{marqueeText=sn.exists()?sn.val():'';updateMarquee();});
-    db.ref('accessCodes').on('value',sn=>{accessCodes=sn.exists()?sn.val():{};});
-    db.ref('wallets').on('value',sn=>{wallets=sn.exists()?sn.val():{};updateCapsDisplay();});
+    db.ref('members').on('value', sn => { if (sn.exists()) { members = sn.val(); renderM(); updateLoginForm(); updateChatSelect(); } });
+    db.ref('tasks').on('value', sn => { if (sn.exists()) { tasks = sn.val(); renderT(); } });
+    db.ref('system').on('value', sn => { if (sn.exists()) { sys = sn.val(); renderSys(); } });
+    db.ref('drones').on('value', sn => { if (sn.exists()) { drones = sn.val(); } else { db.ref('drones').set(DEFDRONES); } renderDrones(); });
+    db.ref('applications').on('value', sn => { applications = sn.exists() ? sn.val() : []; updateAppBadge(); });
+    db.ref('events').on('value', sn => { events = sn.exists() ? sn.val() : []; renderEvents(); });
+    db.ref('radioMessages').on('value', sn => { radioMessages = sn.exists() ? sn.val() : {...DEFRADIO}; updateFreqDisplay(); });
+    db.ref('mails').on('value', sn => { mails = sn.exists() ? sn.val() : []; });
+    db.ref('marquee').on('value', sn => { marqueeText = sn.exists() ? sn.val() : ''; updateMarquee(); });
+    db.ref('accessCodes').on('value', sn => { accessCodes = sn.exists() ? sn.val() : {}; });
+    db.ref('wallets').on('value', sn => { wallets = sn.exists() ? sn.val() : {}; updateCapsDisplay(); });
+    db.ref('chatMessages').on('value', sn => { chatMessages = sn.exists() ? sn.val() : {}; renderChat(); });
   }
 
-  function renderM(){const t=document.getElementById('clanMembersBody');if(!t)return;t.innerHTML='';members.forEach((m,i)=>{const tr=document.createElement('tr');tr.innerHTML=isMobile?`<td>${m.name}</td><td>${m.role}</td>`:`<td>${m.name}</td><td>${m.role}</td><td>${m.status||'Активен'}</td>`;tr.style.cursor='pointer';tr.addEventListener('click',()=>{if(!isGuest())openProfile(i);});t.appendChild(tr);});}
-  function renderT(){const t=document.getElementById('tasksTableBody');if(!t)return;t.innerHTML='';if(!tasks.length){t.innerHTML=isMobile?'<tr><td colspan="2">НЕТ ЗАДАЧ</td></tr>':'<tr><td colspan="3">НЕТ ЗАДАЧ</td></tr>';return;}tasks.forEach(td=>{const tr=document.createElement('tr');tr.innerHTML=isMobile?`<td>${td.id}</td><td>${td.description}</td>`:`<td>${td.id}</td><td>${td.description}</td><td>${td.deadline}</td>`;t.appendChild(tr);});}
-  function openProfile(i){if(isGuest())return;const m=members[i];if(!m)return;document.getElementById('profileName').textContent=m.name;document.getElementById('profileRole').textContent=m.role;document.getElementById('profileContent').innerHTML=m.profileHTML||'<div class="profile-text">[ НЕТ ДАННЫХ ]</div>';document.getElementById('profileOverlay').classList.remove('hidden');}
-  function updateFreqDisplay(){const f=parseFloat(document.getElementById('freqSlider')?.value||114).toFixed(1);document.getElementById('freqDisplay').textContent=f+' МГц';document.getElementById('interceptMessage').textContent=radioMessages[f]||'[ ШУМ ]';}
-  function updateCapsDisplay(){const el=document.getElementById('capsIndicator');if(el&&currentUser&&!isGuest()){el.textContent='💰 '+(wallets[currentUser]||0)+' кр.';el.classList.add('show');}else el?.classList.remove('show');}
+  function renderM() { const t = document.getElementById('clanMembersBody'); if (!t) return; t.innerHTML = ''; members.forEach((m, i) => { const tr = document.createElement('tr'); tr.innerHTML = isMobile ? `<td>${m.name}</td><td>${m.role}</td>` : `<td>${m.name}</td><td>${m.role}</td><td>${m.status || 'Активен'}</td>`; tr.style.cursor = 'pointer'; tr.addEventListener('click', () => { if (!isGuest()) openProfile(i); }); t.appendChild(tr); }); }
+  function renderT() { const t = document.getElementById('tasksTableBody'); if (!t) return; t.innerHTML = ''; if (!tasks.length) { t.innerHTML = isMobile ? '<tr><td colspan="2">НЕТ ЗАДАЧ</td></tr>' : '<tr><td colspan="3">НЕТ ЗАДАЧ</td></tr>'; return; } tasks.forEach(td => { const tr = document.createElement('tr'); tr.innerHTML = isMobile ? `<td>${td.id}</td><td>${td.description}</td>` : `<td>${td.id}</td><td>${td.description}</td><td>${td.deadline}</td>`; t.appendChild(tr); }); }
+  function openProfile(i) { if (isGuest()) return; const m = members[i]; if (!m) return; document.getElementById('profileName').textContent = m.name; document.getElementById('profileRole').textContent = m.role; document.getElementById('profileContent').innerHTML = m.profileHTML || '<div class="profile-text">[ НЕТ ДАННЫХ ]</div>'; document.getElementById('profileOverlay').classList.remove('hidden'); }
+  function updateFreqDisplay() { const f = parseFloat(document.getElementById('freqSlider')?.value || 114).toFixed(1); document.getElementById('freqDisplay').textContent = f + ' МГц'; document.getElementById('interceptMessage').textContent = radioMessages[f] || '[ ШУМ ]'; }
+  function updateCapsDisplay() { const el = document.getElementById('capsIndicator'); if (el && currentUser && !isGuest()) { el.textContent = '💰 ' + (wallets[currentUser] || 0) + ' кр.'; el.classList.add('show'); } else el?.classList.remove('show'); }
 
-  document.getElementById('profileClose').addEventListener('click',()=>document.getElementById('profileOverlay').classList.add('hidden'));
-  document.getElementById('profileOverlay').addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden');});
+  document.getElementById('profileClose').addEventListener('click', () => document.getElementById('profileOverlay').classList.add('hidden'));
+  document.getElementById('profileOverlay').addEventListener('click', function(e) { if (e.target === this) this.classList.add('hidden'); });
 
-  function updateLoginForm(){
-    const s=document.getElementById('loginUserSelect');
-    s.innerHTML='<option value="">— ВЫБЕРИТЕ —</option>';
-    members.forEach(m=>{const o=document.createElement('option');o.value=m.name;o.textContent=m.name;s.appendChild(o);});
+  function updateLoginForm() {
+    const s = document.getElementById('loginUserSelect');
+    s.innerHTML = '<option value="">— ВЫБЕРИТЕ —</option>';
+    members.forEach(m => { const o = document.createElement('option'); o.value = m.name; o.textContent = m.name; s.appendChild(o); });
   }
 
-  function doLogin(){
-    const name=document.getElementById('loginUserSelect').value;
-    const pass=document.getElementById('loginPassInput').value;
-    if(!name||pass.length<3)return;
-    if(!accessCodes[name]||accessCodes[name]==='0000'){accessCodes[name]=pass;db.ref('accessCodes').set(accessCodes);completeLogin(name);}
-    else if(accessCodes[name]===pass){completeLogin(name);}
-    else{alert('НЕВЕРНЫЙ КОД');}
+  function doLogin() {
+    const name = document.getElementById('loginUserSelect').value;
+    const pass = document.getElementById('loginPassInput').value;
+    if (!name || pass.length < 3) return;
+    if (!accessCodes[name] || accessCodes[name] === '0000') { accessCodes[name] = pass; db.ref('accessCodes').set(accessCodes); completeLogin(name); }
+    else if (accessCodes[name] === pass) { completeLogin(name); }
+    else { alert('НЕВЕРНЫЙ КОД'); playErrorSound(); }
   }
 
-  function completeLogin(name){
-    currentUser=name;
-    localStorage.setItem('oidl_current_user',name);
+  function completeLogin(name) {
+    currentUser = name;
+    localStorage.setItem('oidl_current_user', name);
     document.getElementById('loginOverlay').classList.add('hidden');
-    document.getElementById('mainTerminal').style.display='flex';
-    document.getElementById('guestWarning').style.display='none';
-    updateUserUI();updateCapsDisplay();
+    document.getElementById('mainTerminal').style.display = 'flex';
+    document.getElementById('guestWarning').style.display = 'none';
+    updateUserUI(); updateCapsDisplay();
     document.querySelector('.nav-item').click();
-    playBeep();
+    playSuccessSound();
   }
 
-  function guestLogin(){
-    currentUser='ГОСТЬ';
-    localStorage.setItem('oidl_current_user','ГОСТЬ');
+  function guestLogin() {
+    currentUser = 'ГОСТЬ';
+    localStorage.setItem('oidl_current_user', 'ГОСТЬ');
     document.getElementById('loginOverlay').classList.add('hidden');
-    document.getElementById('mainTerminal').style.display='flex';
-    document.getElementById('guestWarning').style.display='block';
+    document.getElementById('mainTerminal').style.display = 'flex';
+    document.getElementById('guestWarning').style.display = 'block';
     updateUserUI();
     document.querySelector('.nav-item').click();
-    playBeep();
+    playSuccessSound();
   }
 
-  function logout(){
-    currentUser=null;isAdmin=false;
+  function logout() {
+    currentUser = null; isAdmin = false;
     localStorage.removeItem('oidl_current_user');
-    document.getElementById('mainTerminal').style.display='none';
+    document.getElementById('mainTerminal').style.display = 'none';
     document.getElementById('loginOverlay').classList.remove('hidden');
-    document.getElementById('loginUserSelect').value='';
-    document.getElementById('loginPassInput').value='';
-    document.getElementById('guestWarning').style.display='none';
+    document.getElementById('loginUserSelect').value = '';
+    document.getElementById('loginPassInput').value = '';
+    document.getElementById('guestWarning').style.display = 'none';
     updateUserUI();
+    playClickSound();
   }
 
-  function updateUserUI(){
-    const i=document.getElementById('userIndicator'),l=document.getElementById('logoutBtn'),c=document.getElementById('capsIndicator');
-    if(currentUser){i.textContent='👤 '+currentUser.toUpperCase();i.classList.add('show');l.classList.add('show');}
-    else{i.classList.remove('show');l.classList.remove('show');c.classList.remove('show');}
+  function updateUserUI() {
+    const i = document.getElementById('userIndicator'), l = document.getElementById('logoutBtn'), c = document.getElementById('capsIndicator');
+    if (currentUser) { i.textContent = '👤 ' + currentUser.toUpperCase(); i.classList.add('show'); l.classList.add('show'); }
+    else { i.classList.remove('show'); l.classList.remove('show'); c.classList.remove('show'); }
   }
 
-  document.getElementById('loginConfirmBtn').addEventListener('click',doLogin);
-  document.getElementById('loginPassInput').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
-  document.getElementById('logoutBtn').addEventListener('click',logout);
-  document.getElementById('guestLoginBtn').addEventListener('click',guestLogin);
+  document.getElementById('loginConfirmBtn').addEventListener('click', doLogin);
+  document.getElementById('loginPassInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+  document.getElementById('guestLoginBtn').addEventListener('click', guestLogin);
 
-  document.querySelectorAll('.nav-item[data-tab]').forEach(n=>{n.addEventListener('click',()=>{document.querySelectorAll('.content-pane').forEach(p=>p.classList.add('hidden'));const tab=document.getElementById('tab-'+n.dataset.tab);if(tab){tab.classList.remove('hidden');if(n.dataset.tab==='mail')renderMailInbox();}document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.remove('active'));n.classList.add('active');});});
+  document.querySelectorAll('.nav-item[data-tab]').forEach(n => { n.addEventListener('click', () => { document.querySelectorAll('.content-pane').forEach(p => p.classList.add('hidden')); const tab = document.getElementById('tab-' + n.dataset.tab); if (tab) { tab.classList.remove('hidden'); if (n.dataset.tab === 'mail') renderMailInbox(); if (n.dataset.tab === 'chat') renderChat(); } document.querySelectorAll('.nav-item[data-tab]').forEach(x => x.classList.remove('active')); n.classList.add('active'); }); });
 
-  document.getElementById('appSubmitBtn')?.addEventListener('click',()=>{
-    const app={name:document.getElementById('appName').value.trim(),role:document.getElementById('appRole').value.trim(),date:new Date().toLocaleString('ru-RU'),fromGuest:isGuest()};
-    if(!app.name){alert('ИМЯ ОБЯЗАТЕЛЬНО!');return;}
-    applications.push(app);db.ref('applications').set(applications);
-    alert('ЗАЯВКА ОТПРАВЛЕНА!');playBeep();
+  document.getElementById('appSubmitBtn')?.addEventListener('click', () => {
+    const app = {
+      name: document.getElementById('appName').value.trim(),
+      gender: document.getElementById('appGender').value.trim(),
+      birth: document.getElementById('appBirth').value.trim(),
+      race: document.getElementById('appRace').value.trim(),
+      role: document.getElementById('appRole').value.trim(),
+      physical: document.getElementById('appPhysical').value.trim(),
+      specialization: document.getElementById('appSpecialization').value.trim(),
+      skills: document.getElementById('appSkills').value.trim(),
+      mentor: document.getElementById('appMentor').value.trim(),
+      history: document.getElementById('appHistory').value.trim(),
+      character: document.getElementById('appCharacter').value.trim(),
+      phobias: document.getElementById('appPhobias').value.trim(),
+      habits: document.getElementById('appHabits').value.trim(),
+      illnesses: document.getElementById('appIllnesses').value.trim(),
+      allergies: document.getElementById('appAllergies').value.trim(),
+      hobbies: document.getElementById('appHobbies').value.trim(),
+      goals: document.getElementById('appGoals').value.trim(),
+      date: new Date().toLocaleString('ru-RU'),
+      fromGuest: isGuest()
+    };
+    if (!app.name) { alert('ИМЯ ОБЯЗАТЕЛЬНО!'); return; }
+    applications.push(app); db.ref('applications').set(applications);
+    alert('ЗАЯВКА ОТПРАВЛЕНА!');
+    ['appName','appGender','appBirth','appRace','appRole','appPhysical','appSpecialization','appSkills','appMentor','appHistory','appCharacter','appPhobias','appHabits','appIllnesses','appAllergies','appHobbies','appGoals'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    playSuccessSound();
   });
 
-  // АДМИН
-  const ADMIN='pipboy42';
-  const adminBtn=document.getElementById('adminAccessBtn'),adminBadge=document.getElementById('adminBadge'),adminPanel=document.getElementById('adminPanel');
-  function setAdmin(a){isAdmin=a;adminBtn.classList.toggle('visible',a);adminBadge.classList.toggle('visible',a);if(!a)adminPanel.classList.add('hidden');}
-  adminBtn.addEventListener('click',()=>{if(!isAdmin)return;adminPanel.classList.remove('hidden');switchATab('members');playBeep();});
-  document.getElementById('adminClose').addEventListener('click',()=>adminPanel.classList.add('hidden'));
-  document.getElementById('commandInput').addEventListener('keydown',function(e){if(e.key==='Enter'){const c=e.target.value.trim().toLowerCase();if(c===ADMIN&&!isGuest()){setAdmin(true);alert('*** ДОСТУП РАЗРЕШЁН ***');playBeep();}else if(c==='logout')logout();e.target.value='';}});
-  window.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElementById('profileOverlay').classList.add('hidden');document.getElementById('mailViewOverlay').classList.add('hidden');adminPanel.classList.add('hidden');}});
+  // ============ АДМИН ============
+  const ADMIN = 'pipboy42';
+  const adminBtn = document.getElementById('adminAccessBtn'), adminBadge = document.getElementById('adminBadge'), adminPanel = document.getElementById('adminPanel');
+  function setAdmin(a) { isAdmin = a; adminBtn.classList.toggle('visible', a); adminBadge.classList.toggle('visible', a); if (!a) adminPanel.classList.add('hidden'); }
+  adminBtn.addEventListener('click', () => { if (!isAdmin) return; adminPanel.classList.remove('hidden'); switchATab('members'); playSuccessSound(); });
+  document.getElementById('adminClose').addEventListener('click', () => adminPanel.classList.add('hidden'));
+  document.getElementById('commandInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') { const c = e.target.value.trim().toLowerCase(); if (c === ADMIN && !isGuest()) { setAdmin(true); alert('*** ДОСТУП РАЗРЕШЁН ***'); playSuccessSound(); } else if (c === 'logout') logout(); e.target.value = ''; } });
+  window.addEventListener('keydown', e => { if (e.key === 'Escape') { document.getElementById('profileOverlay').classList.add('hidden'); document.getElementById('mailViewOverlay').classList.add('hidden'); adminPanel.classList.add('hidden'); } });
 
-  const adminTabs=document.querySelectorAll('.admin-tab'),adminContent=document.getElementById('adminContent');
-  function switchATab(t){adminTabs.forEach(tb=>tb.classList.toggle('active',tb.dataset.adminTab===t));if(t==='members')renderAM();else if(t==='access')renderAAccess();else if(t==='caps')renderACaps();else if(t==='tasks')renderAT();else if(t==='drones')renderADr();else if(t==='events')renderAEv();else if(t==='mail')renderAMail();else if(t==='marquee')renderAMarquee();else if(t==='apps')renderAApps();else if(t==='radio')renderARadio();else if(t==='system')renderAS();else if(t==='data')renderAD();}
-  adminTabs.forEach(t=>t.addEventListener('click',()=>switchATab(t.dataset.adminTab)));
+  const adminTabs = document.querySelectorAll('.admin-tab'), adminContent = document.getElementById('adminContent');
+  function switchATab(t) { adminTabs.forEach(tb => tb.classList.toggle('active', tb.dataset.adminTab === t)); if (t === 'members') renderAM(); else if (t === 'access') renderAAccess(); else if (t === 'caps') renderACaps(); else if (t === 'tasks') renderAT(); else if (t === 'drones') renderADr(); else if (t === 'events') renderAEv(); else if (t === 'mail') renderAMail(); else if (t === 'marquee') renderAMarquee(); else if (t === 'apps') renderAApps(); else if (t === 'radio') renderARadio(); else if (t === 'system') renderAS(); else if (t === 'data') renderAD(); }
+  adminTabs.forEach(t => t.addEventListener('click', () => switchATab(t.dataset.adminTab)));
 
   // ADMIN: CAPS
-  function renderACaps(){adminContent.innerHTML=`<div class="admin-member-list" id="adminCapsList"></div><div style="display:flex;gap:8px;"><input type="text" class="admin-input" id="capsUser" placeholder="ИМЯ"><input type="number" class="admin-input" id="capsAmount" placeholder="СУММА"><button class="admin-btn save-btn" id="capsAdd">■ НАЧИСЛИТЬ</button><button class="admin-btn" id="capsRemove">■ СПИСАТЬ</button></div>`;renderACapsList();document.getElementById('capsAdd').addEventListener('click',()=>modifyCaps(1));document.getElementById('capsRemove').addEventListener('click',()=>modifyCaps(-1));}
-  function renderACapsList(){const l=document.getElementById('adminCapsList');if(!l)return;l.innerHTML='';members.forEach(m=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${m.name}</span><span style="color:#ffaa00;">💰 ${wallets[m.name]||0} кр.</span>`;l.appendChild(d);});}
-  function modifyCaps(dir){const n=document.getElementById('capsUser').value.trim();const a=parseInt(document.getElementById('capsAmount').value)||0;if(!n||!a)return;if(!wallets[n])wallets[n]=0;wallets[n]+=a*dir;if(wallets[n]<0)wallets[n]=0;db.ref('wallets').set(wallets);updateCapsDisplay();renderACapsList();}
+  function renderACaps() { adminContent.innerHTML = `<div class="admin-member-list" id="adminCapsList"></div><div style="display:flex;gap:8px;"><input type="text" class="admin-input" id="capsUser" placeholder="ИМЯ"><input type="number" class="admin-input" id="capsAmount" placeholder="СУММА"><button class="admin-btn save-btn" id="capsAdd">■ НАЧИСЛИТЬ</button><button class="admin-btn" id="capsRemove">■ СПИСАТЬ</button></div>`; renderACapsList(); document.getElementById('capsAdd').addEventListener('click', () => modifyCaps(1)); document.getElementById('capsRemove').addEventListener('click', () => modifyCaps(-1)); }
+  function renderACapsList() { const l = document.getElementById('adminCapsList'); if (!l) return; l.innerHTML = ''; members.forEach(m => { const d = document.createElement('div'); d.className = 'admin-list-item'; d.innerHTML = `<span>${m.name}</span><span style="color:#ffaa00;">💰 ${wallets[m.name] || 0} кр.</span>`; l.appendChild(d); }); }
+  function modifyCaps(dir) { const n = document.getElementById('capsUser').value.trim(); const a = parseInt(document.getElementById('capsAmount').value) || 0; if (!n || !a) return; if (!wallets[n]) wallets[n] = 0; wallets[n] += a * dir; if (wallets[n] < 0) wallets[n] = 0; db.ref('wallets').set(wallets); updateCapsDisplay(); renderACapsList(); }
 
   // ADMIN: ACCESS
-  function renderAAccess(){adminContent.innerHTML=`<div class="admin-member-list" id="adminAccessList"></div>`;renderAAccessList();}
-  function renderAAccessList(){const l=document.getElementById('adminAccessList');if(!l)return;l.innerHTML='';members.forEach(m=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${m.name}</span><span style="color:#ffaa00;">🔑 ${accessCodes[m.name]||'0000'}</span><span><button onclick="window._resetPass('${m.name}')">СБРОС</button></span>`;l.appendChild(d);});}
-  window._resetPass=function(n){if(confirm('Сбросить?')){accessCodes[n]='0000';db.ref('accessCodes').set(accessCodes);renderAAccessList();}};
+  function renderAAccess() { adminContent.innerHTML = `<div class="admin-member-list" id="adminAccessList"></div>`; renderAAccessList(); }
+  function renderAAccessList() { const l = document.getElementById('adminAccessList'); if (!l) return; l.innerHTML = ''; members.forEach(m => { const d = document.createElement('div'); d.className = 'admin-list-item'; d.innerHTML = `<span>${m.name}</span><span style="color:#ffaa00;">🔑 ${accessCodes[m.name] || '0000'}</span><span><button onclick="window._resetPass('${m.name}')">СБРОС</button></span>`; l.appendChild(d); }); }
+  window._resetPass = function(n) { if (confirm('Сбросить?')) { accessCodes[n] = '0000'; db.ref('accessCodes').set(accessCodes); renderAAccessList(); } };
 
-  // ADMIN: MAIL, MARQUEE, EVENTS, APPS, DRONES, RADIO, SYSTEM, MEMBERS, TASKS, DATA (сокращённо)
-  function renderAMail(){adminContent.innerHTML=`<div class="admin-member-list" id="adminMailList"></div>`;renderAMailList();}
-  function renderAMailList(){const l=document.getElementById('adminMailList');if(!l)return;l.innerHTML='';if(!mails.length){l.innerHTML='<div style="color:#667799;padding:10px;">НЕТ</div>';return;}[...mails].reverse().forEach(m=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${m.from}→${m.to||'ВСЕМ'}</span><span>${m.subject}</span><span><button onclick="window._delMail(${mails.indexOf(m)})">УДЛ</button></span>`;l.appendChild(d);});}
-  window._delMail=function(i){if(confirm('Удалить?')){mails.splice(i,1);db.ref('mails').set(mails);renderAMailList();}};
+  // ADMIN: MAIL
+  function renderAMail() { adminContent.innerHTML = `<div class="admin-member-list" id="adminMailList"></div>`; renderAMailList(); }
+  function renderAMailList() { const l = document.getElementById('adminMailList'); if (!l) return; l.innerHTML = ''; if (!mails.length) { l.innerHTML = '<div style="color:#667799;padding:10px;">НЕТ</div>'; return; } [...mails].reverse().forEach(m => { const d = document.createElement('div'); d.className = 'admin-list-item'; d.innerHTML = `<span>${m.from}→${m.to || 'ВСЕМ'}</span><span>${m.subject}</span><span><button onclick="window._delMail(${mails.indexOf(m)})">УДЛ</button></span>`; l.appendChild(d); }); }
+  window._delMail = function(i) { if (confirm('Удалить?')) { mails.splice(i, 1); db.ref('mails').set(mails); renderAMailList(); } };
 
-  function renderAMarquee(){adminContent.innerHTML=`<input type="text" class="admin-input" id="marqueeInput" value="${marqueeText}"><button class="admin-btn save-btn" id="marqueeSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="marqueeClear">■ ОЧИСТИТЬ</button>`;document.getElementById('marqueeSave').addEventListener('click',()=>{marqueeText=document.getElementById('marqueeInput').value.trim();db.ref('marquee').set(marqueeText);updateMarquee();});document.getElementById('marqueeClear').addEventListener('click',()=>{marqueeText='';db.ref('marquee').set('');updateMarquee();});}
+  // ADMIN: MARQUEE
+  function renderAMarquee() { adminContent.innerHTML = `<input type="text" class="admin-input" id="marqueeInput" value="${marqueeText}"><button class="admin-btn save-btn" id="marqueeSave">■ СОХРАНИТЬ</button><button class="admin-btn" id="marqueeClear">■ ОЧИСТИТЬ</button>`; document.getElementById('marqueeSave').addEventListener('click', () => { marqueeText = document.getElementById('marqueeInput').value.trim(); db.ref('marquee').set(marqueeText); updateMarquee(); }); document.getElementById('marqueeClear').addEventListener('click', () => { marqueeText = ''; db.ref('marquee').set(''); updateMarquee(); }); }
 
-  function renderAEv(){adminContent.innerHTML=`<div class="admin-member-list" id="adminEventList"></div><input type="date" class="admin-input" id="evDate"><input type="time" class="admin-input" id="evTime"><input type="text" class="admin-input" id="evTitle"><textarea class="admin-textarea" id="evDesc"></textarea><input type="hidden" id="evEditIdx" value="-1"><button class="admin-btn save-btn" id="evSave">■ СОХРАНИТЬ</button>`;renderAEvList();document.getElementById('evSave').addEventListener('click',saveEvent);}
-  function renderAEvList(){const l=document.getElementById('adminEventList');if(!l)return;l.innerHTML='';events.forEach((e,i)=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${e.date}</span><span>${e.title}</span><span><button onclick="window._eEv(${i})">Р</button><button onclick="window._dEv(${i})">У</button></span>`;l.appendChild(d);});}
-  window._eEv=function(i){const e=events[i];document.getElementById('evDate').value=e.date;document.getElementById('evTime').value=e.time;document.getElementById('evTitle').value=e.title;document.getElementById('evDesc').value=e.description;document.getElementById('evEditIdx').value=i;};
-  window._dEv=function(i){if(confirm('Удалить?')){events.splice(i,1);db.ref('events').set(events);renderEvents();renderAEvList();}};
-  function saveEvent(){const d=document.getElementById('evDate').value,t=document.getElementById('evTime').value,ti=document.getElementById('evTitle').value.trim(),de=document.getElementById('evDesc').value.trim();if(!d||!ti)return;const ei=parseInt(document.getElementById('evEditIdx').value);if(ei>=0)events[ei]={date:d,time:t||'00:00',title:ti,description:de};else events.push({date:d,time:t||'00:00',title:ti,description:de});db.ref('events').set(events);renderEvents();renderAEvList();}
+  // ADMIN: EVENTS
+  function renderAEv() { adminContent.innerHTML = `<div class="admin-member-list" id="adminEventList"></div><input type="date" class="admin-input" id="evDate"><input type="time" class="admin-input" id="evTime"><input type="text" class="admin-input" id="evTitle"><textarea class="admin-textarea" id="evDesc"></textarea><input type="hidden" id="evEditIdx" value="-1"><button class="admin-btn save-btn" id="evSave">■ СОХРАНИТЬ</button>`; renderAEvList(); document.getElementById('evSave').addEventListener('click', saveEvent); }
+  function renderAEvList() { const l = document.getElementById('adminEventList'); if (!l) return; l.innerHTML = ''; events.forEach((e, i) => { const d = document.createElement('div'); d.className = 'admin-list-item'; d.innerHTML = `<span>${e.date}</span><span>${e.title}</span><span><button onclick="window._eEv(${i})">Р</button><button onclick="window._dEv(${i})">У</button></span>`; l.appendChild(d); }); }
+  window._eEv = function(i) { const e = events[i]; document.getElementById('evDate').value = e.date; document.getElementById('evTime').value = e.time; document.getElementById('evTitle').value = e.title; document.getElementById('evDesc').value = e.description; document.getElementById('evEditIdx').value = i; };
+  window._dEv = function(i) { if (confirm('Удалить?')) { events.splice(i, 1); db.ref('events').set(events); renderEvents(); renderAEvList(); } };
+  function saveEvent() { const d = document.getElementById('evDate').value, t = document.getElementById('evTime').value, ti = document.getElementById('evTitle').value.trim(), de = document.getElementById('evDesc').value.trim(); if (!d || !ti) return; const ei = parseInt(document.getElementById('evEditIdx').value); if (ei >= 0) events[ei] = { date: d, time: t || '00:00', title: ti, description: de }; else events.push({ date: d, time: t || '00:00', title: ti, description: de }); db.ref('events').set(events); renderEvents(); renderAEvList(); }
 
-  function renderAApps(){adminContent.innerHTML=`<div class="admin-member-list" id="adminAppList"></div>`;renderAAppList();}
-  function renderAAppList(){const l=document.getElementById('adminAppList');if(!l)return;l.innerHTML='';if(!applications.length){l.innerHTML='<div style="color:#ffaa00;padding:10px;">НЕТ ЗАЯВОК</div>';return;}applications.forEach((a,i)=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span style="color:#ffaa00;">${a.name}${a.fromGuest?' ⚠':''}</span><span><button onclick="window._acceptApp(${i})">✓</button><button onclick="window._rejectApp(${i})">✕</button></span>`;l.appendChild(d);});}
-  window._acceptApp=function(i){const a=applications[i];if(confirm('Принять?')){members.push({name:a.name,role:a.role||'Рекрут',status:'Активен',profileHTML:`<div>${a.name}</div>`});db.ref('members').set(members);applications.splice(i,1);db.ref('applications').set(applications);renderM();renderAAppList();}};
-  window._rejectApp=function(i){if(confirm('Отклонить?')){applications.splice(i,1);db.ref('applications').set(applications);renderAAppList();}};
+  // ADMIN: APPS
+  function renderAApps() { adminContent.innerHTML = `<div class="admin-member-list" id="adminAppList"></div>`; renderAAppList(); }
+  function renderAAppList() { const l = document.getElementById('adminAppList'); if (!l) return; l.innerHTML = ''; if (!applications.length) { l.innerHTML = '<div style="color:#ffaa00;padding:10px;">НЕТ ЗАЯВОК</div>'; return; } applications.forEach((a, i) => { const d = document.createElement('div'); d.className = 'admin-list-item'; d.innerHTML = `<span style="color:#ffaa00;">${a.name}${a.fromGuest ? ' ⚠' : ''}</span><span><button onclick="window._acceptApp(${i})">✓</button><button onclick="window._rejectApp(${i})">✕</button></span>`; l.appendChild(d); }); }
+  window._acceptApp = function(i) { const a = applications[i]; if (confirm('Принять?')) { members.push({ name: a.name, role: a.role || 'Рекрут', status: 'Активен', profileHTML: `<div>${a.name}</div>` }); db.ref('members').set(members); applications.splice(i, 1); db.ref('applications').set(applications); renderM(); renderAAppList(); } };
+  window._rejectApp = function(i) { if (confirm('Отклонить?')) { applications.splice(i, 1); db.ref('applications').set(applications); renderAAppList(); } };
 
-  function renderADr(){adminContent.innerHTML=`<div class="admin-member-list" id="adminDroneList"></div><input type="text" class="admin-input" id="drName"><input type="text" class="admin-input" id="drStatus"><input type="range" class="resource-slider" id="drHealth" min="0" max="100" value="85"><div id="drHealthVal">85%</div><input type="hidden" id="drEditIdx" value="-1"><button class="admin-btn save-btn" id="drSave">■ СОХРАНИТЬ</button>`;renderADrList();document.getElementById('drHealth').addEventListener('input',function(){document.getElementById('drHealthVal').textContent=this.value+'%';});document.getElementById('drSave').addEventListener('click',saveDrone);}
-  function renderADrList(){const l=document.getElementById('adminDroneList');if(!l)return;l.innerHTML='';drones.forEach((d,i)=>{const div=document.createElement('div');div.className='admin-list-item';div.innerHTML=`<span>${d.name}</span><span><button onclick="window._eDr(${i})">РЕД</button></span>`;l.appendChild(div);});}
-  window._eDr=function(i){const d=drones[i];document.getElementById('drName').value=d.name;document.getElementById('drStatus').value=d.status;document.getElementById('drHealth').value=d.health;document.getElementById('drHealthVal').textContent=d.health+'%';document.getElementById('drEditIdx').value=i;};
-  function saveDrone(){const n=document.getElementById('drName').value.trim(),s=document.getElementById('drStatus').value.trim(),h=parseInt(document.getElementById('drHealth').value);if(!n)return;const ei=parseInt(document.getElementById('drEditIdx').value);if(ei>=0)drones[ei]={name:n,status:s,health:h};db.ref('drones').set(drones);renderDrones();renderADrList();}
+  // ADMIN: DRONES
+  function renderADr() { adminContent.innerHTML = `<div class="admin-member-list" id="adminDroneList"></div><input type="text" class="admin-input" id="drName"><input type="text" class="admin-input" id="drStatus"><input type="range" class="resource-slider" id="drHealth" min="0" max="100" value="85"><div id="drHealthVal">85%</div><input type="hidden" id="drEditIdx" value="-1"><button class="admin-btn save-btn" id="drSave">■ СОХРАНИТЬ</button>`; renderADrList(); document.getElementById('drHealth').addEventListener('input', function() { document.getElementById('drHealthVal').textContent = this.value + '%'; }); document.getElementById('drSave').addEventListener('click', saveDrone); }
+  function renderADrList() { const l = document.getElementById('adminDroneList'); if (!l) return; l.innerHTML = ''; drones.forEach((d, i) => { const div = document.createElement('div'); div.className = 'admin-list-item'; div.innerHTML = `<span>${d.name}</span><span><button onclick="window._eDr(${i})">РЕД</button></span>`; l.appendChild(div); }); }
+  window._eDr = function(i) { const d = drones[i]; document.getElementById('drName').value = d.name; document.getElementById('drStatus').value = d.status; document.getElementById('drHealth').value = d.health; document.getElementById('drHealthVal').textContent = d.health + '%'; document.getElementById('drEditIdx').value = i; };
+  function saveDrone() { const n = document.getElementById('drName').value.trim(), s = document.getElementById('drStatus').value.trim(), h = parseInt(document.getElementById('drHealth').value); if (!n) return; const ei = parseInt(document.getElementById('drEditIdx').value); if (ei >= 0) drones[ei] = { name: n, status: s, health: h }; db.ref('drones').set(drones); renderDrones(); renderADrList(); }
 
-  function renderARadio(){adminContent.innerHTML=`<div class="admin-member-list" id="adminRadioList"></div><input type="number" class="admin-input" id="rFreq" step="0.1"><textarea class="admin-textarea" id="rMsg"></textarea><button class="admin-btn save-btn" id="rSave">■ СОХРАНИТЬ</button>`;renderARadioList();document.getElementById('rSave').addEventListener('click',saveRadio);}
-  function renderARadioList(){const l=document.getElementById('adminRadioList');if(!l)return;l.innerHTML='';Object.keys(radioMessages).forEach(f=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${f}</span><span><button onclick="window._eR('${f}')">Р</button><button onclick="window._dR('${f}')">У</button></span>`;l.appendChild(d);});}
-  window._eR=function(f){document.getElementById('rFreq').value=f;document.getElementById('rMsg').value=radioMessages[f];};
-  window._dR=function(f){if(confirm('Удалить?')){delete radioMessages[f];db.ref('radioMessages').set(radioMessages);updateFreqDisplay();renderARadioList();}};
-  function saveRadio(){const f=parseFloat(document.getElementById('rFreq').value).toFixed(1),m=document.getElementById('rMsg').value.trim();if(!f||!m)return;radioMessages[f]=m;db.ref('radioMessages').set(radioMessages);updateFreqDisplay();renderARadioList();}
+  // ADMIN: RADIO
+  function renderARadio() { adminContent.innerHTML = `<div class="admin-member-list" id="adminRadioList"></div><input type="number" class="admin-input" id="rFreq" step="0.1"><textarea class="admin-textarea" id="rMsg"></textarea><button class="admin-btn save-btn" id="rSave">■ СОХРАНИТЬ</button>`; renderARadioList(); document.getElementById('rSave').addEventListener('click', saveRadio); }
+  function renderARadioList() { const l = document.getElementById('adminRadioList'); if (!l) return; l.innerHTML = ''; Object.keys(radioMessages).forEach(f => { const d = document.createElement('div'); d.className = 'admin-list-item'; d.innerHTML = `<span>${f}</span><span><button onclick="window._eR('${f}')">Р</button><button onclick="window._dR('${f}')">У</button></span>`; l.appendChild(d); }); }
+  window._eR = function(f) { document.getElementById('rFreq').value = f; document.getElementById('rMsg').value = radioMessages[f]; };
+  window._dR = function(f) { if (confirm('Удалить?')) { delete radioMessages[f]; db.ref('radioMessages').set(radioMessages); updateFreqDisplay(); renderARadioList(); } };
+  function saveRadio() { const f = parseFloat(document.getElementById('rFreq').value).toFixed(1), m = document.getElementById('rMsg').value.trim(); if (!f || !m) return; radioMessages[f] = m; db.ref('radioMessages').set(radioMessages); updateFreqDisplay(); renderARadioList(); }
 
-  function renderAS(){adminContent.innerHTML=`<input type="range" class="resource-slider" id="sr" min="0" max="9" value="${sys.resources}"><div id="sp">${'◼'.repeat(sys.resources)+'◻'.repeat(9-sys.resources)}</div><input type="number" class="admin-input" id="sa" value="${sys.arsenal}"><input type="text" class="admin-input" id="sw" value="${sys.water}"><input type="text" class="admin-input" id="sl" value="${sys.activity}"><input type="text" class="admin-input" id="ss" value="${sys.sysMsg}"><button class="admin-btn save-btn" id="ssBtn">■ СОХРАНИТЬ</button>`;document.getElementById('sr').addEventListener('input',function(){document.getElementById('sp').textContent='◼'.repeat(parseInt(this.value))+'◻'.repeat(9-parseInt(this.value));});document.getElementById('ssBtn').addEventListener('click',()=>{sys.resources=parseInt(document.getElementById('sr').value);sys.arsenal=parseInt(document.getElementById('sa').value)||0;sys.water=document.getElementById('sw').value.trim();sys.activity=document.getElementById('sl').value.trim();sys.sysMsg=document.getElementById('ss').value.trim();db.ref('system').set(sys);renderSys();});}
+  // ADMIN: SYSTEM
+  function renderAS() { adminContent.innerHTML = `<input type="range" class="resource-slider" id="sr" min="0" max="9" value="${sys.resources}"><div id="sp">${'◼'.repeat(sys.resources) + '◻'.repeat(9 - sys.resources)}</div><input type="number" class="admin-input" id="sa" value="${sys.arsenal}"><input type="text" class="admin-input" id="sw" value="${sys.water}"><input type="text" class="admin-input" id="sl" value="${sys.activity}"><input type="text" class="admin-input" id="ss" value="${sys.sysMsg}"><button class="admin-btn save-btn" id="ssBtn">■ СОХРАНИТЬ</button>`; document.getElementById('sr').addEventListener('input', function() { document.getElementById('sp').textContent = '◼'.repeat(parseInt(this.value)) + '◻'.repeat(9 - parseInt(this.value)); }); document.getElementById('ssBtn').addEventListener('click', () => { sys.resources = parseInt(document.getElementById('sr').value); sys.arsenal = parseInt(document.getElementById('sa').value) || 0; sys.water = document.getElementById('sw').value.trim(); sys.activity = document.getElementById('sl').value.trim(); sys.sysMsg = document.getElementById('ss').value.trim(); db.ref('system').set(sys); renderSys(); }); }
 
-  function renderAM(){adminContent.innerHTML=`<div class="admin-member-list" id="adminMemberList"></div><input type="text" class="admin-input" id="aName"><input type="text" class="admin-input" id="aRole"><input type="text" class="admin-input" id="aStatus" value="Активен"><textarea class="admin-textarea" id="aProfile"></textarea><input type="hidden" id="aEditIdx" value="-1"><button class="admin-btn save-btn" id="mSave">■ СОХРАНИТЬ</button>`;renderAML();document.getElementById('mSave').addEventListener('click',saveM);}
-  function renderAML(){const l=document.getElementById('adminMemberList');if(!l)return;l.innerHTML='';members.forEach((m,i)=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${m.name}</span><span><button onclick="window._eM(${i})">Р</button><button onclick="window._dM(${i})">У</button></span>`;l.appendChild(d);});}
-  window._eM=function(i){const m=members[i];document.getElementById('aName').value=m.name;document.getElementById('aRole').value=m.role;document.getElementById('aStatus').value=m.status||'Активен';document.getElementById('aProfile').value=m.profileHTML||'';document.getElementById('aEditIdx').value=i;};
-  window._dM=function(i){if(confirm('Удалить?')){members.splice(i,1);db.ref('members').set(members);renderM();renderAML();}};
-  function saveM(){const n=document.getElementById('aName').value.trim(),r=document.getElementById('aRole').value.trim();if(!n||!r)return;const d={name:n,role:r,status:document.getElementById('aStatus').value.trim()||'Активен',profileHTML:document.getElementById('aProfile').value};const ei=parseInt(document.getElementById('aEditIdx').value);if(ei>=0)members[ei]=d;else members.push(d);db.ref('members').set(members);renderM();renderAML();}
+  // ADMIN: MEMBERS
+  function renderAM() { adminContent.innerHTML = `<div class="admin-member-list" id="adminMemberList"></div><input type="text" class="admin-input" id="aName"><input type="text" class="admin-input" id="aRole"><input type="text" class="admin-input" id="aStatus" value="Активен"><textarea class="admin-textarea" id="aProfile"></textarea><input type="hidden" id="aEditIdx" value="-1"><button class="admin-btn save-btn" id="mSave">■ СОХРАНИТЬ</button>`; renderAML(); document.getElementById('mSave').addEventListener('click', saveM); }
+  function renderAML() { const l = document.getElementById('adminMemberList'); if (!l) return; l.innerHTML = ''; members.forEach((m, i) => { const d = document.createElement('div'); d.className = 'admin-list-item'; d.innerHTML = `<span>${m.name}</span><span><button onclick="window._eM(${i})">Р</button><button onclick="window._dM(${i})">У</button></span>`; l.appendChild(d); }); }
+  window._eM = function(i) { const m = members[i]; document.getElementById('aName').value = m.name; document.getElementById('aRole').value = m.role; document.getElementById('aStatus').value = m.status || 'Активен'; document.getElementById('aProfile').value = m.profileHTML || ''; document.getElementById('aEditIdx').value = i; };
+  window._dM = function(i) { if (confirm('Удалить?')) { members.splice(i, 1); db.ref('members').set(members); renderM(); renderAML(); } };
+  function saveM() { const n = document.getElementById('aName').value.trim(), r = document.getElementById('aRole').value.trim(); if (!n || !r) return; const d = { name: n, role: r, status: document.getElementById('aStatus').value.trim() || 'Активен', profileHTML: document.getElementById('aProfile').value }; const ei = parseInt(document.getElementById('aEditIdx').value); if (ei >= 0) members[ei] = d; else members.push(d); db.ref('members').set(members); renderM(); renderAML(); }
 
-  function renderAT(){adminContent.innerHTML=`<div class="admin-member-list" id="adminTaskList"></div><input type="text" class="admin-input" id="tId"><input type="text" class="admin-input" id="tDesc"><input type="text" class="admin-input" id="tDead"><input type="hidden" id="tEditIdx" value="-1"><button class="admin-btn save-btn" id="tSave">■ СОХРАНИТЬ</button>`;renderATL();document.getElementById('tSave').addEventListener('click',saveT);}
-  function renderATL(){const l=document.getElementById('adminTaskList');if(!l)return;l.innerHTML='';tasks.forEach((t,i)=>{const d=document.createElement('div');d.className='admin-list-item';d.innerHTML=`<span>${t.id}</span><span><button onclick="window._eT(${i})">Р</button><button onclick="window._dT(${i})">У</button></span>`;l.appendChild(d);});}
-  window._eT=function(i){const t=tasks[i];document.getElementById('tId').value=t.id;document.getElementById('tDesc').value=t.description;document.getElementById('tDead').value=t.deadline;document.getElementById('tEditIdx').value=i;};
-  window._dT=function(i){if(confirm('Удалить?')){tasks.splice(i,1);db.ref('tasks').set(tasks);renderT();renderATL();}};
-  function saveT(){const id=document.getElementById('tId').value.trim(),d=document.getElementById('tDesc').value.trim(),dl=document.getElementById('tDead').value.trim();if(!id||!d||!dl)return;const ei=parseInt(document.getElementById('tEditIdx').value);if(ei>=0)tasks[ei]={id,description:d,deadline:dl};else tasks.push({id,description:d,deadline:dl});db.ref('tasks').set(tasks);renderT();renderATL();}
+  // ADMIN: TASKS
+  function renderAT() { adminContent.innerHTML = `<div class="admin-member-list" id="adminTaskList"></div><input type="text" class="admin-input" id="tId"><input type="text" class="admin-input" id="tDesc"><input type="text" class="admin-input" id="tDead"><input type="hidden" id="tEditIdx" value="-1"><button class="admin-btn save-btn" id="tSave">■ СОХРАНИТЬ</button>`; renderATL(); document.getElementById('tSave').addEventListener('click', saveT); }
+  function renderATL() { const l = document.getElementById('adminTaskList'); if (!l) return; l.innerHTML = ''; tasks.forEach((t, i) => { const d = document.createElement('div'); d.className = 'admin-list-item'; d.innerHTML = `<span>${t.id}</span><span><button onclick="window._eT(${i})">Р</button><button onclick="window._dT(${i})">У</button></span>`; l.appendChild(d); }); }
+  window._eT = function(i) { const t = tasks[i]; document.getElementById('tId').value = t.id; document.getElementById('tDesc').value = t.description; document.getElementById('tDead').value = t.deadline; document.getElementById('tEditIdx').value = i; };
+  window._dT = function(i) { if (confirm('Удалить?')) { tasks.splice(i, 1); db.ref('tasks').set(tasks); renderT(); renderATL(); } };
+  function saveT() { const id = document.getElementById('tId').value.trim(), d = document.getElementById('tDesc').value.trim(), dl = document.getElementById('tDead').value.trim(); if (!id || !d || !dl) return; const ei = parseInt(document.getElementById('tEditIdx').value); if (ei >= 0) tasks[ei] = { id, description: d, deadline: dl }; else tasks.push({ id, description: d, deadline: dl }); db.ref('tasks').set(tasks); renderT(); renderATL(); }
 
-  function renderAD(){adminContent.innerHTML=`<button class="admin-btn" id="expM">■ ЭКСПОРТ</button><textarea class="admin-textarea" id="impM"></textarea><button class="admin-btn" id="impMBtn">■ ИМПОРТ</button>`;document.getElementById('expM').addEventListener('click',()=>{navigator.clipboard.writeText(JSON.stringify(members,null,2));});document.getElementById('impMBtn').addEventListener('click',()=>{try{const d=JSON.parse(document.getElementById('impM').value);if(Array.isArray(d)){members=d;db.ref('members').set(members);renderM();}}catch(e){}});}
+  // ADMIN: DATA
+  function renderAD() { adminContent.innerHTML = `<button class="admin-btn" id="expM">■ ЭКСПОРТ</button><textarea class="admin-textarea" id="impM"></textarea><button class="admin-btn" id="impMBtn">■ ИМПОРТ</button>`; document.getElementById('expM').addEventListener('click', () => { navigator.clipboard.writeText(JSON.stringify(members, null, 2)); }); document.getElementById('impMBtn').addEventListener('click', () => { try { const d = JSON.parse(document.getElementById('impM').value); if (Array.isArray(d)) { members = d; db.ref('members').set(members); renderM(); } } catch(e) {} }); }
 
   // RADIO, VAULT
-  document.getElementById('freqSlider')?.addEventListener('input',updateFreqDisplay);
-  document.getElementById('scanBtn')?.addEventListener('click',()=>{let f=88;const iv=setInterval(()=>{const s=document.getElementById('freqSlider');s.value=f;updateFreqDisplay();f+=0.5;if(f>150)clearInterval(iv);},60);});
-  document.querySelectorAll('.vault-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.vault-btn').forEach(x=>x.classList.remove('active-floor'));b.classList.add('active-floor');const img=document.getElementById('vaultImage');if(img)img.src=`vault_floor_${parseInt(b.dataset.floor)+1}.png`;});});
+  document.getElementById('freqSlider')?.addEventListener('input', updateFreqDisplay);
+  document.getElementById('scanBtn')?.addEventListener('click', () => { let f = 88; const iv = setInterval(() => { const s = document.getElementById('freqSlider'); s.value = f; updateFreqDisplay(); f += 0.5; if (f > 150) clearInterval(iv); }, 60); });
+  document.querySelectorAll('.vault-btn').forEach(b => { b.addEventListener('click', () => { document.querySelectorAll('.vault-btn').forEach(x => x.classList.remove('active-floor')); b.classList.add('active-floor'); const img = document.getElementById('vaultImage'); if (img) img.src = `vault_floor_${parseInt(b.dataset.floor) + 1}.png`; }); });
 
-  window.addEventListener('resize',()=>{loginParticlesCanvas.width=window.innerWidth;loginParticlesCanvas.height=window.innerHeight;});
+  window.addEventListener('resize', () => { loginParticlesCanvas.width = window.innerWidth; loginParticlesCanvas.height = window.innerHeight; });
 
   loadData();
   setAdmin(false);
